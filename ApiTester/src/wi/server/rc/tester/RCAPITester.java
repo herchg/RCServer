@@ -8,59 +8,59 @@ package wi.server.rc.tester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.io.FileInputStream;
-import org.apache.http.client.methods.HttpGet;
 import wi.server.core.pattern.IExecutable;
-import wi.server.rc.tester.config.UrlsConfig;
+import wi.server.rc.tester.config.Config;
 
 /**
  *
  * @author hermeschang
  */
 public class RCAPITester implements IExecutable {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(RCAPITester.class);
 
-    protected UrlsConfig mConfig;
+    protected Config mConfig;
     protected int mThreadNum;
     protected int mCount;
-    
+
     public RCAPITester() {
     }
 
     protected void loadConfig(String path) {
         try {
-            mConfig = UrlsConfig.loadFromStream(new FileInputStream(path));
+            mConfig = Config.loadFromStream(new FileInputStream(path));
         } catch (Exception ex) {
-            logger.error("RCAPITester.loadConfig() exception={}", ex);
+            logger.error("loadConfig() exception={}", ex);
         }
-        
+
     }
-    
+
+    @Override
     public void execute() {
-        
+
         for (int i = 0; i < mThreadNum; i++) {
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     for (int j = 0; j < mCount; j++) {
-                        for (String api: mConfig.mApiList) {
-                            HttpGet mHttpGet = new HttpGet(mConfig.mServerUrl + "/" + api);
-                        }
+//                        for (ApiInfo api : mConfig.mApiInfoList) {
+//                            HttpGet mHttpGet = new HttpGet(mConfig.mServerUrl + "/" + api);
+//                        }
                     }
                 }
             });
             thread.start();
         }
-        
+
     }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-    
+
         RCAPITester tester = new RCAPITester();
-        
+
         // args
         // args[0] := thread
         // args[1] := count
@@ -69,17 +69,17 @@ public class RCAPITester implements IExecutable {
             int threadNum = Integer.parseInt(args[0]);
             int count = Integer.parseInt(args[1]);
             String configPath = args[2];
-            
+
             tester.mThreadNum = threadNum;
             tester.mCount = count;
-            
+
             tester.loadConfig(configPath);
-            
-            tester.executeTest();
+
+            tester.execute();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
     }
 
 }

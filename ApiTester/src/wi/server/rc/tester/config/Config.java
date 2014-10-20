@@ -15,37 +15,37 @@ import com.google.gson.annotations.Since;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
-import wi.util.FileUtil;
+import wi.server.rc.tester.Constants;
+import wi.server.rc.tester.config.data.ApiInfo;
+import wi.server.util.FileUtil;
 
 /**
  *
  * @author hermeschang
  */
-public class UrlsConfig {
+public class Config {
     
-    private static final Logger logger = LoggerFactory.getLogger(UrlsConfig.class);
+    private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private static final double _VERSION = 1.0;
     
     @Since(1.0) @SerializedName("ServerUrl")
     public String mServerUrl;
-    @Since(1.0) @SerializedName("ApiList")
-    public List<String> mApiList;
-    
-    private static final String CHARSET = "UTF-8";
+    @Since(1.0) @SerializedName("ApiInfoList")
+    public List<ApiInfo> mApiInfoList;
 
-    public static UrlsConfig loadFromStream(InputStream in) {
+    public static Config loadFromStream(InputStream in) {
         try {
-            String content = FileUtil.readStreamAsString(in, Charset.forName(CHARSET));
+            String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.CHARSET));
 
-            return UrlsConfig.loadFromJson(content);
+            return Config.loadFromJson(content);
         } catch (Exception ex) {
-            return new UrlsConfig();
+            return new Config();
         }
     }
 
-    public static UrlsConfig loadFromJson(String json) {
+    public static Config loadFromJson(String json) {
         Gson gson = new GsonBuilder().setVersion(_VERSION).create();
-        UrlsConfig config = gson.fromJson(json, UrlsConfig.class);
+        Config config = gson.fromJson(json, Config.class);
         config.init(); 
         return config;
     }
