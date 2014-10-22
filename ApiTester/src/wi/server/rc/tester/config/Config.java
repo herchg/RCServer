@@ -28,8 +28,6 @@ public class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private static final double _VERSION = 1.0;
     
-    @Since(1.0) @SerializedName("ServerUrl")
-    public String mServerUrl;
     @Since(1.0) @SerializedName("ApiInfoList")
     public List<ApiInfo> mApiInfoList;
 
@@ -51,6 +49,7 @@ public class Config {
     }
     
     private void init() {
+        // do nothing
     }
 
 }

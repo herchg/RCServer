@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import wi.server.core.pattern.IExecutable;
 import wi.server.rc.tester.config.Config;
+import wi.server.rc.tester.config.data.ApiInfo;
 
 /**
  *
@@ -43,9 +44,11 @@ public class RCAPITester implements IExecutable {
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     for (int j = 0; j < mCount; j++) {
-//                        for (ApiInfo api : mConfig.mApiInfoList) {
+                        for (ApiInfo apiInfo : mConfig.mApiInfoList) {
+                            logger.info(apiInfo.toString());
+                            System.out.println("api ddd");
 //                            HttpGet mHttpGet = new HttpGet(mConfig.mServerUrl + "/" + api);
-//                        }
+                        }
                     }
                 }
             });

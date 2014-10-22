@@ -26,14 +26,26 @@ public class ApiInfo {
     private static final Logger logger = LoggerFactory.getLogger(ApiInfo.class);
     private static final double _VERSION = 1.0;
 
-    @Since(1.0) @SerializedName("ApiName")
-    public String mApiName;
-
+    @Since(1.0) @SerializedName("ServerUrl")
+    public String mServerUrl;
+    @Since(1.0) @SerializedName("Api")
+    public String mApi;
+    @Since(1.0) @SerializedName("Request")
+    public Object mRequest;
+    @Since(1.0) @SerializedName("Response")
+    public Object mResponse;
+    @Since(1.0) @SerializedName("Method")
+    public String mMethod;
+    @Since(1.0) @SerializedName("Desc")
+    public transient String mDesc;
+    
+    
     public static ApiInfo loadFromStream(InputStream in) {
         try {
             String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.CHARSET));
 
             return ApiInfo.loadFromJson(content);
+            
         } catch (Exception ex) {
             return new ApiInfo();
         }
@@ -47,6 +59,13 @@ public class ApiInfo {
     }
     
     private void init() {
-        
+        // do nothing
     }
+
+    @Override
+    public String toString() {
+        return "ApiInfo{" + "ServerUrl=" + mServerUrl + ", Api=" + mApi + ", Request=" + mRequest + ", Response=" + mResponse + ", Method=" + mMethod + ", Desc=" + mDesc + '}';
+    }
+    
+    
 }

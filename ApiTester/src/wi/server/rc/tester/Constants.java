@@ -11,5 +11,12 @@ package wi.server.rc.tester;
  */
 public class Constants {
     
-    public final static String CHARSET = "UTF-8";
+    // default charset
+    public final static String CHARSET  = "UTF-8";
+    
+    // http method
+    public final static String METHOD_GET       = "GET";
+    public final static String METHOD_POST      = "POST";
+    public final static String METHOD_PUT       = "PUT";
+    public final static String METHOD_DELETE    = "DELETE";
 }

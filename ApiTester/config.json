@@ -1,9 +1,22 @@
 {
-	"ServerUrl" : "http://192.168.11.140/",
 	"ApiInfoList" : [
-		{"ApiName" : "apiName1"}, 
-		{"ApiName" : "apiName2"}, 
-		{"ApiName" : "apiName3"}, 
+		{
+			"ServerUrl" : "http://192.168.11.140/rc", 
+			"Api" : "api01",
+			"Request" : 	{
+								"param1" : "desc1", 
+								"param2" : "desc2"
+							},
+			"Response" :	{
+								"key1" : "v1", 
+								"key2" : {
+									"k1" : "v1", 
+									"k2" : "v2"
+								} 
+							}, 
+			"Method" : "GET",
+			"Desc" : "Method: GET / POST / PUT / DELETE"
+		}
 	]
 	
 }
