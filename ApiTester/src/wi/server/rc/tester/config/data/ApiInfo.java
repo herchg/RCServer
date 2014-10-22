@@ -15,14 +15,15 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.annotations.Since;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import wi.core.misc.HttpMethod;
+import wi.core.net.HttpMethod;
 import wi.server.util.FileUtil;
+import wi.server.util.json.AbsBaseJson;
 
 /**
  *
  * @author hermeschang
  */
-public class ApiInfo {
+public class ApiInfo  extends AbsBaseJson {
     
     private static final Logger logger = LoggerFactory.getLogger(ApiInfo.class);
     private static final double _VERSION = 1.0;
@@ -46,14 +47,14 @@ public class ApiInfo {
         try {
             String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.CHARSET));
 
-            return ApiInfo.loadFromJson(content);
+            return ApiInfo.fromJson(content);
             
         } catch (Exception ex) {
             return new ApiInfo();
         }
     }
 
-    public static ApiInfo loadFromJson(String json) {
+    public static ApiInfo fromJson(String json) {
         Gson gson = new GsonBuilder().setVersion(_VERSION).create();
         ApiInfo config = gson.fromJson(json, ApiInfo.class);
         config.init();
@@ -63,11 +64,5 @@ public class ApiInfo {
     private void init() {
         // do nothing
     }
-
-    public String toJson() {
-        Gson gson = new Gson();
-        return gson.toJson(this);
-    }
-    
     
 }

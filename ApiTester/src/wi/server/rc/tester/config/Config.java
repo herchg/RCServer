@@ -18,12 +18,13 @@ import java.util.List;
 import wi.server.rc.tester.Constants;
 import wi.server.rc.tester.config.data.ApiInfo;
 import wi.server.util.FileUtil;
+import wi.server.util.json.AbsBaseJson;
 
 /**
  *
  * @author hermeschang
  */
-public class Config {
+public class Config extends AbsBaseJson {
     
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private static final double _VERSION = 1.0;
@@ -37,14 +38,14 @@ public class Config {
         try {
             String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.CHARSET));
 
-            return Config.loadFromJson(content);
+            return Config.fromJson(content);
         } catch (Exception ex) {
             ex.printStackTrace();
             return new Config();
         }
     }
 
-    public static Config loadFromJson(String json) {
+    public static Config fromJson(String json) {
         Gson gson = new GsonBuilder().setVersion(_VERSION).create();
         Config config = gson.fromJson(json, Config.class);
         config.init(); 

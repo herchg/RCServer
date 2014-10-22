@@ -19,3 +19,4 @@ nbproject/private/
 *.out
 /WiCore/dist/
 /WiCore/build/
+/RCApi/build/
