@@ -1,22 +1,32 @@
 {
-	"ApiInfoList" : [
+	"ApiInfoList" : 
+	[
 		{
-			"ServerUrl" : "http://192.168.11.140/rc", 
-			"Api" : "api01",
-			"Request" : 	{
-								"param1" : "desc1", 
-								"param2" : "desc2"
-							},
+			"ServerUrl" : "http://192.168.11.140:8080", 
+			"Api" : "",
+			"Request" : {
+							"param1" : "desc1", 
+							"param2" : "desc2"
+						},
 			"Response" :	{
-								"key1" : "v1", 
+								"key1" : "desc", 
 								"key2" : {
-									"k1" : "v1", 
-									"k2" : "v2"
+									"k1" : "desc", 
+									"k2" : "desc"
 								} 
-							}, 
-			"Method" : "GET",
+							},
+			"Method" : "Get",
+			"Test" : {
+				"Request" : {
+					"param1" : "value1",
+					"param2" : "value2",
+					"param3" : "value3"
+				}
+			},
 			"Desc" : "Method: GET / POST / PUT / DELETE"
 		}
-	]
+	],
+	
+	"Desc" : "Description"
 	
 }

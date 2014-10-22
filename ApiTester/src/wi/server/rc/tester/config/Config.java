@@ -30,6 +30,8 @@ public class Config {
     
     @Since(1.0) @SerializedName("ApiInfoList")
     public List<ApiInfo> mApiInfoList;
+    @Since(1.0) @SerializedName("Desc")
+    protected transient String mDesc;
 
     public static Config loadFromStream(InputStream in) {
         try {
@@ -37,6 +39,7 @@ public class Config {
 
             return Config.loadFromJson(content);
         } catch (Exception ex) {
+            ex.printStackTrace();
             return new Config();
         }
     }

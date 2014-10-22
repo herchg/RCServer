@@ -9,7 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
-import wi.server.core.pattern.IExecutable;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import wi.core.pattern.IExecutable;
 import wi.server.rc.tester.config.Config;
 import wi.server.rc.tester.config.data.ApiInfo;
 
@@ -44,11 +50,56 @@ public class RCAPITester implements IExecutable {
             Thread thread = new Thread(new Runnable() {
                 public void run() {
                     for (int j = 0; j < mCount; j++) {
+                        
+                        // HttpClient
+                        // 
+                        CloseableHttpClient httpClient = HttpClients.createDefault();
+
                         for (ApiInfo apiInfo : mConfig.mApiInfoList) {
-                            logger.info(apiInfo.toString());
+                            
+                            logger.info(apiInfo.toJson());
                             System.out.println("api ddd");
-//                            HttpGet mHttpGet = new HttpGet(mConfig.mServerUrl + "/" + api);
+                            
+                            switch (apiInfo.mMethod) {
+                                case Get: {
+                                    try {
+                                        HttpGet httpGet = new HttpGet(apiInfo.mServerUrl);
+                                        CloseableHttpResponse response1 = httpClient.execute(httpGet);
+                                        try {
+                                            System.out.println(response1.getStatusLine());
+                                            HttpEntity entity1 = response1.getEntity();
+                                            // do something useful with the response body
+                                            // and ensure it is fully consumed
+                                            EntityUtils.consume(entity1);
+                                        } finally {
+                                            response1.close();
+                                        }
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+
+                                    
+                                    
+                                }
+                                    break;
+                                case Post: {
+                                    
+                                }
+                                    break;
+                                case Put: {
+                                    
+                                }
+                                    break;
+                                case Delete: {
+                                    
+                                }
+                                    break;
+                                    
+                            }
                         }
+                        
+                        
+                        
                     }
                 }
             });

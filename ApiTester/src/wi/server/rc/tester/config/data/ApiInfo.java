@@ -15,6 +15,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.annotations.Since;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import wi.core.misc.HttpMethod;
 import wi.server.util.FileUtil;
 
 /**
@@ -22,7 +23,7 @@ import wi.server.util.FileUtil;
  * @author hermeschang
  */
 public class ApiInfo {
-
+    
     private static final Logger logger = LoggerFactory.getLogger(ApiInfo.class);
     private static final double _VERSION = 1.0;
 
@@ -35,10 +36,11 @@ public class ApiInfo {
     @Since(1.0) @SerializedName("Response")
     public Object mResponse;
     @Since(1.0) @SerializedName("Method")
-    public String mMethod;
+    public HttpMethod mMethod;
+    @Since(1.0) @SerializedName("Test")
+    public Object mTest;
     @Since(1.0) @SerializedName("Desc")
     public transient String mDesc;
-    
     
     public static ApiInfo loadFromStream(InputStream in) {
         try {
@@ -62,9 +64,9 @@ public class ApiInfo {
         // do nothing
     }
 
-    @Override
-    public String toString() {
-        return "ApiInfo{" + "ServerUrl=" + mServerUrl + ", Api=" + mApi + ", Request=" + mRequest + ", Response=" + mResponse + ", Method=" + mMethod + ", Desc=" + mDesc + '}';
+    public String toJson() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
     
     
