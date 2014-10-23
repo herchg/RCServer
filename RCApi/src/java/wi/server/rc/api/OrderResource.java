@@ -17,40 +17,39 @@ import javax.ws.rs.Produces;
 /**
  * REST Web Service
  *
- * @author hermeschang
+ * @author 10307905
  */
-@Path("service")
-public class ServiceResource {
+@Path("order")
+public class OrderResource {
 
     @Context
     private UriInfo context;
 
     /**
-     * Creates a new instance of ServiceResource
+     * Creates a new instance of OrderResource
      */
-    public ServiceResource() {
+    public OrderResource() {
     }
 
     /**
-     * Retrieves representation of an instance of wi.server.rc.api.ServiceResource
+     * Retrieves representation of an instance of wi.server.rc.api.OrderResource
      * @return an instance of java.lang.String
      */
     @GET
-    @Path("/getJson/{name}")
+    @Path("/get")
     @Produces("application/json")
-    public String getJson(@PathParam("name") String name) {
+    public String getXml() {
         //TODO return proper representation object
-//        throw new UnsupportedOperationException();
-        return "{\"" + name + "\" : \"value1\", \"obj2\" : \"value2\"}";
+        return "order get";
     }
 
     /**
-     * PUT method for updating or creating an instance of ServiceResource
+     * PUT method for updating or creating an instance of OrderResource
      * @param content representation for the resource
      * @return an HTTP response with content of the updated or created resource.
      */
     @PUT
-    @Consumes("application/json")
-    public void putJson(String content) {
+    @Consumes("application/xml")
+    public void putXml(String content) {
     }
 }
