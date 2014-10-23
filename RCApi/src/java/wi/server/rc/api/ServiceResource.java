@@ -36,11 +36,12 @@ public class ServiceResource {
      * @return an instance of java.lang.String
      */
     @GET
+    @Path("/getJson/{name}")
     @Produces("application/json")
-    public String getJson() {
+    public String getJson(@PathParam("name") String name) {
         //TODO return proper representation object
 //        throw new UnsupportedOperationException();
-        return "{\"obj1\" : \"value1\", \"obj2\" : \"value2\"}";
+        return "{\"" + name + "\" : \"value1\", \"obj2\" : \"value2\"}";
     }
 
     /**
