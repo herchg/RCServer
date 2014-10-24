@@ -7,12 +7,12 @@ package wi.server.rc.api;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
+import wi.rc.data.order.Order;
 
 /**
  * REST Web Service
@@ -31,16 +31,12 @@ public class OrderResource {
     public OrderResource() {
     }
 
-    /**
-     * Retrieves representation of an instance of wi.server.rc.api.OrderResource
-     * @return an instance of java.lang.String
-     */
+    @Path("/order/{orderId}")
     @GET
-    @Path("/get")
     @Produces("application/json")
-    public String getXml() {
-        //TODO return proper representation object
-        return "order get";
+    public Order getOrder(int orderId) {
+        // TODO get order info
+        return null;
     }
 
     /**
@@ -48,8 +44,12 @@ public class OrderResource {
      * @param content representation for the resource
      * @return an HTTP response with content of the updated or created resource.
      */
+    @Path("/order/{orderId}")
     @PUT
-    @Consumes("application/xml")
-    public void putXml(String content) {
+    @Consumes("application/json")
+    public void updateOrder(int orderId) {
+        // TODO update order info
     }
+    
+    
 }

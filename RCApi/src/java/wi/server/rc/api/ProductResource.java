@@ -7,40 +7,43 @@ package wi.server.rc.api;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
-import wi.rc.data.category.Category;
+import wi.rc.data.product.Product;
 
 /**
  * REST Web Service
  *
- * @author 10307905
+ * @author hermeschang
  */
-@Path("category")
-public class CategoryResource {
+@Path("product")
+public class ProductResource {
 
     @Context
     private UriInfo context;
 
     /**
-     * Creates a new instance of CategoryResource
+     * Creates a new instance of ProductResource
      */
-    public CategoryResource() {
+    public ProductResource() {
     }
 
-    @Path("/category/{cagegoryId}")
+    @Path("/product/{productId}")
     @GET
     @Produces("application/json")
-    public Category getCategory() {
+    public Product getProduct(int productId) {
         //TODO return proper representation object
-        throw new UnsupportedOperationException();
+        return new Product();
     }
 
+    @Path("/product/{productId}")
     @PUT
     @Consumes("application/json")
-    public void updateCategory(Category content) {
+    public void updateProduct(Product product) {
+        
     }
 }
