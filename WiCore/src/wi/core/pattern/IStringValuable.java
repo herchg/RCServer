@@ -7,5 +7,4 @@ package wi.core.pattern;
  */
 public interface IStringValuable extends IValuable<String> {
 
-
 }

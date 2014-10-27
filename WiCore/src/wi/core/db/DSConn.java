@@ -11,12 +11,16 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author hermeschang
  */
 public class DSConn {
+
+        private static final Logger logger = LoggerFactory.getLogger(DSConn.class);
 
     /**
      * 
@@ -28,15 +32,14 @@ public class DSConn {
         try {
             Context initContext = new InitialContext();
             Context envContext  = (Context)initContext.lookup("java:/comp/env");
-            DataSource ds = (DataSource)envContext.lookup("jdbc/");
+            DataSource ds = (DataSource)envContext.lookup(name);
             
             Connection conn = ds.getConnection();
             
             return ds.getConnection();
         } catch (NamingException | SQLException ex) {
-            
+            logger.error("getConnection() {}", ex);
             return null;
-
         }
     }
 

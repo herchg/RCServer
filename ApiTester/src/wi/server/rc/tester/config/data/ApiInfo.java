@@ -16,8 +16,8 @@ import com.google.gson.annotations.Since;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import wi.core.net.HttpMethod;
-import wi.server.util.FileUtil;
-import wi.server.util.json.AbsBaseJson;
+import wi.core.util.FileUtil;
+import wi.core.util.json.AbsBaseJson;
 
 /**
  *

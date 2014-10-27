@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package wi.server.util.json;
+package wi.core.util.json;
 
 import com.google.gson.Gson;
 

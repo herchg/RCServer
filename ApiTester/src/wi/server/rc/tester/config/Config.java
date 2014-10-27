@@ -17,8 +17,8 @@ import java.nio.charset.Charset;
 import java.util.List;
 import wi.server.rc.tester.Constants;
 import wi.server.rc.tester.config.data.ApiInfo;
-import wi.server.util.FileUtil;
-import wi.server.util.json.AbsBaseJson;
+import wi.core.util.FileUtil;
+import wi.core.util.json.AbsBaseJson;
 
 /**
  *
