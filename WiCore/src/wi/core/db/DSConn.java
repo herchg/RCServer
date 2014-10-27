@@ -16,20 +16,22 @@ import javax.sql.DataSource;
  *
  * @author hermeschang
  */
-public class DSConnection implements IDSConnection {
+public class DSConn {
 
     /**
      * 
      * @param name
      * @return 
      */
-    @Override
-    public Connection getConnection(String name) {
+    public static Connection getConnection(String name) {
 
         try {
             Context initContext = new InitialContext();
-            Context envContext = (Context) initContext.lookup(name);
-            DataSource ds = (DataSource) envContext.lookup("jdbc/myoracle");
+            Context envContext  = (Context)initContext.lookup("java:/comp/env");
+            DataSource ds = (DataSource)envContext.lookup("jdbc/");
+            
+            Connection conn = ds.getConnection();
+            
             return ds.getConnection();
         } catch (NamingException | SQLException ex) {
             

@@ -29,7 +29,8 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(wi.server.rc.api.GenericResource.class        resources.add(wi.server.rc.api.Order2Resource.class);
+        resources.add(wi.server.rc.api.GenericResource.class);
+        resources.add(wi.server.rc.api.Order2Resource.class);
         resources.add(wi.server.rc.api.OrdersResource.class);
     }
     
