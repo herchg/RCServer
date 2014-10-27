@@ -19,36 +19,36 @@ import javax.ws.rs.Produces;
  *
  * @author hermeschang
  */
-@Path("order")
-public class Order2Resource {
+@Path("generic")
+public class GenericResource {
 
     @Context
     private UriInfo context;
 
     /**
-     * Creates a new instance of OrderResource
+     * Creates a new instance of GenericResource
      */
-    public Order2Resource() {
+    public GenericResource() {
     }
 
     /**
-     * Retrieves representation of an instance of wi.server.rc.api.OrderResource
+     * Retrieves representation of an instance of wi.server.rc.api.GenericResource
      * @return an instance of java.lang.String
      */
     @GET
     @Produces("application/json")
-    public String getJson() {
+    public String getXml() {
         //TODO return proper representation object
-        return "{}";
+        return "{\"field1\" : \"value1\"}";
     }
 
     /**
-     * PUT method for updating or creating an instance of OrderResource
+     * PUT method for updating or creating an instance of GenericResource
      * @param content representation for the resource
      * @return an HTTP response with content of the updated or created resource.
      */
     @PUT
     @Consumes("application/json")
-    public void putJson(String content) {
+    public void putXml(String content) {
     }
 }
