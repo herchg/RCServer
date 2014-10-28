@@ -11,7 +11,6 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.annotations.Since;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.Date;
 
 import wi.core.Constants;
 import wi.core.util.FileUtil;
@@ -21,47 +20,33 @@ import wi.core.util.json.AbsBaseJson;
  *
  * @author hermeschang
  */
-public class Order extends AbsBaseJson {
-
+public class OrderDetail extends AbsBaseJson {
+    
     private static final double _VERSION = 1.0;
 
     @Since(1.0) @SerializedName("order_id")
-    public Long mOrderId;
-    @Since(1.0) @SerializedName("customer_id")
-    public int mCustomerId;
-    @Since(1.0) @SerializedName("company_id")
-    public int mCompanyId;
-    @Since(1.0) @SerializedName("store_id")
-    public int mStoreId;
-    @Since(1.0) @SerializedName("employee_id")
-    public int mEmployeeId;
-    @Since(1.0) @SerializedName("ncode")
-    public String mNcode;
+    public long mOrderId;
+    @Since(1.0) @SerializedName("product_id")
+    public int mProductId;
+    @Since(1.0) @SerializedName("price")
+    public int mPrice;
+    @Since(1.0) @SerializedName("amount")
+    public int mAmount;
     @Since(1.0) @SerializedName("total_amount")
     public int mTotalAmount;
-    @Since(1.0) @SerializedName("order_datetime")
-    public Date mOrderDatetime;
-    @Since(1.0) @SerializedName("log_datetime")
-    public Date mLogDatetime;
-    @Since(1.0) @SerializedName("status")
-    public Character mStatus;
-    @Since(1.0) @SerializedName("memo")
-    public String mMemo;
-    @Since(1.0) @SerializedName("pos_order_id")
-    public int mPosOrderId;
 
-    public static Order loadFromStream(InputStream in) {
+    public static OrderDetail loadFromStream(InputStream in) {
         try {
             String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.DEFAULT_CHARSET));
-            return Order.fromJson(content);
+            return OrderDetail.fromJson(content);
         } catch (Exception ex) {
-            return new Order();
+            return new OrderDetail();
         }
     }
 
-    public static Order fromJson(String json) {
+    public static OrderDetail fromJson(String json) {
         Gson gson = new GsonBuilder().setVersion(_VERSION).create();
-        Order data = gson.fromJson(json, Order.class);
+        OrderDetail data = gson.fromJson(json, OrderDetail.class);
         data.init();
         return data;
     }

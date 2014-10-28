@@ -5,5 +5,5 @@ package wi.core.pattern;
  * @author hermeschang
  */
 public interface IEventable<C, P, R> {
-    public R onEvent(C cmd, P... params);
+    public R onEvent(C cmd, P params);
 }

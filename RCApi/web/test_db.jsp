@@ -40,12 +40,23 @@ import javax.sql.DataSource;
             <%=ex.getMessage() %>
 <%            
         } finally {
+%>
+            <h1>close connection! 0</h1>
+<%
             if (conn != null) {
-                conn.close();
+                try {
+%>
+            <h1>close connection! 1</h1>
+<%
+                    conn.close();
+%>
+            <h1>close connection! 2</h1>
+<%
+                } catch (Exception ex) {
+                }
             }
             conn = null;
         }
 %>
-        <h1>Hello World!</h1>
     </body>
 </html>

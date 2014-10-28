@@ -30,8 +30,8 @@ public class ApplicationConfig extends Application {
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(wi.server.rc.api.GenericResource.class);
-        resources.add(wi.server.rc.api.Order2Resource.class);
-        resources.add(wi.server.rc.api.OrdersResource.class);
+        resources.add(wi.server.rc.api.OrderResource.class);
+        resources.add(wi.server.rc.api.ProductResource.class);
     }
     
 }
