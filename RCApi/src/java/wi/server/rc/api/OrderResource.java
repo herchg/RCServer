@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package wi.server.rc.api;
 
 import com.google.gson.JsonSyntaxException;
@@ -11,13 +6,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.ArrayList;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import wi.core.db.DSConn;
@@ -35,21 +33,23 @@ public class OrderResource {
     public OrderResource() {
     }
 
-//    /**
-//     * Get order by orderId
-//     */
-//    @GET
-//    @Path("/")
-//    @Produces("application/json")
-//    public String getOrder(@QueryParam("detail") int detail) {
-//        // TODO get order info
-//        return "Get all orders";
-//    }
+    /**
+     * Get all orders 
+     */
+    @GET
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOrders(@QueryParam("detail") int detail) {
+        
+        Response resp;
+        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return resp;
+    }
     
     @GET
     @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrder(@PathParam("orderId")int orderId) {
+    public Response getOrder(@PathParam("orderId")int orderId, @QueryParam("detail") int detail) {
 
         Connection conn = null;
         Response resp;
@@ -149,7 +149,7 @@ public class OrderResource {
     }
     
     @POST
-    @Path("/create")
+    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response createOrder(String jsonOrderSet) {
 
@@ -245,32 +245,25 @@ public class OrderResource {
         return resp;
     }
 
-    @POST
-    @Path("/create2")
-//    @Consumes(MediaType.APPLICATION_JSON)
+    @PUT
+    @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createOrder2(String content) {
-        OrderSet orderSet = OrderSet.fromJson(content);
-        
-        Response r = Response.status(Response.Status.OK).entity(orderSet.toJson(OrderSet._VERSION)).build();
-
-        return r;
+    public Response updateOrder(@PathParam("orderId") int orderId, String jsonOrderSet) {
+       
+       Response resp;
+       resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
+       return resp; 
     }
-//    @PUT
-//    @Path("/{orderId}")
-//    @Consumes("application/json")
-//    public String updateOrder(@PathParam("orderId") int orderId) {
-//        // TODO update order info
-//        return "Update " + orderId;
-//    }
-//    
-//    @DELETE
-//    @Path("/{orderId}")
-//    @Consumes("application/json")
-//    public String deleteOrder(@PathParam("orderId") int orderId) {
-//        // TODO update order info
-//        return "Delete " + orderId;
-//    }
+    
+    @DELETE
+    @Path("/{orderId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteOrder(@PathParam("orderId") int orderId) {
+        
+       Response resp;
+       resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
+       return resp;
+    }
 
     private void Exception(String FORMAT_ERROR) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
