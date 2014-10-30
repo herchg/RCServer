@@ -34,8 +34,6 @@ public class DSConn {
             Context envContext  = (Context)initContext.lookup("java:/comp/env");
             DataSource ds = (DataSource)envContext.lookup(name);
             
-            Connection conn = ds.getConnection();
-            
             return ds.getConnection();
         } catch (NamingException | SQLException ex) {
             logger.error("getConnection() {}", ex);
