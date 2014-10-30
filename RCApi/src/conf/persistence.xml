@@ -6,6 +6,7 @@
     <class>wi.server.rc.api.order.OrderDetail</class>
     <class>wi.server.rc.api.product.Product</class>
     <class>wi.server.rc.api.product.ProductPrice</class>
+    <class>wi.rc.server.order2.Order1</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/rc?zeroDateTimeBehavior=convertToNull"/>

@@ -21,32 +21,29 @@ import wi.core.util.json.AbsBaseJson;
  *
  * @author hermeschang
  */
-public class OrderResult extends AbsBaseJson {
+public class OrderSet extends AbsBaseJson {
     
-    private static final double _VERSION = 1.0;
+    public static final double _VERSION = 1.0;
 
     @Since(1.0) @SerializedName("order")
     public Order mOrder;
     @Since(1.0) @SerializedName("order_detail")
     public List<OrderDetail> mOrderDetail;
  
-    public static OrderResult loadFromStream(InputStream in) {
+    public static OrderSet loadFromStream(InputStream in) {
         try {
             String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.DEFAULT_CHARSET));
-            return OrderResult.fromJson(content);
+            return OrderSet.fromJson(content);
         } catch (Exception ex) {
-            return new OrderResult();
+            return new OrderSet();
         }
     }
 
-    public static OrderResult fromJson(String json) {
-        Gson gson = new GsonBuilder().setVersion(_VERSION).create();
-        OrderResult data = gson.fromJson(json, OrderResult.class);
-        data.init();
-        return data;
+    public static OrderSet fromJson(String json) {
+        return (OrderSet) fromJson(_VERSION, json, OrderSet.class);
     }
     
-    private void init() {
+    public void init() {
         // do nothing
     }
 }

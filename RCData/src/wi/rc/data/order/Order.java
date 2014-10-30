@@ -11,7 +11,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.annotations.Since;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.Date;
+import java.sql.Date;
 
 import wi.core.Constants;
 import wi.core.util.FileUtil;
@@ -23,7 +23,7 @@ import wi.core.util.json.AbsBaseJson;
  */
 public class Order extends AbsBaseJson {
 
-    private static final double _VERSION = 1.0;
+    public static final double _VERSION = 1.0;
 
     @Since(1.0) @SerializedName("order_id")
     public Long mOrderId;
@@ -33,6 +33,8 @@ public class Order extends AbsBaseJson {
     public int mCompanyId;
     @Since(1.0) @SerializedName("store_id")
     public int mStoreId;
+    @Since(1.0) @SerializedName("pos_id")
+    public int mPosId;
     @Since(1.0) @SerializedName("employee_id")
     public int mEmployeeId;
     @Since(1.0) @SerializedName("ncode")
@@ -40,15 +42,15 @@ public class Order extends AbsBaseJson {
     @Since(1.0) @SerializedName("total_amount")
     public int mTotalAmount;
     @Since(1.0) @SerializedName("order_datetime")
-    public Date mOrderDatetime;
-    @Since(1.0) @SerializedName("log_datetime")
-    public Date mLogDatetime;
+    public java.sql.Date mOrderDatetime;
+//    @Since(1.0) @SerializedName("log_datetime")
+//    public transient java.sql.Date mLogDatetime;
     @Since(1.0) @SerializedName("status")
-    public Character mStatus;
+    public String mStatus;
+    @Since(1.0) @SerializedName("pos_order_id")
+    public String mPosOrderId;
     @Since(1.0) @SerializedName("memo")
     public String mMemo;
-    @Since(1.0) @SerializedName("pos_order_id")
-    public int mPosOrderId;
 
     public static Order loadFromStream(InputStream in) {
         try {
@@ -60,13 +62,10 @@ public class Order extends AbsBaseJson {
     }
 
     public static Order fromJson(String json) {
-        Gson gson = new GsonBuilder().setVersion(_VERSION).create();
-        Order data = gson.fromJson(json, Order.class);
-        data.init();
-        return data;
+        return (Order) fromJson(_VERSION, json, Order.class);
     }
     
-    private void init() {
+    public void init() {
         // do nothing
     }
 }

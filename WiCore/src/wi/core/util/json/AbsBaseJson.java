@@ -6,6 +6,7 @@
 package wi.core.util.json;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  *
@@ -13,9 +14,23 @@ import com.google.gson.Gson;
  */
 public abstract class AbsBaseJson {
     
-    public String toJson() {
-        Gson gson = new Gson();
+    public final static String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    
+    public String toJson(double version) {
+        Gson gson = getGson(version);
         return gson.toJson(this);
     }
+    
+    protected static Gson getGson(double version) {
+        return new GsonBuilder().setDateFormat(DATETIME_FORMAT).setVersion(version).create();
+    }
 
+    public static AbsBaseJson fromJson(double version, String json, Class c) {
+        Gson gson = getGson(version);
+        AbsBaseJson data = (AbsBaseJson)gson.fromJson(json, c);
+        data.init();
+        return data;
+    }
+    
+    abstract public void init();
 }

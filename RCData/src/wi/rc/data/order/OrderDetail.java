@@ -22,7 +22,7 @@ import wi.core.util.json.AbsBaseJson;
  */
 public class OrderDetail extends AbsBaseJson {
     
-    private static final double _VERSION = 1.0;
+    public static final double _VERSION = 1.0;
 
     @Since(1.0) @SerializedName("order_id")
     public long mOrderId;
@@ -45,13 +45,10 @@ public class OrderDetail extends AbsBaseJson {
     }
 
     public static OrderDetail fromJson(String json) {
-        Gson gson = new GsonBuilder().setVersion(_VERSION).create();
-        OrderDetail data = gson.fromJson(json, OrderDetail.class);
-        data.init();
-        return data;
+        return (OrderDetail) fromJson(_VERSION, json, OrderDetail.class);
     }
     
-    private void init() {
+    public void init() {
         // do nothing
     }
 }

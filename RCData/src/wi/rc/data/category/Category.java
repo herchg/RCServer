@@ -21,5 +21,10 @@ import wi.core.util.json.AbsBaseJson;
  * @author hermeschang
  */
 public class Category extends AbsBaseJson {
+
+    @Override
+    public void init() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     // TODO    
 }

@@ -21,7 +21,7 @@ import wi.core.util.json.AbsBaseJson;
  */
 public class Product extends AbsBaseJson {
     
-    private static final double _VERSION = 1.0;
+    public static final double _VERSION = 1.0;
 
     @Since(1.0) @SerializedName("product_id")
     public Integer mProductId;
@@ -62,7 +62,7 @@ public class Product extends AbsBaseJson {
     @Since(1.0) @SerializedName("option9")
     public String mOption9;
     @Since(1.0) @SerializedName("status")
-    public Character mStatus;
+    public String mStatus;
     
     public static Product loadFromStream(InputStream in) {
         try {
@@ -74,13 +74,10 @@ public class Product extends AbsBaseJson {
     }
 
     public static Product fromJson(String json) {
-        Gson gson = new GsonBuilder().setVersion(_VERSION).create();
-        Product data = gson.fromJson(json, Product.class);
-        data.init();
-        return data;
+        return (Product)fromJson(_VERSION, json, Product.class);
     }
     
-    private void init() {
+    public void init() {
         // do nothing
     }
 }
