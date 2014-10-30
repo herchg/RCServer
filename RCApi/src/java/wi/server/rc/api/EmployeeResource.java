@@ -8,7 +8,6 @@ package wi.server.rc.api;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -43,7 +42,7 @@ public class EmployeeResource {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPoss(@QueryParam("authority") int authority, @QueryParam("ext") int ext) {
+    public Response getEmployees(@QueryParam("authority") int authority, @QueryParam("ext") int ext) {
         
         Response resp;
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
@@ -53,7 +52,7 @@ public class EmployeeResource {
     @GET
     @Path("/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPos(@PathParam("employee_id")int employee_id, @QueryParam("authority") int authority, @QueryParam("ext") int ext) {
+    public Response getEmployee(@PathParam("employee_id")int employee_id, @QueryParam("authority") int authority, @QueryParam("ext") int ext) {
         
         Response resp;
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
@@ -63,7 +62,7 @@ public class EmployeeResource {
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createPos(String jsonEmployeeSet) {
+    public Response createEmployee(String jsonEmployeeSet) {
         
         Response resp;
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
@@ -73,7 +72,7 @@ public class EmployeeResource {
     @PUT
     @Path("/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updatePos(@PathParam("employee_id")int employee_id, String jsonEmployeeSet) {
+    public Response updateEmployee(@PathParam("employee_id")int employee_id, String jsonEmployeeSet) {
         
         Response resp;
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
@@ -83,7 +82,7 @@ public class EmployeeResource {
     @DELETE
     @Path("/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deletePos(@PathParam("employee_id")int employee_id) {
+    public Response deleteEmployee(@PathParam("employee_id")int employee_id) {
         
         Response resp;
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();

@@ -8,7 +8,6 @@ package wi.server.rc.api;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -39,7 +38,7 @@ public class CustomerResource {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPoss(@QueryParam("detail") int detail) {
+    public Response getCustomers(@QueryParam("detail") int detail) {
         
         Response resp;
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
@@ -49,7 +48,7 @@ public class CustomerResource {
     @GET
     @Path("/{customer_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPos(@PathParam("customer_id")int customer_id, @QueryParam("detail") int detail) {
+    public Response getCustomer(@PathParam("customer_id")int customer_id, @QueryParam("detail") int detail) {
         
         Response resp;
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
@@ -59,7 +58,7 @@ public class CustomerResource {
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createPos(String jsonCustomerSet) {
+    public Response createCustomer(String jsonCustomerSet) {
         
         Response resp;
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
@@ -69,7 +68,7 @@ public class CustomerResource {
     @PUT
     @Path("/{customer_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updatePos(@PathParam("customer_id")int customer_id, String jsonCustomerSet) {
+    public Response updateCustomer(@PathParam("customer_id")int customer_id, String jsonCustomerSet) {
         
         Response resp;
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
@@ -79,7 +78,7 @@ public class CustomerResource {
     @DELETE
     @Path("/{customer_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deletePos(@PathParam("customer_id")int customer_id) {
+    public Response deleteCustomer(@PathParam("customer_id")int customer_id) {
         
         Response resp;
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
