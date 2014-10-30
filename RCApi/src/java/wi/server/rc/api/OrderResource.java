@@ -22,7 +22,7 @@ import wi.core.db.DSConn;
 import wi.rc.data.order.Order;
 import wi.rc.data.order.OrderDetail;
 import wi.rc.data.order.OrderSet;
-import wi.server.rc.api.order.OrderDBInfo;
+import wi.rc.server.opr.OrderDataOpr;
 
 @Path("order")
 public class OrderResource {
@@ -56,7 +56,7 @@ public class OrderResource {
         
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement stmtOrder = conn.prepareStatement(OrderDBInfo.OrderInfo.SQL_ORDER_SELECT);
+            PreparedStatement stmtOrder = conn.prepareStatement(OrderDataOpr.DBInfo.OrderInfo.SQL_ORDER_SELECT);
             // "SELECT customer_id, company_id, store_id, pos_id, employee_id, ncode, total_amount, order_datetime, log_datetime, status, pos_order_id, memo FROM rc.order WHERE order_id = ?";
             stmtOrder.setLong(1, orderId);
 
@@ -66,30 +66,30 @@ public class OrderResource {
                 OrderSet orderSet = new OrderSet();
                 // new an Order
                 orderSet.mOrder = new Order();
-                orderSet.mOrder.mOrderId = rs.getLong(OrderDBInfo.OrderInfo.FIELD_NAME_ORDER_ID);
-                orderSet.mOrder.mCustomerId = rs.getInt(OrderDBInfo.OrderInfo.FIELD_NAME_ORDER_ID);
-                orderSet.mOrder.mCompanyId = rs.getInt(OrderDBInfo.OrderInfo.FIELD_NAME_COMPANY_ID);
-                orderSet.mOrder.mStoreId = rs.getInt(OrderDBInfo.OrderInfo.FIELD_NAME_STORE_ID);
-                orderSet.mOrder.mEmployeeId = rs.getInt(OrderDBInfo.OrderInfo.FIELD_NAME_EMPLOYEE_ID);
-                orderSet.mOrder.mNcode = rs.getString(OrderDBInfo.OrderInfo.FIELD_NAME_NCODE);
-                orderSet.mOrder.mTotalAmount = rs.getInt(OrderDBInfo.OrderInfo.FIELD_NAME_TOTAL_AMOUNT);
-                orderSet.mOrder.mOrderDatetime = rs.getDate(OrderDBInfo.OrderInfo.FIELD_NAME_ORDER_DATETIME);
-                orderSet.mOrder.mStatus = rs.getString(OrderDBInfo.OrderInfo.FIELD_NAME_STATUS);
-                orderSet.mOrder.mPosOrderId = rs.getString(OrderDBInfo.OrderInfo.FIELD_NAME_POS_ORDER_ID);
-                orderSet.mOrder.mMemo = rs.getString(OrderDBInfo.OrderInfo.FIELD_NAME_MEMO);
+                orderSet.mOrder.mOrderId = rs.getLong(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_ORDER_ID);
+                orderSet.mOrder.mCustomerId = rs.getInt(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_ORDER_ID);
+                orderSet.mOrder.mCompanyId = rs.getInt(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_COMPANY_ID);
+                orderSet.mOrder.mStoreId = rs.getInt(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_STORE_ID);
+                orderSet.mOrder.mEmployeeId = rs.getInt(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_EMPLOYEE_ID);
+                orderSet.mOrder.mNcode = rs.getString(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_NCODE);
+                orderSet.mOrder.mTotalAmount = rs.getInt(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_TOTAL_AMOUNT);
+                orderSet.mOrder.mOrderDatetime = rs.getDate(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_ORDER_DATETIME);
+                orderSet.mOrder.mStatus = rs.getString(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_STATUS);
+                orderSet.mOrder.mPosOrderId = rs.getString(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_POS_ORDER_ID);
+                orderSet.mOrder.mMemo = rs.getString(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_MEMO);
 
                 // new an Order Detail List
                 orderSet.mOrderDetail = new ArrayList<OrderDetail>();
-                PreparedStatement stmtOrderDetail = conn.prepareStatement(OrderDBInfo.OrderDetailInfo.SQL_ORDER_DETAIL_SELECT);
+                PreparedStatement stmtOrderDetail = conn.prepareStatement(OrderDataOpr.DBInfo.OrderDetailInfo.SQL_ORDER_DETAIL_SELECT);
                 stmtOrderDetail.setLong(1, orderId);
                 ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                 while(rsOrderDetail.next()) {
                     OrderDetail orderDetail = new OrderDetail();
-                    orderDetail.mOrderId = rsOrderDetail.getLong(OrderDBInfo.OrderDetailInfo.FIELD_NAME_ORDER_ID);
-                    orderDetail.mProductId = rsOrderDetail.getInt(OrderDBInfo.OrderDetailInfo.FIELD_NAME_PRODUCT_ID);
-                    orderDetail.mPrice = rsOrderDetail.getInt(OrderDBInfo.OrderDetailInfo.FIELD_NAME_PRICE);
-                    orderDetail.mAmount = rsOrderDetail.getInt(OrderDBInfo.OrderDetailInfo.FIELD_NAME_AMOUNT);
-                    orderDetail.mTotalAmount = rsOrderDetail.getInt(OrderDBInfo.OrderDetailInfo.FIELD_NAME_TOTAL_AMOUNT);
+                    orderDetail.mOrderId = rsOrderDetail.getLong(OrderDataOpr.DBInfo.OrderDetailInfo.FIELD_NAME_ORDER_ID);
+                    orderDetail.mProductId = rsOrderDetail.getInt(OrderDataOpr.DBInfo.OrderDetailInfo.FIELD_NAME_PRODUCT_ID);
+                    orderDetail.mPrice = rsOrderDetail.getInt(OrderDataOpr.DBInfo.OrderDetailInfo.FIELD_NAME_PRICE);
+                    orderDetail.mAmount = rsOrderDetail.getInt(OrderDataOpr.DBInfo.OrderDetailInfo.FIELD_NAME_AMOUNT);
+                    orderDetail.mTotalAmount = rsOrderDetail.getInt(OrderDataOpr.DBInfo.OrderDetailInfo.FIELD_NAME_TOTAL_AMOUNT);
                     orderSet.mOrderDetail.add(orderDetail);
                 }
                 resp = Response.status(Response.Status.CREATED).entity(orderSet.toJson(OrderSet._VERSION)).build();
@@ -115,37 +115,6 @@ public class OrderResource {
         }
 
         return resp;
-        /*
-        Response resp;
-        
-        OrderSet orderSet = new OrderSet();
-        orderSet.mOrder = new Order();
-        orderSet.mOrder.mOrderId        = (long)1;
-        orderSet.mOrder.mCustomerId     = 3;
-        orderSet.mOrder.mCompanyId      = 4;
-        orderSet.mOrder.mStoreId        = 5;
-        orderSet.mOrder.mPosId          = 5;
-        orderSet.mOrder.mEmployeeId     = 6;
-        orderSet.mOrder.mNcode          = "901";
-        orderSet.mOrder.mTotalAmount    = 7;
-        orderSet.mOrder.mOrderDatetime  = Calendar.getInstance().getTime();
-        orderSet.mOrder.mStatus         = 'A';
-        orderSet.mOrder.mPosOrderId     = "20141029105613001";
-        orderSet.mOrder.mMemo           = "Memo";
-        
-        orderSet.mOrderDetail = new ArrayList<OrderDetail>();
-        for (int i = 0; i < 2; i++) {
-            OrderDetail od = new OrderDetail();
-            od.mOrderId = orderSet.mOrder.mOrderId;
-            od.mProductId = i*100 + 11;
-            od.mPrice = i*100 + 12;
-            od.mAmount = i*100 + 13;
-            od.mTotalAmount = i*100 + 14;
-            orderSet.mOrderDetail.add(od);
-        }
-        //resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        
-        return Response.status(Response.Status.OK).entity(orderSet.toJson()).build(); */
     }
     
     @POST
@@ -164,7 +133,7 @@ public class OrderResource {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             conn.setAutoCommit(false);
             
-            PreparedStatement stmtOrder = conn.prepareStatement(OrderDBInfo.OrderInfo.SQL_ORDER_INSERT, PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement stmtOrder = conn.prepareStatement(OrderDataOpr.DBInfo.OrderInfo.SQL_ORDER_INSERT, PreparedStatement.RETURN_GENERATED_KEYS);
             stmtOrder.setInt(1, orderSet.mOrder.mCustomerId);
             stmtOrder.setInt(2, orderSet.mOrder.mCompanyId);
             stmtOrder.setInt(3, orderSet.mOrder.mStoreId);
@@ -198,7 +167,7 @@ public class OrderResource {
                 if (rs.next())
                     orderSet.mOrder.mOrderId = rs.getLong(1);
                 
-                PreparedStatement stmtOrderDetail = conn.prepareStatement(OrderDBInfo.OrderDetailInfo.SQL_ORDER_DETAIL_INSERT);
+                PreparedStatement stmtOrderDetail = conn.prepareStatement(OrderDataOpr.DBInfo.OrderDetailInfo.SQL_ORDER_DETAIL_INSERT);
                 for (OrderDetail orderDetail: orderSet.mOrderDetail) {
                     // set order_id
                     orderDetail.mOrderId = orderSet.mOrder.mOrderId;
