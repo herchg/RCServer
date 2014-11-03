@@ -67,14 +67,14 @@ public class Product extends AbsBaseJson {
     public static Product loadFromStream(InputStream in) {
         try {
             String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.DEFAULT_CHARSET));
-            return Product.fromJson(content);
+            return Product.fromJson(_VERSION, content);
         } catch (Exception ex) {
             return new Product();
         }
     }
 
-    public static Product fromJson(String json) {
-        return (Product)fromJson(_VERSION, json, Product.class);
+    public static Product fromJson(double version, String json) {
+        return (Product)fromJson(version, json, Product.class);
     }
     
     public void init() {

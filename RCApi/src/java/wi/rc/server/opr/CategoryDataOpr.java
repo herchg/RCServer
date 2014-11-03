@@ -72,9 +72,9 @@ public class CategoryDataOpr {
                 category.mCatrgoryId = rs.getLong(CategoryDataOpr.DBInfo.CategoryInfo.FIELD_NAME_CATEGORY_ID);
                 category.mCompanyId = rs.getInt(CategoryDataOpr.DBInfo.CategoryInfo.FIELD_NAME_COMPANY_ID);
                 category.mDiscription = rs.getString(CategoryDataOpr.DBInfo.CategoryInfo.FIELD_NAME_DISCRIPTION);
-                category.mDiscription4Short = rs.getString(CategoryDataOpr.DBInfo.CategoryInfo.FIELD_NAME_DISCRIPTION_4_SHORT);
+                category.mDescription4Short = rs.getString(CategoryDataOpr.DBInfo.CategoryInfo.FIELD_NAME_DISCRIPTION_4_SHORT);
                 category.mName = rs.getString(CategoryDataOpr.DBInfo.CategoryInfo.FIELD_NAME_NAME);
-                category.mName4Shrot = rs.getString(CategoryDataOpr.DBInfo.CategoryInfo.FIELD_NAME_NAME_4_SHORT);
+                category.mName4Short = rs.getString(CategoryDataOpr.DBInfo.CategoryInfo.FIELD_NAME_NAME_4_SHORT);
                 category.mOption0 = rs.getString(CategoryDataOpr.DBInfo.CategoryInfo.FIELD_NAME_OPTION_0);
                 category.mOption1 = rs.getString(CategoryDataOpr.DBInfo.CategoryInfo.FIELD_NAME_OPTION_1);
                 category.mOption2 = rs.getString(CategoryDataOpr.DBInfo.CategoryInfo.FIELD_NAME_OPTION_2);
@@ -117,7 +117,7 @@ public class CategoryDataOpr {
         Response resp;
         boolean ret = true;
         try {
-            category = Category.fromJson(jsonCategorySet);
+            category = Category.fromJson(Category._VERSION, jsonCategorySet);
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             conn.setAutoCommit(false);
             PreparedStatement stmtCategory = conn.prepareStatement(CategoryDataOpr.DBInfo.CategoryInfo.SQL_CATEGORY_INSERT, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -128,20 +128,20 @@ public class CategoryDataOpr {
             } else {
                 stmtCategory.setString(2, category.mDiscription);
             }
-            if (category.mDiscription4Short == null) {
+            if (category.mDescription4Short == null) {
                 stmtCategory.setNull(3, Types.VARCHAR);
             } else {
-                stmtCategory.setString(3, category.mDiscription4Short);
+                stmtCategory.setString(3, category.mDescription4Short);
             }
-            if (category.mName4Shrot == null) {
+            if (category.mName4Short == null) {
                 stmtCategory.setNull(4, Types.VARCHAR);
             } else {
                 stmtCategory.setString(4, category.mName);
             }
-            if (category.mName4Shrot == null) {
+            if (category.mName4Short == null) {
                 stmtCategory.setNull(5, Types.VARCHAR);
             } else {
-                stmtCategory.setString(5, category.mName4Shrot);
+                stmtCategory.setString(5, category.mName4Short);
             }
             if (category.mOption0 == null) {
                 stmtCategory.setNull(6, Types.VARCHAR);
@@ -245,7 +245,7 @@ public class CategoryDataOpr {
         String sql = "UPDATE rc.category SET";
 
         try {
-            category = Category.fromJson(jsonCategorySet);
+            category = Category.fromJson(Category._VERSION, jsonCategorySet);
 
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             conn.setAutoCommit(false);
@@ -259,13 +259,13 @@ public class CategoryDataOpr {
             if (category.mDiscription != null) {
                 sql += " description = " + category.mCatrgoryId;
             }
-            if (category.mDiscription4Short != null) {
+            if (category.mDescription4Short != null) {
                 sql += " description_4_short = " + category.mCatrgoryId;
             }
             if (category.mName != null) {
                 sql += " name = " + category.mCatrgoryId;
             }
-            if (category.mName4Shrot != null) {
+            if (category.mName4Short != null) {
                 sql += " name_4_short = " + category.mCatrgoryId;
             }
             if (category.mOption0 != null) {

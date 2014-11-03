@@ -5,8 +5,6 @@
  */
 package wi.rc.data.category;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.annotations.Since;
 import java.io.InputStream;
@@ -31,11 +29,11 @@ public class Category extends AbsBaseJson {
     @Since(1.0) @SerializedName("discription")
     public String mDiscription;
     @Since(1.0) @SerializedName("description_4_short")
-    public String mDiscription4Short;
+    public String mDescription4Short;
     @Since(1.0) @SerializedName("name")
     public String mName;
     @Since(1.0) @SerializedName("name_4_short")
-    public String mName4Shrot;
+    public String mName4Short;
     @Since(1.0) @SerializedName("option0")
     public String mOption0;
     @Since(1.0) @SerializedName("option1")
@@ -64,14 +62,14 @@ public class Category extends AbsBaseJson {
     public static Category loadFromStream(InputStream in) {
         try {
             String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.DEFAULT_CHARSET));
-            return Category.fromJson(content);
+            return Category.fromJson(_VERSION, content);
         } catch (Exception ex) {
             return new Category();
         }
     }
 
-    public static Category fromJson(String json) {
-        return (Category)fromJson(_VERSION, json, Category.class);
+    public static Category fromJson(double version, String json) {
+        return (Category)fromJson(version, json, Category.class);
     }
     
     public void init() {

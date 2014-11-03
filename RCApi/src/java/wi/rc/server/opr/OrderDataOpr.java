@@ -63,7 +63,7 @@ public class OrderDataOpr {
 
             public final static String SQL_ORDER_DETAIL_SELECT
                     = "SELECT order_id, product_id, price, amount, total_amount FROM rc.order_detail WHERE order_id = ? ORDER BY product_id";
-            public final static String SQL_ORDER_DETAIL_SELECT_2
+            public final static String SQL_ORDER_DETAIL_SELECT_BY_CPK
                     = "SELECT order_id, product_id, price, amount, total_amount FROM rc.order_detail WHERE order_id = ? AND product_id = ?";
             public final static String SQL_ORDER_DETAIL_INSERT
                     = "INSERT INTO rc.order_detail (order_id, product_id, price, amount, total_amount) VALUES (?, ?, ?, ?, ?);";
@@ -153,7 +153,7 @@ public class OrderDataOpr {
         Response resp;
         boolean ret = true;
         try {
-            orderSet = OrderSet.fromJson(jsonOrderSet);
+            orderSet = OrderSet.fromJson(OrderSet._VERSION, jsonOrderSet);
 
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             conn.setAutoCommit(false);
@@ -254,7 +254,7 @@ public class OrderDataOpr {
         boolean ret = true;
         String sql = "UPDATE rc.order SET";
         try {
-            orderSet = OrderSet.fromJson(jsonOrderSet);
+            orderSet = OrderSet.fromJson(OrderSet._VERSION, jsonOrderSet);
 
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             conn.setAutoCommit(false);

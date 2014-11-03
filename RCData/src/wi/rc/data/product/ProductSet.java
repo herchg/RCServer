@@ -16,8 +16,6 @@ import wi.core.util.json.AbsBaseJson;
 import static wi.core.util.json.AbsBaseJson.fromJson;
 import wi.rc.data.category.Category;
 import wi.rc.data.order.Order;
-import wi.rc.data.order.OrderDetail;
-import wi.rc.data.order.OrderSet;
 
 /**
  *
@@ -28,7 +26,7 @@ public class ProductSet extends AbsBaseJson{
     public static final double _VERSION = 1.0;
 
     @Since(1.0) @SerializedName("product")
-    public Order mProducr;
+    public Product mProducr;
     @Since(1.0) @SerializedName("product_price")
     public List<ProductPrice> mProductPrice;
     @Since(1.0) @SerializedName("product_category")
@@ -37,14 +35,14 @@ public class ProductSet extends AbsBaseJson{
     public static ProductSet loadFromStream(InputStream in) {
         try {
             String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.DEFAULT_CHARSET));
-            return ProductSet.fromJson(content);
+            return ProductSet.fromJson(_VERSION, content);
         } catch (Exception ex) {
             return new ProductSet();
         }
     }
 
-    public static ProductSet fromJson(String json) {
-        return (ProductSet) fromJson(_VERSION, json, ProductSet.class);
+    public static ProductSet fromJson(double version, String json) {
+        return (ProductSet) fromJson(version, json, ProductSet.class);
     }
     
     public void init() {

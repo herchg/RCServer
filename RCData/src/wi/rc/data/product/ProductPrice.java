@@ -36,14 +36,14 @@ public class ProductPrice extends AbsBaseJson {
     public static ProductPrice loadFromStream(InputStream in) {
         try {
             String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.DEFAULT_CHARSET));
-            return ProductPrice.fromJson(content);
+            return ProductPrice.fromJson(_VERSION, content);
         } catch (Exception ex) {
             return new ProductPrice();
         }
     }
 
-    public static ProductPrice fromJson(String json) {
-        return (ProductPrice)fromJson(_VERSION, json, ProductPrice.class);
+    public static ProductPrice fromJson(double version, String json) {
+        return (ProductPrice)fromJson(version, json, ProductPrice.class);
     }
     
     public void init() {

@@ -6,8 +6,6 @@
 package wi.rc.data.order;
 
 import java.util.List;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.annotations.Since;
 import java.io.InputStream;
@@ -33,14 +31,14 @@ public class OrderSet extends AbsBaseJson {
     public static OrderSet loadFromStream(InputStream in) {
         try {
             String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.DEFAULT_CHARSET));
-            return OrderSet.fromJson(content);
+            return OrderSet.fromJson(_VERSION, content);
         } catch (Exception ex) {
             return new OrderSet();
         }
     }
 
-    public static OrderSet fromJson(String json) {
-        return (OrderSet) fromJson(_VERSION, json, OrderSet.class);
+    public static OrderSet fromJson(double version, String json) {
+        return (OrderSet) fromJson(version, json, OrderSet.class);
     }
     
     public void init() {

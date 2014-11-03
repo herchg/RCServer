@@ -5,13 +5,10 @@
  */
 package wi.rc.data.order;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.annotations.Since;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.sql.Date;
 
 import wi.core.Constants;
 import wi.core.util.FileUtil;
@@ -55,14 +52,14 @@ public class Order extends AbsBaseJson {
     public static Order loadFromStream(InputStream in) {
         try {
             String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.DEFAULT_CHARSET));
-            return Order.fromJson(content);
+            return Order.fromJson(_VERSION, content);
         } catch (Exception ex) {
             return new Order();
         }
     }
 
-    public static Order fromJson(String json) {
-        return (Order) fromJson(_VERSION, json, Order.class);
+    public static Order fromJson(double version, String json) {
+        return (Order) fromJson(version, json, Order.class);
     }
     
     public void init() {
