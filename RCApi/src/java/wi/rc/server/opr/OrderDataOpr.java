@@ -92,7 +92,7 @@ public class OrderDataOpr {
                 // new an Order
                 orderSet.mOrder = new Order();
                 orderSet.mOrder.mOrderId = rs.getLong(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_ORDER_ID);
-                orderSet.mOrder.mCustomerId = rs.getInt(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_ORDER_ID);
+                orderSet.mOrder.mCustomerId = rs.getInt(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_CUSTOMER_ID);
                 orderSet.mOrder.mCompanyId = rs.getInt(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_COMPANY_ID);
                 orderSet.mOrder.mStoreId = rs.getInt(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_STORE_ID);
                 orderSet.mOrder.mEmployeeId = rs.getInt(OrderDataOpr.DBInfo.OrderInfo.FIELD_NAME_EMPLOYEE_ID);
@@ -252,7 +252,7 @@ public class OrderDataOpr {
         Connection conn = null;
         Response resp;
         boolean ret = true;
-        String sql = "UPDATE rc.order SET ";
+        String sql = "UPDATE rc.order SET";
         try {
             orderSet = OrderSet.fromJson(jsonOrderSet);
 
@@ -260,27 +260,29 @@ public class OrderDataOpr {
             conn.setAutoCommit(false);
             
             //if dont need to update the value will be -1
-            PreparedStatement stmtOrder = conn.prepareStatement(OrderDataOpr.DBInfo.OrderInfo.SQL_ORDER_INSERT, PreparedStatement.RETURN_GENERATED_KEYS);
+            
             if (orderSet.mOrder.mCustomerId != -1)
-                sql += "customer_id = " + orderSet.mOrder.mCustomerId;
+                sql += " customer_id = " + orderSet.mOrder.mCustomerId;
             if (orderSet.mOrder.mCompanyId != -1)
-                sql += "company_id = " + orderSet.mOrder.mCompanyId;
+                sql += " company_id = " + orderSet.mOrder.mCompanyId;
             if (orderSet.mOrder.mStoreId != -1)
-                sql += "store_id = " + orderSet.mOrder.mStoreId;
+                sql += " store_id = " + orderSet.mOrder.mStoreId;
             if (orderSet.mOrder.mPosId != -1)
-                sql += "pos_id = " + orderSet.mOrder.mPosId;
+                sql += " pos_id = " + orderSet.mOrder.mPosId;
             if (orderSet.mOrder.mEmployeeId != -1)
-                sql += "employee_id = " + orderSet.mOrder.mEmployeeId;
+                sql += " employee_id = " + orderSet.mOrder.mEmployeeId;
             if (orderSet.mOrder.mNcode != null) 
-                sql += "ncode = " + orderSet.mOrder.mNcode;
+                sql += " ncode = " + orderSet.mOrder.mNcode;
             if (orderSet.mOrder.mOrderDatetime != null) 
-                sql += "order_datetime = " + orderSet.mOrder.mOrderDatetime;
+                sql += " order_datetime = " + orderSet.mOrder.mOrderDatetime;
             if (orderSet.mOrder.mStatus != null) 
-                sql += "status = " + orderSet.mOrder.mStatus;
+                sql += " status = " + orderSet.mOrder.mStatus;
             if (orderSet.mOrder.mPosOrderId == null) 
-                sql += "pos_order_id = " + orderSet.mOrder.mPosOrderId;
+                sql += " pos_order_id = " + orderSet.mOrder.mPosOrderId;
             if (orderSet.mOrder.mMemo == null) 
-                sql += "memo = " + orderSet.mOrder.mMemo;
+                sql += " memo = " + orderSet.mOrder.mMemo;
+            
+            PreparedStatement stmtOrder = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             //
             // update order detail , unfinished
             //

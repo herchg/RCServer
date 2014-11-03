@@ -43,8 +43,8 @@ public class Order extends AbsBaseJson {
     public int mTotalAmount;
     @Since(1.0) @SerializedName("order_datetime")
     public java.sql.Date mOrderDatetime;
-//    @Since(1.0) @SerializedName("log_datetime")
-//    public transient java.sql.Date mLogDatetime;
+//  @Since(1.0) @SerializedName("log_datetime")
+//  public transient java.sql.Date mLogDatetime;
     @Since(1.0) @SerializedName("status")
     public String mStatus;
     @Since(1.0) @SerializedName("pos_order_id")

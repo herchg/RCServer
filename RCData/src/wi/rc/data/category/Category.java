@@ -21,10 +21,60 @@ import wi.core.util.json.AbsBaseJson;
  * @author hermeschang
  */
 public class Category extends AbsBaseJson {
-
-    @Override
-    public void init() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
+    public static final double _VERSION = 1.0;
+    
+    @Since(1.0) @SerializedName("category_id")
+    public Long mCatrgoryId;
+    @Since(1.0) @SerializedName("company_id")
+    public int mCompanyId;
+    @Since(1.0) @SerializedName("discription")
+    public String mDiscription;
+    @Since(1.0) @SerializedName("description_4_short")
+    public String mDiscription4Short;
+    @Since(1.0) @SerializedName("name")
+    public String mName;
+    @Since(1.0) @SerializedName("name_4_short")
+    public String mName4Shrot;
+    @Since(1.0) @SerializedName("option0")
+    public String mOption0;
+    @Since(1.0) @SerializedName("option1")
+    public String mOption1;
+    @Since(1.0) @SerializedName("option2")
+    public String mOption2;
+    @Since(1.0) @SerializedName("option3")
+    public String mOption3;
+    @Since(1.0) @SerializedName("option4")
+    public String mOption4;
+    @Since(1.0) @SerializedName("option5")
+    public String mOption5;
+    @Since(1.0) @SerializedName("option6")
+    public String mOption6;
+    @Since(1.0) @SerializedName("option7")
+    public String mOption7;
+    @Since(1.0) @SerializedName("option8")
+    public String mOption8;
+    @Since(1.0) @SerializedName("option9")
+    public String mOption9;
+    @Since(1.0) @SerializedName("parent_category_id")
+    public Long mParentCategoryId;
+    @Since(1.0) @SerializedName("status")
+    public String mStatus;
+    
+    public static Category loadFromStream(InputStream in) {
+        try {
+            String content = FileUtil.readStreamAsString(in, Charset.forName(Constants.DEFAULT_CHARSET));
+            return Category.fromJson(content);
+        } catch (Exception ex) {
+            return new Category();
+        }
     }
-    // TODO    
+
+    public static Category fromJson(String json) {
+        return (Category)fromJson(_VERSION, json, Category.class);
+    }
+    
+    public void init() {
+        // do nothing
+    }
 }

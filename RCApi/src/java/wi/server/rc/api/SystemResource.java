@@ -16,6 +16,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import wi.rc.server.opr.CategoryDataOpr;
 
 /**
  * REST Web Service
@@ -97,29 +98,25 @@ public class SystemResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategories() {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return CategoryDataOpr.selectCategory();
     }
     
-    @GET
-    @Path("/{system_id}/category/{category_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCategory(@PathParam("category_id")int category_id) {
-        
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
-    }
+//  @GET
+//  @Path("/{system_id}/category/{category_id}")
+//  @Produces(MediaType.APPLICATION_JSON)
+//  public Response getCategory(@PathParam("category_id")int category_id) {
+//      
+//      Response resp;
+//      resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
+//      return resp;
+//  }
     
     @POST
     @Path("/{system_id}/category")
     @Produces(MediaType.APPLICATION_JSON)
     public Response createCategory(String jsonCategorySet) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return CategoryDataOpr.insertCategory(jsonCategorySet);
     }
     
     @PUT
@@ -127,9 +124,7 @@ public class SystemResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCategory(@PathParam("category_id")int category_id, String jsonCategorySet) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return CategoryDataOpr.updateCategory(category_id, jsonCategorySet);
     }
     
     @DELETE
@@ -137,9 +132,7 @@ public class SystemResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteCategory(@PathParam("category_id")int category_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return CategoryDataOpr.deleteCategory(category_id);
     }
     
     //
