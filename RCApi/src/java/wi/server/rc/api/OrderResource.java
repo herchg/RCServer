@@ -49,7 +49,6 @@ public class OrderResource {
         return OrderDataOpr.selectOrdersByPosId(posId, expand);
     }
 
-    
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
