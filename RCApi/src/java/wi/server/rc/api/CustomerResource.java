@@ -17,6 +17,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import wi.rc.server.opr.CustomerDataOpr;
 
 /**
  * REST Web Service
@@ -36,23 +37,35 @@ public class CustomerResource {
     }
 
     @GET
-    @Path("/")
+    @Path("/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCustomers(@QueryParam("detail") int detail) {
+    public Response getCustomers(@PathParam("company_id")int company_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return CustomerDataOpr.selectAllCustomer(company_id);
     }
     
     @GET
-    @Path("/{customer_id}")
+    @Path("/{company_id}/{customer_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCustomer(@PathParam("customer_id")int customer_id, @QueryParam("detail") int detail) {
+    public Response getCustomerById(@PathParam("company_id")int company_id,@PathParam("customer_id")int customer_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return CustomerDataOpr.selectCustomerById(company_id,customer_id);
+    }
+    
+    @GET
+    @Path("/{company_id}/store/{store_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCustomerByStore(@PathParam("company_id")int company_id,@PathParam("store_id")int store_id) {
+        
+        return CustomerDataOpr.selectCustomerByStore(company_id,store_id);
+    }
+        
+    @GET
+    @Path("/{company_id}/name/{customer_name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCustomersByName(@PathParam("company_id")int company_id,@PathParam("customer_name")String customer_name) {
+        
+        return CustomerDataOpr.selectCustomerByName(company_id,customer_name);
     }
     
     @POST
@@ -60,9 +73,7 @@ public class CustomerResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createCustomer(String jsonCustomerSet) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return CustomerDataOpr.insertCustomer(jsonCustomerSet);
     }
     
     @PUT
@@ -76,12 +87,10 @@ public class CustomerResource {
     }
     
     @DELETE
-    @Path("/{customer_id}")
+    @Path("/{company_id}/{customer_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteCustomer(@PathParam("customer_id")int customer_id) {
+    public Response deleteCustomer(@PathParam("company_id")int company_id,@PathParam("customer_id")int customer_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return CustomerDataOpr.deleteCustomer(company_id,customer_id);
     }
 }
