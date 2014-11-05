@@ -38,7 +38,7 @@ public class OrderResource {
     @GET
     @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrder(@PathParam("orderId")int orderId, @QueryParam("expand") String expand) {
+    public Response getOrder(@PathParam("orderId")long orderId, @QueryParam("expand") String expand) {
         return OrderDataOpr.selectOrder(orderId, expand);
     }
 
@@ -70,7 +70,7 @@ public class OrderResource {
     @DELETE
     @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteOrder(@PathParam("orderId") int orderId) {
+    public Response deleteOrder(@PathParam("orderId") long orderId) {
         
        return OrderDataOpr.deleteOrder(orderId);
     }

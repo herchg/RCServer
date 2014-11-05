@@ -10,16 +10,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.LinkedHashSet;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.ws.rs.core.Response;
 import wi.core.db.DSConn;
+import wi.core.util.DateTimeUtil;
 import wi.core.util.json.JsonUtil;
 import wi.core.util.sql.SQLUtil;
+import wi.rc.server.Status;
 
 /**
  *
@@ -27,7 +29,7 @@ import wi.core.util.sql.SQLUtil;
  */
 public class OrderDataOpr {
 
-    public static Response selectOrder(int orderId, String expand) {
+    public static Response selectOrder(long orderId, String expand) {
 
         Connection conn = null;
         Response resp;
@@ -175,6 +177,9 @@ public class OrderDataOpr {
 
             Map<?, ?> map = JsonUtil.toMap(jsonString);
             Map<String, Object> mapOrder = (Map<String, Object>) map.get("order");
+            // add server info
+            mapOrder.put("status", Status.Valid.getValue());
+            mapOrder.put("log_datetime", DateTimeUtil.format(new Date(System.currentTimeMillis()), DateTimeUtil.DEFAULT_DATETIME_FORMAT));
 
             sql = SQLUtil.genInsertSQLString("`order`", mapOrder.keySet());
             PreparedStatement stmtOrder = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -249,12 +254,11 @@ public class OrderDataOpr {
         return resp;
     }
 
-    public static Response updateOrder(int orderId, String jsonOrderSet) {
-
+    public static Response updateOrder(long orderId, String jsonOrderSet) {
+        Response resp;
 //        OrderSet orderSet;
 //
 //        Connection conn = null;
-//        Response resp;
 //        boolean ret = true;
 //        String sql = "UPDATE rc.order SET";
 //        try {
@@ -340,42 +344,37 @@ public class OrderDataOpr {
 //            }
 //        }
 //
-//        return resp;
-        return null;
+        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return resp;
     }
 
-    public static Response deleteOrder(int orderId) {
+    public static Response deleteOrder(long orderId) {
+        
+        Response resp;
+        Connection conn = null;
+        
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+            PreparedStatement stmtOrder = conn.prepareStatement("UPDATE `order` SET  status = ? WHERE  order_id = ?");
+            stmtOrder.setLong(1, Status.Deleted.getValue());
+            stmtOrder.setLong(2, orderId);
+            stmtOrder.executeUpdate();
+            resp = Response.status(Response.Status.OK).build();
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (Exception ex) {
 
-//        Connection conn = null;
-//        Response resp;
-//        
-//        try {
-//            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-//            PreparedStatement stmtOrder = conn.prepareStatement(OrderDataOpr.DBInfo.OrderInfo.SQL_ORDER_DELETE);
-//            // "DELETE FROM rc.order WHERE order_id = ?";
-//            stmtOrder.setLong(1, orderId);
-//            stmtOrder.execute();
-//            PreparedStatement stmtOrderDetail = conn.prepareStatement(OrderDataOpr.DBInfo.OrderDetailInfo.SQL_ORDER_DETAIL_DELETE);
-//            // "DELETE FROM rc.order_detail WHERE order_id = ?"
-//            stmtOrderDetail.setLong(1, orderId);
-//            stmtOrderDetail.execute();
-//            resp = Response.status(Response.Status.CREATED).entity(null).build();
-//            
-//        } catch (JsonSyntaxException | NullPointerException ex) {
-//            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-//        } catch (Exception ex) {
-//            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-//        } finally {
-//            if (conn != null) {
-//                try {
-//                    conn.setAutoCommit(true);
-//                    conn.close();
-//                } catch (Exception ex) {
-//
-//                }
-//            }
-//        }
-//        return resp;
-        return null;
+                }
+            }
+        }
+
+        return resp;
     }
 }
