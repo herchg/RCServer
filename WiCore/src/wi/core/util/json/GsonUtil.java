@@ -18,4 +18,8 @@ public class GsonUtil {
     public static Gson getGson(double version) {
         return new GsonBuilder().setDateFormat(DATETIME_FORMAT).setVersion(version).create();
     }
+    public static Gson getGson() {
+        return new GsonBuilder().setDateFormat(DATETIME_FORMAT).create();
+    }
+
 }

@@ -39,12 +39,16 @@ public class OrderResource {
     @Path("/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrder(@PathParam("orderId")int orderId, @QueryParam("expand") String expand) {
-        
-        if(expand == null){
-            expand = "";
-        }
         return OrderDataOpr.selectOrder(orderId, expand);
     }
+
+    @GET
+    @Path("/pos/{posId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOrderByPosId(@PathParam("posId")int posId, @QueryParam("expand") String expand) {
+        return OrderDataOpr.selectOrdersByPosId(posId, expand);
+    }
+
     
     @POST
     @Path("/")
