@@ -31,9 +31,9 @@ public class PosResource {
     }
     
     @GET
-    @Path("/")
+    @Path("/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPoss(@QueryParam("ext") int ext) {
+    public Response getPos(@PathParam("company_id")int company_id) {
         
         Response resp;
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
@@ -41,9 +41,29 @@ public class PosResource {
     }
     
     @GET
-    @Path("/{pos_id}")
+    @Path("/{company_id}/{pos_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPos(@PathParam("pos_id")int pos_id, @QueryParam("ext") int ext) {
+    public Response getPosById(@PathParam("company_id")int company_id,@PathParam("pos_id")int pos_id) {
+        
+        Response resp;
+        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return resp;
+    }
+    
+    @GET
+    @Path("/{company_id}/store/{store_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPosByStore(@PathParam("company_id")int company_id,@PathParam("store_id")int store_id) {
+        
+        Response resp;
+        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return resp;
+    }
+    
+    @GET
+    @Path("/{company_id}/name/{store_name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPosById(@PathParam("company_id")int company_id,@PathParam("store_name")String store_name) {
         
         Response resp;
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();

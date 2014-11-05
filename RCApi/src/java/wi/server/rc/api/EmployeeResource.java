@@ -42,7 +42,7 @@ public class EmployeeResource {
     @GET
     @Path("/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployees(@QueryParam("company_id") int company_id) {
+    public Response getEmployees(@PathParam("company_id") int company_id) {
         
         return EmployeeDataOpr.selectAllEmployee(company_id);
     }
@@ -50,7 +50,7 @@ public class EmployeeResource {
     @GET
     @Path("/{company_id}/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployeeById(@QueryParam("company_id") int company_id,@QueryParam("employee_id") int employee_id,@QueryParam("expand") String expand) {
+    public Response getEmployeeById(@PathParam("company_id") int company_id,@PathParam("employee_id") int employee_id,@QueryParam("expand") String expand) {
         
         return EmployeeDataOpr.selectEmployeeById(company_id,employee_id,expand);
     }   
@@ -58,7 +58,7 @@ public class EmployeeResource {
     @GET
     @Path("/{company_id}/store/{store_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployeeByStoreId(@QueryParam("company_id") int company_id,@QueryParam("employee_id") int employee_id) {
+    public Response getEmployeeByStoreId(@PathParam("company_id") int company_id,@PathParam("employee_id") int employee_id) {
         
         return EmployeeDataOpr.selectEmployeeByStoreId(company_id,employee_id);
     }  
@@ -66,7 +66,7 @@ public class EmployeeResource {
     @GET
     @Path("/{company_id}/name/{employee_name}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployeeByName(@QueryParam("company_id") int company_id,@QueryParam("employee_name") String employee_name) {
+    public Response getEmployeeByName(@PathParam("company_id") int company_id,@PathParam("employee_name") String employee_name) {
         
         return EmployeeDataOpr.selectEmployeeByName(company_id,employee_name);
     }  

@@ -17,7 +17,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
+import wi.rc.server.opr.StoreDataOpr;
 /**
  * REST Web Service
  *
@@ -35,24 +35,37 @@ public class StoreResource {
     public StoreResource() {
     }
 
+
     @GET
-    @Path("/")
+    @Path("/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getStores(@QueryParam("price") int price, @QueryParam("ext") int ext) {
+    public Response getStores(@PathParam("company_id")int company_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return StoreDataOpr.selectAllStore(company_id);
     }
     
     @GET
-    @Path("/{store_id}")
+    @Path("/{company_id}/{store_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getStore(@PathParam("store_id")int store_id, @QueryParam("price") int price, @QueryParam("ext") int ext) {
+    public Response getStoresById(@PathParam("company_id")int company_id,@PathParam("store_id")int store_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return StoreDataOpr.selectStoreById(company_id,store_id);
+    }
+    
+    @GET
+    @Path("/{company_id}/name/{store_name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getStoresByName(@PathParam("company_id")int company_id,@PathParam("store_name")String store_name) {
+        
+        return StoreDataOpr.selectStoreByName(company_id,store_name);
+    }
+    
+    @GET
+    @Path("/{company_id}/employee/{employee_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getStoresByEmployee(@PathParam("company_id")int company_id,@PathParam("employee_id")int employee_id) {
+        
+        return StoreDataOpr.selectStoreByEmployee(company_id,employee_id);
     }
     
     @POST
@@ -60,9 +73,7 @@ public class StoreResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createStore(String jsonStoreSet) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return StoreDataOpr.insertStore(jsonStoreSet);
     }
     
     @PUT
@@ -76,12 +87,10 @@ public class StoreResource {
     }
     
     @DELETE
-    @Path("/{store_id}")
+    @Path("/{company_id}/{store_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteStore(@PathParam("store_id")int store_id) {
+    public Response deleteStore(@PathParam("company_id")int company_id,@PathParam("store_id")int store_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return StoreDataOpr.deleteStore(company_id,store_id);
     }
 }
