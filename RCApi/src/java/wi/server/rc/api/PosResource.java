@@ -13,6 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import wi.rc.server.opr.PosDataOpr;
 /**
  * REST Web Service
  *
@@ -35,9 +36,7 @@ public class PosResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPos(@PathParam("company_id")int company_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return PosDataOpr.selectAllPos(company_id);
     }
     
     @GET
@@ -45,9 +44,7 @@ public class PosResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPosById(@PathParam("company_id")int company_id,@PathParam("pos_id")int pos_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return PosDataOpr.selectPosById(company_id, pos_id);
     }
     
     @GET
@@ -55,9 +52,7 @@ public class PosResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPosByStore(@PathParam("company_id")int company_id,@PathParam("store_id")int store_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return PosDataOpr.selectPosByStore(company_id, store_id);
     }
     
     @GET
@@ -65,9 +60,7 @@ public class PosResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPosById(@PathParam("company_id")int company_id,@PathParam("store_name")String store_name) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return PosDataOpr.selectPosByName(company_id, store_name);
     }
     
     @POST
@@ -75,9 +68,7 @@ public class PosResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createPos(String jsonPosSet) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return PosDataOpr.insertPos(jsonPosSet);
     }
     
     @PUT
@@ -91,12 +82,10 @@ public class PosResource {
     }
     
     @DELETE
-    @Path("/{pos_id}")
+    @Path("/{company_id}/{pos_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deletePos(@PathParam("pos_id")int pos_id) {
+    public Response deletePos(@PathParam("company_id")int company_id,@PathParam("pos_id")int pos_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return PosDataOpr.deletePos(company_id, pos_id);
     }
 }
