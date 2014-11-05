@@ -17,7 +17,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
+import wi.rc.server.opr.EmployeeDataOpr;
 /**
  * REST Web Service
  *
@@ -40,35 +40,46 @@ public class EmployeeResource {
      * @return an instance of java.lang.String
      */
     @GET
-    @Path("/")
+    @Path("/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployees(@QueryParam("authority") int authority, @QueryParam("ext") int ext) {
+    public Response getEmployees(@QueryParam("company_id") int company_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return EmployeeDataOpr.selectAllEmployee(company_id);
     }
     
     @GET
-    @Path("/{employee_id}")
+    @Path("/{company_id}/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployee(@PathParam("employee_id")int employee_id, @QueryParam("authority") int authority, @QueryParam("ext") int ext) {
+    public Response getEmployeeById(@QueryParam("company_id") int company_id,@QueryParam("employee_id") int employee_id,@QueryParam("expand") String expand) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
-    }
+        return EmployeeDataOpr.selectEmployeeById(company_id,employee_id,expand);
+    }   
+    
+    @GET
+    @Path("/{company_id}/store/{store_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getEmployeeByStoreId(@QueryParam("company_id") int company_id,@QueryParam("employee_id") int employee_id) {
+        
+        return EmployeeDataOpr.selectEmployeeByStoreId(company_id,employee_id);
+    }  
+    
+    @GET
+    @Path("/{company_id}/name/{employee_name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getEmployeeByName(@QueryParam("company_id") int company_id,@QueryParam("employee_name") String employee_name) {
+        
+        return EmployeeDataOpr.selectEmployeeByName(company_id,employee_name);
+    }  
     
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response createEmployee(String jsonEmployeeSet) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return EmployeeDataOpr.insertEmployee(jsonEmployeeSet);
     }
     
+    /*
     @PUT
     @Path("/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -78,14 +89,12 @@ public class EmployeeResource {
         resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
         return resp;
     }
-    
+    */
     @DELETE
-    @Path("/{employee_id}")
+    @Path("/{company_id}/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteEmployee(@PathParam("employee_id")int employee_id) {
+    public Response deleteEmployee(@PathParam("company_id")int company_id,@PathParam("employee_id")int employee_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return EmployeeDataOpr.deleteEmployee(company_id,employee_id);
     }
 }

@@ -26,6 +26,7 @@ public class ProductResource {
     public ProductResource() {
     }
 
+    /*
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
@@ -33,32 +34,46 @@ public class ProductResource {
         
         return ProductDataOpr.selectAllProduct();
     }
+    */
+    @GET
+    @Path("/{company_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProductByCompany(@PathParam("company_id")int company_id) {
+        
+        return ProductDataOpr.selectProductByCompany(company_id);
+    }
     
     @GET
-    @Path("/{category_id}")
+    @Path("/{company_id}/{product_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProduct(@PathParam("category_id")int category_id) {
+    public Response getProduct(@PathParam("company_id")int company_id,@PathParam("product_id")int product_id) {
         
-        return ProductDataOpr.selectProductByCategory(category_id);
+        return ProductDataOpr.selectProductById(company_id,product_id);
     }
-    /*
+    
     @GET
-    @Path("/{product_name}")
+    @Path("/{company_id}/category/{category_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProduct(@PathParam("product_name")String product_name) {
+    public Response getProductByCategory(@PathParam("company_id")int company_id,@PathParam("category_id")int category_id) {
         
-        return ProductDataOpr.selectProductByName(product_name);
+        return ProductDataOpr.selectProductByCategory(company_id,category_id);
     }
-    */
+    
+    @GET
+    @Path("/{company_id}/name/{product_name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProductByName(@PathParam("company_id")int company_id,@PathParam("product_name")String product_name) {
+        
+        return ProductDataOpr.selectProductByName(company_id,product_name);
+    }
+    
     
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response createProduct(String jsonProductSet) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return ProductDataOpr.insertProduct(jsonProductSet);
     }
     
     /*
@@ -74,12 +89,10 @@ public class ProductResource {
     */
     
     @DELETE
-    @Path("/{product_id}")
+    @Path("/{company_id}/{product_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteProduct(@PathParam("product_id")int product_id) {
+    public Response deleteProduct(@PathParam("company_id")int company_id,@PathParam("product_id")int product_id) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return ProductDataOpr.deleteProduct(company_id,product_id);
     }
 }
