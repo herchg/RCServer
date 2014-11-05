@@ -174,7 +174,6 @@ public class OrderDataOpr {
             conn.setAutoCommit(false);
 
             Map<?, ?> map = JsonUtil.toMap(jsonString);
-//            Map<String, Map<String, Object>> mapOrder = (Map<String, Map<String, Object>>)map.get("order");
             Map<String, Object> mapOrder = (Map<String, Object>) map.get("order");
 
             sql = SQLUtil.genInsertSQLString("`order`", mapOrder.keySet());
@@ -189,11 +188,11 @@ public class OrderDataOpr {
 
             if (stmtOrder.executeUpdate() > 0) {
                 // execute success
+                // get order_id
                 ResultSet rs = stmtOrder.getGeneratedKeys();
                 if (rs.next()) {
                     order_id = rs.getLong(1);
                 }
-                jsonResult.addProperty("order_id", order_id);
 
                 PreparedStatement stmtOrderDetail = null;
                 List<Map<String, Object>> listOrderDetail = (List<Map<String, Object>>) map.get("order_detail");
@@ -216,6 +215,9 @@ public class OrderDataOpr {
                         break;
                     }
                 }
+                
+                // gen result
+                jsonResult.addProperty("order_id", order_id);
             } else {
                 // execute failure
                 ret = false;
@@ -227,12 +229,12 @@ public class OrderDataOpr {
                 resp = Response.status(Response.Status.CREATED).entity(jsonResult.toString()).build();
             } else {
                 conn.rollback();
-                resp = Response.status(Response.Status.BAD_REQUEST).entity(sql).build();
+                resp = Response.status(Response.Status.BAD_REQUEST).build();
             }
         } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage() + ":" + sql).build();
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage() + ":" + sql).build();
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
             if (conn != null) {
                 try {
