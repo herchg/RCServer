@@ -81,7 +81,6 @@ public class OrderDataOpr {
         } finally {
             if (conn != null) {
                 try {
-                    conn.setAutoCommit(true);
                     conn.close();
                 } catch (Exception ex) {
 
@@ -151,7 +150,6 @@ public class OrderDataOpr {
         } finally {
             if (conn != null) {
                 try {
-                    conn.setAutoCommit(true);
                     conn.close();
                 } catch (Exception ex) {
 
@@ -358,8 +356,11 @@ public class OrderDataOpr {
             PreparedStatement stmtOrder = conn.prepareStatement("UPDATE `order` SET  status = ? WHERE  order_id = ?");
             stmtOrder.setLong(1, Status.Deleted.getValue());
             stmtOrder.setLong(2, orderId);
-            stmtOrder.executeUpdate();
-            resp = Response.status(Response.Status.OK).build();
+            if (stmtOrder.executeUpdate() > 0) {
+                resp = Response.status(Response.Status.OK).build();
+            } else {
+                resp = Response.status(Response.Status.NOT_FOUND).build();
+            }
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
@@ -367,7 +368,6 @@ public class OrderDataOpr {
         } finally {
             if (conn != null) {
                 try {
-                    conn.setAutoCommit(true);
                     conn.close();
                 } catch (Exception ex) {
 
