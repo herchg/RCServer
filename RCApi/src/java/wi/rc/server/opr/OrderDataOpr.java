@@ -107,7 +107,6 @@ public class OrderDataOpr {
                     + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
                     + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
                     + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
-                    + " LEFT JOIN `order_detail` AS od ON o.order_id = od.order_id \n"
                     + " WHERE o.pos_id = ?");
             pStmt.setInt(1, posId);
             ResultSet rs = pStmt.executeQuery();
