@@ -54,7 +54,6 @@ public class OrderResource {
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response createOrder(String jsonOrderSet) {
-
         return OrderDataOpr.insertOrder(jsonOrderSet);
     }
 

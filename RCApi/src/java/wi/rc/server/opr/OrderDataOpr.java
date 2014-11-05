@@ -12,14 +12,14 @@ import com.google.gson.JsonSyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.ws.rs.core.Response;
 import wi.core.db.DSConn;
 import wi.core.util.json.JsonUtil;
 import wi.core.util.sql.SQLUtil;
-import wi.rc.data.order.OrderDetail;
-import wi.rc.data.order.OrderSet;
 
 /**
  *
@@ -49,17 +49,17 @@ public class OrderDataOpr {
             pStmt.setLong(1, orderId);
 
             ResultSet rs = pStmt.executeQuery();
-            
+
             if (!rs.next()) {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             } else {
                 // back to first
                 rs.previous();
-                
+
                 JsonObject jsonResult = new JsonObject();
                 JsonElement jsonOrder = JsonUtil.toJsonElement(rs);
                 jsonResult.add("order", jsonOrder);
-            
+
                 if (expand != null && expand.equals("detail")) {
                     PreparedStatement stmtOrderDetail = conn.prepareStatement("SELECT od.order_id AS order_id, od.product_id AS product_id, od.price AS price, od.amount AS amount, od.total_amount AS total_amount"
                             + " FROM order_detail AS od"
@@ -110,7 +110,7 @@ public class OrderDataOpr {
                     + " WHERE o.pos_id = ?");
             pStmt.setInt(1, posId);
             ResultSet rs = pStmt.executeQuery();
-            
+
             if (!rs.next()) {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             } else {
@@ -158,26 +158,30 @@ public class OrderDataOpr {
         }
         return resp;
     }
-        
+
     public static Response insertOrder(String jsonString) {
 
         Connection conn = null;
         Response resp;
         boolean ret = true;
-        
-        long order_id;
+
+        long order_id = -1;
         JsonObject jsonResult = new JsonObject();
-        
+
+        String sql = null;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             conn.setAutoCommit(false);
 
             Map<?, ?> map = JsonUtil.toMap(jsonString);
-            Map<String, Map<String, Object>> mapOrder = (Map<String, Map<String, Object>>)map.get("order");
+//            Map<String, Map<String, Object>> mapOrder = (Map<String, Map<String, Object>>)map.get("order");
+            Map<String, Object> mapOrder = (Map<String, Object>) map.get("order");
 
-            PreparedStatement stmtOrder = conn.prepareStatement(SQLUtil.genInsertSQLString(mapOrder.keySet()), PreparedStatement.RETURN_GENERATED_KEYS);
+            sql = SQLUtil.genInsertSQLString("`order`", mapOrder.keySet());
+            PreparedStatement stmtOrder = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+
             int count = 1;
-            for (String key: mapOrder.keySet()) {
+            for (String key : mapOrder.keySet()) {
                 Object value = mapOrder.get(key);
                 stmtOrder.setObject(count, value);
                 count++;
@@ -186,25 +190,32 @@ public class OrderDataOpr {
             if (stmtOrder.executeUpdate() > 0) {
                 // execute success
                 ResultSet rs = stmtOrder.getGeneratedKeys();
-                order_id = rs.getLong(1);
-                
+                if (rs.next()) {
+                    order_id = rs.getLong(1);
+                }
                 jsonResult.addProperty("order_id", order_id);
-//                PreparedStatement stmtOrderDetail = conn.prepareStatement(OrderDataOpr.DBInfo.OrderDetailInfo.SQL_ORDER_DETAIL_INSERT);
-//                for (OrderDetail orderDetail : orderSet.mOrderDetail) {
-//                    // set order_id
-//                    orderDetail.mOrderId = orderSet.mOrder.mOrderId;
-//
-//                    // execute order_detail
-//                    stmtOrderDetail.setLong(1, orderDetail.mOrderId);
-//                    stmtOrderDetail.setInt(2, orderDetail.mProductId);
-//                    stmtOrderDetail.setInt(3, orderDetail.mPrice);
-//                    stmtOrderDetail.setInt(4, orderDetail.mAmount);
-//                    stmtOrderDetail.setInt(5, orderDetail.mTotalAmount);
-//                    if (stmtOrderDetail.executeUpdate() < 0) {
-//                        ret = false;
-//                        break;
-//                    }
-//                }
+
+                PreparedStatement stmtOrderDetail = null;
+                List<Map<String, Object>> listOrderDetail = (List<Map<String, Object>>) map.get("order_detail");
+                for (Map<String, Object> mapOrderDetail : listOrderDetail) {
+                    // add order_id
+                    mapOrderDetail.put("order_id", order_id);
+                    // prepare sql and statement
+                    if (stmtOrderDetail == null) {
+                        sql = SQLUtil.genInsertSQLString("`order_detail`", mapOrderDetail.keySet());
+                        stmtOrderDetail = conn.prepareStatement(sql);
+                    }
+                    count = 1;
+                    for (String key : mapOrderDetail.keySet()) {
+                        Object value = mapOrderDetail.get(key);
+                        stmtOrderDetail.setObject(count, value);
+                        count++;
+                    }
+                    if (stmtOrderDetail.executeUpdate() < 0) {
+                        ret = false;
+                        break;
+                    }
+                }
             } else {
                 // execute failure
                 ret = false;
@@ -216,12 +227,12 @@ public class OrderDataOpr {
                 resp = Response.status(Response.Status.CREATED).entity(jsonResult.toString()).build();
             } else {
                 conn.rollback();
-                resp = Response.status(Response.Status.BAD_REQUEST).build();
+                resp = Response.status(Response.Status.BAD_REQUEST).entity(sql).build();
             }
         } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage() + ":" + sql).build();
         } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage() + ":" + sql).build();
         } finally {
             if (conn != null) {
                 try {
@@ -235,9 +246,9 @@ public class OrderDataOpr {
 
         return resp;
     }
-    
+
     public static Response updateOrder(int orderId, String jsonOrderSet) {
-        
+
 //        OrderSet orderSet;
 //
 //        Connection conn = null;
@@ -330,7 +341,7 @@ public class OrderDataOpr {
 //        return resp;
         return null;
     }
-    
+
     public static Response deleteOrder(int orderId) {
 
 //        Connection conn = null;

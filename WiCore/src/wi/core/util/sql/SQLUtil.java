@@ -12,7 +12,7 @@ import java.util.Set;
  * @author hermeschang
  */
 public class SQLUtil {
-    public final static String genInsertSQLString(Set<String> keys) {
+    public final static String genInsertSQLString(String tableName, Set<String> keys) {
         StringBuilder sbOrder = new StringBuilder();
         StringBuilder sbOrderParam = new StringBuilder();
         StringBuilder sbOrderValue = new StringBuilder();
@@ -28,7 +28,8 @@ public class SQLUtil {
             sbOrderParam.append(key);
             sbOrderValue.append("?");
         }
-        sbOrder.append("INSERT INTO order");
+        sbOrder.append("INSERT INTO ");
+        sbOrder.append(tableName);
         sbOrder.append("(");
         sbOrder.append(sbOrderParam);
         sbOrder.append(")");
