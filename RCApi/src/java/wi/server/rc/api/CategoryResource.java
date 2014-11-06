@@ -52,7 +52,7 @@ public class CategoryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategoryById(@PathParam("company_id") int company_id,@PathParam("category_id") int category_id) {
         
-        return null;
+        return CategoryDataOpr.selectCategoryById(company_id,category_id);
     }   
 
     @GET
@@ -60,7 +60,7 @@ public class CategoryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategoryByName(@PathParam("company_id") int company_id,@PathParam("category_name") String category_name) {
         
-        return null;
+        return CategoryDataOpr.selectCategoryByName(company_id,category_name);
     }  
     
     @POST
@@ -68,7 +68,7 @@ public class CategoryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createCategory(String jsonEmployeeSet) {
         
-        return null;
+        return CategoryDataOpr.insertCategory(jsonEmployeeSet);
     }
 
     /*
@@ -87,6 +87,6 @@ public class CategoryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEmployee(@PathParam("company_id")int company_id,@PathParam("category_id")int category_id) {
         
-        return null;
+        return CategoryDataOpr.deleteCategory(company_id,category_id);
     }
 }

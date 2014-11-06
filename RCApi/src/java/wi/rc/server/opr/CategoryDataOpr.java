@@ -27,59 +27,21 @@ public class CategoryDataOpr {
     
     public static Response selectAllCategory(int company_id) {
         
-        Response resp;
-        /*
-        Connection conn = null;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
-                                + " FROM `employee` \n" 
-                                + " WHERE company_id = ?");
-            pStmt.setInt(1, company_id);
-            ResultSet rs = pStmt.executeQuery();
-            
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-     
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
-                jsonResult.add("employee", jsonEmployee);
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-            }
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
-        }
-        */
-        resp = Response.status(Response.Status.BAD_REQUEST).entity("AAAA").build();
-        return resp;
+        return null;
     }
     
-    public static Response selectCategoryById(int company_id ,int employee_id,String expand) {
+    public static Response selectCategoryById(int company_id ,int category_id) {
         
         Connection conn = null;
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
-            PreparedStatement pStmt = conn.prepareStatement("SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
-                    + " FROM `employee` \n" 
-                    + " WHERE company_id = ? AND employee_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement("SELECT category_id, parent_category_id, company_id, name, name_4_short, description, description_4_short, \n"
+                    + " option0, option1, option2, option3, option4, option5, option6, option7, option8, option9, status \n"
+                    + " FROM `category` WHERE company_id = ? AND category_id = ?");
             pStmt.setInt(1, company_id);
-            pStmt.setInt(2, employee_id);
+            pStmt.setInt(2, category_id);
             ResultSet rs = pStmt.executeQuery();
             
             if (!rs.next()) {
@@ -89,18 +51,9 @@ public class CategoryDataOpr {
                 rs.previous();
      
                 JsonObject jsonResult = new JsonObject();
-                JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
-                jsonResult.add("employee", jsonEmployee);
-                
-                if (expand != null && expand.equals("ext")) {
-                    PreparedStatement stmtEmployeeExt = conn.prepareStatement("SELECT address, contact, tel, mobile, email \n"
-                            + " FROM `employee_ext` \n"
-                            + " WHERE employee_id = ?");
-                    stmtEmployeeExt.setLong(1, employee_id);
-                    ResultSet rsEmployeeExt = stmtEmployeeExt.executeQuery();
-                    JsonElement jsonEmployeeExt = JsonUtil.toJsonArray(rsEmployeeExt);
-                    jsonResult.add("employee_ext", jsonEmployeeExt);
-                }
+                JsonElement jsonCategory = JsonUtil.toJsonArray(rs);
+                jsonResult.add("category", jsonCategory);
+
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
         } catch (JsonSyntaxException | NullPointerException ex) {
@@ -121,18 +74,18 @@ public class CategoryDataOpr {
         return resp;
     }
 
-    public static Response selectCategoryByName(int company_id,String employee_name) {
+    public static Response selectCategoryByName(int company_id,String category_name) {
         
         Connection conn = null;
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
-            PreparedStatement pStmt = conn.prepareStatement("SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
-                    + " FROM `employee` \n" 
-                    + " WHERE company_id = ? AND name LIKE ?");
+            PreparedStatement pStmt = conn.prepareStatement("SELECT category_id, parent_category_id, company_id, name, name_4_short, description, description_4_short, \n"
+                    + " option0, option1, option2, option3, option4, option5, option6, option7, option8, option9, status \n"
+                    + " FROM `category` WHERE company_id = ? AND name LIKE ?");
             pStmt.setInt(1, company_id);
-            pStmt.setString(2, "%" + employee_name + "%");
+            pStmt.setString(2, "%" + category_name + "%");
             ResultSet rs = pStmt.executeQuery();
             
             if (!rs.next()) {
@@ -143,7 +96,7 @@ public class CategoryDataOpr {
      
                 JsonObject jsonResult = new JsonObject();
                 JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
-                jsonResult.add("employee", jsonEmployee);
+                jsonResult.add("category", jsonEmployee);
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
         } catch (JsonSyntaxException | NullPointerException ex) {
@@ -169,7 +122,7 @@ public class CategoryDataOpr {
         Response resp;
         boolean ret = true;
 
-        long employee_id = -1;
+        long category_id = -1;
         JsonObject jsonResult = new JsonObject();
 
         String sql = null;
@@ -178,46 +131,29 @@ public class CategoryDataOpr {
             conn.setAutoCommit(false);
 
             Map<?, ?> map = JsonUtil.toMap(jsonString);
-            Map<String, Object> mapEmployee = (Map<String, Object>) map.get("employee");
+            Map<String, Object> mapCategory = (Map<String, Object>) map.get("category");
 
-            sql = SQLUtil.genInsertSQLString("`employee`", mapEmployee.keySet());
-            PreparedStatement stmtEmployee = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            sql = SQLUtil.genInsertSQLString("`category`", mapCategory.keySet());
+            PreparedStatement stmtCategory = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 
             int count = 1;
-            for (String key : mapEmployee.keySet()) {
-                Object value = mapEmployee.get(key);
-                stmtEmployee.setObject(count, value);
+            for (String key : mapCategory.keySet()) {
+                Object value = mapCategory.get(key);
+                stmtCategory.setObject(count, value);
                 count++;
             }
 
-            if (stmtEmployee.executeUpdate() > 0) {
+            if (stmtCategory.executeUpdate() > 0) {
                 // execute success
                 // get product_id
-                ResultSet rs = stmtEmployee.getGeneratedKeys();
+                ResultSet rs = stmtCategory.getGeneratedKeys();
                 if (rs.next()) {
-                    employee_id = rs.getLong(1);
-                }
-                
-                PreparedStatement stmtEmployeeExt = null;
-                Map<String, Object> mapEmployeeExt = (Map<String, Object>) map.get("employee_ext");
-                // add product_id
-                mapEmployeeExt.put("employee_id", employee_id);
-                // prepare sql and statement
-                if (stmtEmployeeExt == null) {
-                    sql = SQLUtil.genInsertSQLString("`employee_ext`", mapEmployeeExt.keySet());
-                    stmtEmployeeExt = conn.prepareStatement(sql);
-                }
-                count = 1;
-                for (String key : mapEmployeeExt.keySet()) {
-                    Object value = mapEmployeeExt.get(key);
-                    stmtEmployeeExt.setObject(count, value);
-                    count++;
-                }
-                if (stmtEmployeeExt.executeUpdate() < 0) {
+                    category_id = rs.getLong(1);
+                    // gen result
+                    jsonResult.addProperty("category_id", category_id);
+                }else{
                     ret = false;
                 }
-                // gen result
-                jsonResult.addProperty("employee_id", employee_id);
             } else {
                 // execute failure
                 ret = false;
@@ -249,23 +185,23 @@ public class CategoryDataOpr {
         return resp;
     }
     
-    public static Response updateEmployee(int employee_id, String jsonOrderSet) {
+    public static Response updateEmployee(String jsonOrderSet) {
         
         return null;
     }
     
     
-    public static Response deleteCategory(int company_id,int employee_id) {
+    public static Response deleteCategory(int company_id,int category_id) {
         
         Response resp;
         Connection conn = null;
         
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement stmtEmployee = conn.prepareStatement("UPDATE `employee` SET  status = ? WHERE company_id = ? AND employee_id = ?");
+            PreparedStatement stmtEmployee = conn.prepareStatement("UPDATE `category` SET  status = ? WHERE company_id = ? AND category_id = ?");
             stmtEmployee.setLong(1, Status.Deleted.getValue());
             stmtEmployee.setLong(2, company_id);
-            stmtEmployee.setLong(3, employee_id);
+            stmtEmployee.setLong(3, category_id);
             if (stmtEmployee.executeUpdate() > 0) {
                 resp = Response.status(Response.Status.OK).build();
             } else {
