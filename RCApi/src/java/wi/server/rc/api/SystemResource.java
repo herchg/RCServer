@@ -98,7 +98,7 @@ public class SystemResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategories() {
         
-        return CategoryDataOpr.selectCategory();
+        return null;//CategoryDataOpr.selectCategory();
     }
     
 //  @GET
@@ -124,7 +124,7 @@ public class SystemResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCategory(@PathParam("category_id")int category_id, String jsonCategorySet) {
         
-        return CategoryDataOpr.updateCategory(category_id, jsonCategorySet);
+        return null;//CategoryDataOpr.updateCategory(category_id, jsonCategorySet);
     }
     
     @DELETE
@@ -132,7 +132,7 @@ public class SystemResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteCategory(@PathParam("category_id")int category_id) {
         
-        return CategoryDataOpr.deleteCategory(category_id);
+        return null;//CategoryDataOpr.deleteCategory(category_id);
     }
     
     //
