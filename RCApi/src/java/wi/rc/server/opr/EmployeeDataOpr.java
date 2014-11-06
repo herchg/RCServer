@@ -290,6 +290,71 @@ public class EmployeeDataOpr {
         return resp;
     }
     
+    public static Response loginEmployee(String jsonString) {
+        
+        Connection conn = null;
+        Response resp;
+        boolean ret = false;
+
+        try {
+            Map<?, ?> map = JsonUtil.toMap(jsonString);
+            Map<String, Object> mapEmployee = (Map<String, Object>) map.get("employee");
+            
+            int company_id = ((Double)mapEmployee.get("company_id")).intValue();
+            int employee_id = ((Double)mapEmployee.get("employee_id")).intValue();
+            String login_account = (String)mapEmployee.get("login_account");
+            String login_password = (String)mapEmployee.get("login_password");
+            
+            //check input
+            if(company_id > 0 && employee_id > 0 && login_account != null && login_password != null){
+                
+                conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+                PreparedStatement pStmt = conn.prepareStatement("SELECT login_password ,status \n"
+                        + " FROM `employee` WHERE company_id = ? AND employee_id = ? AND login_account =? ");
+                
+                pStmt.setInt(1, company_id);
+                pStmt.setInt(2, employee_id);
+                pStmt.setString(3, login_account);
+        
+                ResultSet rs = pStmt.executeQuery();
+
+                if (rs.next()) {
+                    //check password and status
+                    String password = rs.getString("login_password");
+                    int status = rs.getInt("status");
+        
+                    //password ok and status = 1
+                    if(login_password.equals(password) && status == 1 ){
+                        ret = true;
+                    }
+                }
+            }
+            
+            
+            if (ret) {
+                resp = Response.status(Response.Status.OK).build();
+            } else {
+                resp = Response.status(Response.Status.NOT_FOUND).build();
+            }
+            
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+
+        return resp;
+    } 
+    
     
     public static Response updateEmployee(int employee_id, String jsonOrderSet) {
         
@@ -304,11 +369,11 @@ public class EmployeeDataOpr {
         
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement stmtOrder = conn.prepareStatement("UPDATE `employee` SET  status = ? WHERE company_id = ? AND employee_id = ?");
-            stmtOrder.setLong(1, Status.Deleted.getValue());
-            stmtOrder.setLong(2, company_id);
-            stmtOrder.setLong(3, employee_id);
-            if (stmtOrder.executeUpdate() > 0) {
+            PreparedStatement stmtEmployee = conn.prepareStatement("UPDATE `employee` SET  status = ? WHERE company_id = ? AND employee_id = ?");
+            stmtEmployee.setLong(1, Status.Deleted.getValue());
+            stmtEmployee.setLong(2, company_id);
+            stmtEmployee.setLong(3, employee_id);
+            if (stmtEmployee.executeUpdate() > 0) {
                 resp = Response.status(Response.Status.OK).build();
             } else {
                 resp = Response.status(Response.Status.NOT_FOUND).build();

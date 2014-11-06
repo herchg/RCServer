@@ -79,6 +79,14 @@ public class EmployeeResource {
         return EmployeeDataOpr.insertEmployee(jsonEmployeeSet);
     }
     
+    @POST
+    @Path("/login")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loginEmployee(String jsonEmployeeSet) {
+        
+        return EmployeeDataOpr.loginEmployee(jsonEmployeeSet);
+    }
+    
     /*
     @PUT
     @Path("/{employee_id}")

@@ -6,6 +6,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -76,17 +77,15 @@ public class ProductResource {
         return ProductDataOpr.insertProduct(jsonProductSet);
     }
     
-    /*
+    
     @PUT
-    @Path("/{product_id}")
+    @Path("/{company_id}/{product_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateProduct(@PathParam("product_id")int product_id, String jsonProductSet) {
+    public Response updateProduct(@PathParam("company_id")int company_id,@PathParam("product_id")int product_id, String jsonProductSet) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return ProductDataOpr.updateProduct(company_id, product_id,jsonProductSet);
     }
-    */
+    
     
     @DELETE
     @Path("/{company_id}/{product_id}")

@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import wi.core.db.DSConn;
 import wi.core.util.json.JsonUtil;
 import wi.core.util.sql.SQLUtil;
+import wi.rc.data.product.Product;
 import wi.rc.server.Status;
 /**
  *
@@ -360,78 +361,84 @@ public class ProductDataOpr {
         return resp;
     }
     
-    public static Response updateProduct(int orderId, String jsonOrderSet) {
+    public static Response updateProduct(int company_id, int product_id,String jsonProductSet) {
         
-//        OrderSet orderSet;
+//        Product product;
 //
 //        Connection conn = null;
 //        Response resp;
 //        boolean ret = true;
-//        String sql = "UPDATE rc.order SET";
+//        String sql = "UPDATE rc.product SET";
+//
 //        try {
-//            orderSet = OrderSet.fromJson(OrderSet._VERSION, jsonOrderSet);
+//            product = Product.fromJson(Product._VERSION, jsonProductSet);
 //
 //            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-//            
-//            //if dont need to update the value will be -1
-//            
-//            if (orderSet.mOrder.mCustomerId != -1)
-//                sql += " customer_id = " + orderSet.mOrder.mCustomerId;
-//            if (orderSet.mOrder.mCompanyId != -1)
-//                sql += " company_id = " + orderSet.mOrder.mCompanyId;
-//            if (orderSet.mOrder.mStoreId != -1)
-//                sql += " store_id = " + orderSet.mOrder.mStoreId;
-//            if (orderSet.mOrder.mPosId != -1)
-//                sql += " pos_id = " + orderSet.mOrder.mPosId;
-//            if (orderSet.mOrder.mEmployeeId != -1)
-//                sql += " employee_id = " + orderSet.mOrder.mEmployeeId;
-//            if (orderSet.mOrder.mNcode != null) 
-//                sql += " ncode = " + orderSet.mOrder.mNcode;
-//            if (orderSet.mOrder.mOrderDatetime != null) 
-//                sql += " order_datetime = " + orderSet.mOrder.mOrderDatetime;
-//            if (orderSet.mOrder.mStatus != null) 
-//                sql += " status = " + orderSet.mOrder.mStatus;
-//            if (orderSet.mOrder.mPosOrderId == null) 
-//                sql += " pos_order_id = " + orderSet.mOrder.mPosOrderId;
-//            if (orderSet.mOrder.mMemo == null) 
-//                sql += " memo = " + orderSet.mOrder.mMemo;
-//            
-//            PreparedStatement stmtOrder = conn.prepareStatement(sql);
-//            //
-//            // update order detail , unfinished
-//            //
-//            if (stmtOrder.executeUpdate() > 0) {
-//                // execute success
-//                ResultSet rs = stmtOrder.getGeneratedKeys();
-//                if (rs.next()) {
-//                    orderSet.mOrder.mOrderId = rs.getLong(1);
-//                }
+//            conn.setAutoCommit(false);
 //
-//                PreparedStatement stmtOrderDetail = conn.prepareStatement(OrderDataOpr.DBInfo.OrderDetailInfo.SQL_ORDER_DETAIL_INSERT);
-//                for (OrderDetail orderDetail : orderSet.mOrderDetail) {
-//                    // set order_id
-//                    orderDetail.mOrderId = orderSet.mOrder.mOrderId;
-//
-//                    // execute order_detail
-//                    stmtOrderDetail.setLong(1, orderDetail.mOrderId);
-//                    stmtOrderDetail.setInt(2, orderDetail.mProductId);
-//                    stmtOrderDetail.setInt(3, orderDetail.mPrice);
-//                    stmtOrderDetail.setInt(4, orderDetail.mAmount);
-//                    stmtOrderDetail.setInt(5, orderDetail.mTotalAmount);
-//                    if (stmtOrderDetail.executeUpdate() < 0) {
-//                        ret = false;
-//                        break;
-//                    }
-//                }
-//            } else {
-//                // execute failure
-//                ret = false;
+//            if (product.mName != null) {
+//                sql += " name = " + product.mName;
+//            }
+//            if (product.mName4Short != null) {
+//                sql += " name_4_short = " + product.mName4Short;
+//            }
+//            if (product.mDescription != null) {
+//                sql += " description = " + product.mDescription;
+//            }
+//            if (product.mDescription4Short != null) {
+//                sql += " description_4_short = " + product.mDescription4Short;
+//            }
+//            if (product.mProductCode != null) {
+//                sql += " product_code = " + product.mProductCode;
+//            }
+//            if (product.mBarcode != null) {
+//                sql += " barcode = " + product.mBarcode;
+//            }
+//            if (product.mCategoryId > 0) {
+//                sql += " category_id = " + product.mCategoryId;
+//            }
+//            if (product.mOption0 != null) {
+//                sql += " option0 = " + product.mOption0;
+//            }
+//            if (product.mOption1 != null) {
+//                sql += " option1 = " + product.mOption1;
+//            }
+//            if (product.mOption2 != null) {
+//                sql += " option2 = " + product.mOption2;
+//            }
+//            if (product.mOption3 != null) {
+//                sql += " option3 = " + product.mOption3;
+//            }
+//            if (product.mOption4 != null) {
+//                sql += " option04 = " + product.mOption4;
+//            }
+//            if (product.mOption5 != null) {
+//                sql += " option05 = " + product.mOption5;
+//            }
+//            if (product.mOption6 != null) {
+//                sql += " option06 = " + product.mOption6;
+//            }
+//            if (product.mOption7 != null) {
+//                sql += " option07= " + product.mOption7;
+//            }
+//            if (product.mOption8 != null) {
+//                sql += " option08 = " + product.mOption8;
+//            }
+//            if (product.mOption9 != null) {
+//                sql += " option09 = " + product.mOption9;
+//            }
+//            if (product.mStatus != null) {
+//                sql += " status = " + product.mStatus;
 //            }
 //
-//            // check ret and commit or rollback
+//            sql += " WHERE company_id = " + company_id + " AND product_id = " + product_id;
+//            PreparedStatement stmtCategory = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+//            if (stmtCategory.executeUpdate() < 0) {
+//                ret = false;
+//            }
 //            if (ret) {
 //                conn.commit();
-//                resp = Response.status(Response.Status.CREATED).entity(orderSet.toJson(OrderSet._VERSION)).build();
+//                resp = Response.status(Response.Status.CREATED).entity(product.toJson(Product._VERSION)).build();
 //            } else {
 //                conn.rollback();
 //                resp = Response.status(Response.Status.BAD_REQUEST).build();
@@ -452,6 +459,7 @@ public class ProductDataOpr {
 //        }
 //
 //        return resp;
+        
         return null;
     }
     
