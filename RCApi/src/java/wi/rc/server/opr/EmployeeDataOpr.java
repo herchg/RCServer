@@ -295,7 +295,7 @@ public class EmployeeDataOpr {
         Connection conn = null;
         Response resp;
         boolean ret = false;
-
+        /*
         try {
             Map<?, ?> map = JsonUtil.toMap(jsonString);
             Map<String, Object> mapEmployee = (Map<String, Object>) map.get("employee");
@@ -351,7 +351,9 @@ public class EmployeeDataOpr {
                 }
             }
         }
-
+        */
+        resp = Response.status(Response.Status.OK).build();
+        
         return resp;
     } 
     
