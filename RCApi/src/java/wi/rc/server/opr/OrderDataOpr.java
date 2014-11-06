@@ -165,6 +165,7 @@ public class OrderDataOpr {
         boolean ret = true;
 
         long order_id = -1;
+        String ncode = "901";
         JsonObject jsonResult = new JsonObject();
 
         String sql = null;
@@ -175,6 +176,10 @@ public class OrderDataOpr {
 
             Map<?, ?> map = JsonUtil.toMap(jsonString);
             Map<String, Object> mapOrder = (Map<String, Object>) map.get("order");
+            
+            //取得ncode
+            ncode = (String)mapOrder.get("ncode");
+            
             // add server info
             mapOrder.put("status", Status.Valid.getValue());
             mapOrder.put("log_datetime", DateTimeUtil.format(new Date(System.currentTimeMillis()), DateTimeUtil.DEFAULT_DATETIME_FORMAT));
@@ -201,6 +206,7 @@ public class OrderDataOpr {
                 List<Map<String, Object>> listOrderDetail = (List<Map<String, Object>>) map.get("order_detail");
                 for (Map<String, Object> mapOrderDetail : listOrderDetail) {
                     // add order_id
+                    mapOrderDetail.put("ncode", ncode);
                     mapOrderDetail.put("order_id", order_id);
                     // prepare sql and statement
                     if (stmtOrderDetail == null) {
