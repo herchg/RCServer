@@ -169,6 +169,7 @@ public class OrderDataOpr {
 
         String sql = null;
         try {
+            
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             conn.setAutoCommit(false);
 
@@ -195,7 +196,7 @@ public class OrderDataOpr {
                 if (rs.next()) {
                     order_id = rs.getLong(1);
                 }
-
+                
                 PreparedStatement stmtOrderDetail = null;
                 List<Map<String, Object>> listOrderDetail = (List<Map<String, Object>>) map.get("order_detail");
                 for (Map<String, Object> mapOrderDetail : listOrderDetail) {
@@ -233,6 +234,7 @@ public class OrderDataOpr {
                 conn.rollback();
                 resp = Response.status(Response.Status.BAD_REQUEST).build();
             }
+            
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
