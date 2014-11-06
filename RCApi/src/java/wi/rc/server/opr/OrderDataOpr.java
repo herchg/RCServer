@@ -165,7 +165,7 @@ public class OrderDataOpr {
         boolean ret = true;
 
         long order_id = -1;
-        String ncode = "901";
+        String ncode;
         JsonObject jsonResult = new JsonObject();
 
         String sql = null;
