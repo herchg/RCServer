@@ -29,7 +29,75 @@ import wi.rc.server.Status;
  */
 public class OrderDataOpr {
 
-    public static Response selectOrder(long orderId, String expand) {
+    public static Response selectAllOrders(int company_id, String expand) {
+
+        Connection conn = null;
+        Response resp;
+
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+            PreparedStatement pStmt = conn.prepareStatement("SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
+                    + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
+                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount, o.order_datetime AS order_datetime, \n"
+                    + " o.log_datetime AS log_datetime, o.status AS status, o.pos_order_id AS pos_order_id, o.memo  AS memo \n"
+                    + " FROM `order` AS o \n"
+                    + " LEFT JOIN `customer` AS cu ON o.customer_id = cu.customer_id \n"
+                    + " LEFT JOIN `company` AS c ON o.company_id = c.company_id \n"
+                    + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
+                    + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
+                    + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
+                    + " WHERE o.company_id = ? ");
+            pStmt.setInt(1, company_id);
+            ResultSet rs = pStmt.executeQuery();
+
+            if (!rs.next()) {
+                resp = Response.status(Response.Status.NOT_FOUND).build();
+            } else {
+                // back to first
+                rs.previous();
+                JsonArray jsonResult = new JsonArray();
+                while (rs.next()) {
+                    long orderId = rs.getLong("order_id");
+
+                    // back because next
+                    rs.previous();
+
+                    JsonObject jsonRow = new JsonObject();
+                    JsonElement jsonOrder = JsonUtil.toJsonElement(rs);
+                    jsonRow.add("order", jsonOrder);
+
+                    if (expand != null && expand.equals("detail")) {
+                        PreparedStatement stmtOrderDetail = conn.prepareStatement("SELECT od.order_id AS order_id, od.product_id AS product_id, od.price AS price, od.amount AS amount, od.total_amount AS total_amount"
+                                + " FROM order_detail AS od"
+                                + " LEFT JOIN `product` AS pd ON od.product_id = pd.product_id \n"
+                                + " WHERE od.order_id = ?");
+                        stmtOrderDetail.setLong(1, orderId);
+                        ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
+                        JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
+                        jsonRow.add("order_detail", elementOrderDetail);
+                    }
+                    jsonResult.add(jsonRow);
+                }
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+            }
+
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+        return resp;
+    }
+    
+    public static Response selectOrder(int company_id,long orderId, String expand) {
 
         Connection conn = null;
         Response resp;
@@ -47,9 +115,9 @@ public class OrderDataOpr {
                     + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
                     + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
                     + " LEFT JOIN `order_detail` AS od ON o.order_id = od.order_id \n"
-                    + " WHERE  o.order_id = ?");
-            pStmt.setLong(1, orderId);
-
+                    + " WHERE o.company_id = ? AND o.order_id = ?");
+            pStmt.setLong(1, company_id);
+            pStmt.setLong(2, orderId);
             ResultSet rs = pStmt.executeQuery();
 
             if (!rs.next()) {
@@ -90,7 +158,7 @@ public class OrderDataOpr {
         return resp;
     }
 
-    public static Response selectOrdersByPosId(int posId, String expand) {
+    public static Response selectOrdersByPosId(int company_id,int posId, String expand) {
 
         Connection conn = null;
         Response resp;
@@ -107,8 +175,148 @@ public class OrderDataOpr {
                     + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
                     + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
                     + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
-                    + " WHERE o.pos_id = ?");
-            pStmt.setInt(1, posId);
+                    + " WHERE o.company_id = ? AND o.pos_id = ?");
+            pStmt.setInt(1, company_id);
+            pStmt.setInt(2, posId);
+            ResultSet rs = pStmt.executeQuery();
+
+            if (!rs.next()) {
+                resp = Response.status(Response.Status.NOT_FOUND).build();
+            } else {
+                // back to first
+                rs.previous();
+                JsonArray jsonResult = new JsonArray();
+                while (rs.next()) {
+                    long orderId = rs.getLong("order_id");
+
+                    // back because next
+                    rs.previous();
+
+                    JsonObject jsonRow = new JsonObject();
+                    JsonElement jsonOrder = JsonUtil.toJsonElement(rs);
+                    jsonRow.add("order", jsonOrder);
+
+                    if (expand != null && expand.equals("detail")) {
+                        PreparedStatement stmtOrderDetail = conn.prepareStatement("SELECT od.order_id AS order_id, od.product_id AS product_id, od.price AS price, od.amount AS amount, od.total_amount AS total_amount"
+                                + " FROM order_detail AS od"
+                                + " LEFT JOIN `product` AS pd ON od.product_id = pd.product_id \n"
+                                + " WHERE od.order_id = ?");
+                        stmtOrderDetail.setLong(1, orderId);
+                        ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
+                        JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
+                        jsonRow.add("order_detail", elementOrderDetail);
+                    }
+                    jsonResult.add(jsonRow);
+                }
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+            }
+
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+        return resp;
+    }
+    
+    public static Response selectOrderByStatus(int company_id,long status_id, String expand) {
+
+        Connection conn = null;
+        Response resp;
+
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+            PreparedStatement pStmt = conn.prepareStatement("SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
+                    + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
+                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount, o.order_datetime AS order_datetime, \n"
+                    + " o.log_datetime AS log_datetime, o.status AS status, o.pos_order_id AS pos_order_id, o.memo  AS memo \n"
+                    + " FROM `order` AS o \n"
+                    + " LEFT JOIN `customer` AS cu ON o.customer_id = cu.customer_id \n"
+                    + " LEFT JOIN `company` AS c ON o.company_id = c.company_id \n"
+                    + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
+                    + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
+                    + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
+                    + " WHERE o.company_id = ? AND o.status = ?");
+            pStmt.setInt(1, company_id);
+            pStmt.setLong(2, status_id);
+            ResultSet rs = pStmt.executeQuery();
+
+            if (!rs.next()) {
+                resp = Response.status(Response.Status.NOT_FOUND).build();
+            } else {
+                // back to first
+                rs.previous();
+                JsonArray jsonResult = new JsonArray();
+                while (rs.next()) {
+                    long orderId = rs.getLong("order_id");
+
+                    // back because next
+                    rs.previous();
+
+                    JsonObject jsonRow = new JsonObject();
+                    JsonElement jsonOrder = JsonUtil.toJsonElement(rs);
+                    jsonRow.add("order", jsonOrder);
+
+                    if (expand != null && expand.equals("detail")) {
+                        PreparedStatement stmtOrderDetail = conn.prepareStatement("SELECT od.order_id AS order_id, od.product_id AS product_id, od.price AS price, od.amount AS amount, od.total_amount AS total_amount"
+                                + " FROM order_detail AS od"
+                                + " LEFT JOIN `product` AS pd ON od.product_id = pd.product_id \n"
+                                + " WHERE od.order_id = ?");
+                        stmtOrderDetail.setLong(1, orderId);
+                        ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
+                        JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
+                        jsonRow.add("order_detail", elementOrderDetail);
+                    }
+                    jsonResult.add(jsonRow);
+                }
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+            }
+
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+        return resp;
+    }
+    
+    public static Response selectOrderByDate(int company_id,String begin_date , String end_date, String expand) {
+
+        Connection conn = null;
+        Response resp;
+
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+            PreparedStatement pStmt = conn.prepareStatement("SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
+                    + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
+                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount, o.order_datetime AS order_datetime, \n"
+                    + " o.log_datetime AS log_datetime, o.status AS status, o.pos_order_id AS pos_order_id, o.memo  AS memo \n"
+                    + " FROM `order` AS o \n"
+                    + " LEFT JOIN `customer` AS cu ON o.customer_id = cu.customer_id \n"
+                    + " LEFT JOIN `company` AS c ON o.company_id = c.company_id \n"
+                    + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
+                    + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
+                    + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
+                    + " WHERE o.company_id = ? AND o.order_datetime >= ? AND o.order_datetime <= ?");
+            pStmt.setInt(1, company_id);
+            pStmt.setString(2, begin_date);
+            pStmt.setString(3, end_date);
             ResultSet rs = pStmt.executeQuery();
 
             if (!rs.next()) {
@@ -353,16 +561,17 @@ public class OrderDataOpr {
         return resp;
     }
 
-    public static Response deleteOrder(long orderId) {
+    public static Response deleteOrder(int company_id,long orderId) {
         
         Response resp;
         Connection conn = null;
         
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement stmtOrder = conn.prepareStatement("UPDATE `order` SET  status = ? WHERE  order_id = ?");
+            PreparedStatement stmtOrder = conn.prepareStatement("UPDATE `order` SET  status = ? WHERE company_id = ? AND order_id = ?");
             stmtOrder.setLong(1, Status.Deleted.getValue());
-            stmtOrder.setLong(2, orderId);
+            stmtOrder.setInt(2, company_id);
+            stmtOrder.setLong(3, orderId);
             if (stmtOrder.executeUpdate() > 0) {
                 resp = Response.status(Response.Status.OK).build();
             } else {

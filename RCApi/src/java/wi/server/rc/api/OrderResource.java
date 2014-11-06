@@ -26,28 +26,42 @@ public class OrderResource {
      * Get all orders 
      */
     @GET
-    @Path("/")
+    @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrders(@QueryParam("expand") String expand) {
+    public Response getOrders(@PathParam("company_id")int company_id,@QueryParam("expand") String expand) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return OrderDataOpr.selectAllOrders(company_id, expand);
     }
     
     @GET
-    @Path("/{orderId}")
+    @Path("/company/{company_id}/order/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrder(@PathParam("orderId")long orderId, @QueryParam("expand") String expand) {
-        return OrderDataOpr.selectOrder(orderId, expand);
+    public Response getOrder(@PathParam("company_id")int company_id,@PathParam("orderId")long orderId, @QueryParam("expand") String expand) {
+        return OrderDataOpr.selectOrder(company_id,orderId, expand);
     }
 
     @GET
-    @Path("/pos/{posId}")
+    @Path("/company/{company_id}/pos/{posId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrderByPosId(@PathParam("posId")int posId, @QueryParam("expand") String expand) {
-        return OrderDataOpr.selectOrdersByPosId(posId, expand);
+    public Response getOrderByPosId(@PathParam("company_id")int company_id,@PathParam("posId")int posId, @QueryParam("expand") String expand) {
+        return OrderDataOpr.selectOrdersByPosId(company_id,posId, expand);
     }
+    
+    @GET
+    @Path("/company/{company_id}/status/{status_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOrderByStatus(@PathParam("company_id")int company_id,@PathParam("status_id")long status_id, @QueryParam("expand") String expand) {
+        return OrderDataOpr.selectOrderByStatus(company_id,status_id, expand);
+    }
+    
+    @GET
+    @Path("/company/{company_id}/start_date/{start_date}/end_date/{end_date}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOrderByOrderDate(@PathParam("company_id")int company_id,@PathParam("start_date")String start_date,@PathParam("end_date")String end_date, @QueryParam("expand") String expand) {
+        return OrderDataOpr.selectOrderByDate(company_id,start_date,end_date, expand);
+    }
+    
+    
 
     @POST
     @Path("/")
@@ -67,11 +81,11 @@ public class OrderResource {
 //  }
     
     @DELETE
-    @Path("/{orderId}")
+    @Path("/company/{company_id}/order/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteOrder(@PathParam("orderId") long orderId) {
+    public Response deleteOrder(@PathParam("company_id")int company_id,@PathParam("orderId") long orderId) {
         
-       return OrderDataOpr.deleteOrder(orderId);
+       return OrderDataOpr.deleteOrder(company_id,orderId);
     }
 
     private void Exception(String FORMAT_ERROR) {

@@ -40,7 +40,7 @@ public class CategoryResource {
      * @return an instance of java.lang.String
      */
     @GET
-    @Path("/{company_id}")
+    @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllCategorys(@PathParam("company_id") int company_id) {
         
@@ -48,7 +48,7 @@ public class CategoryResource {
     }
     
     @GET
-    @Path("/{company_id}/{category_id}")
+    @Path("/company/{company_id}/category/{category_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategoryById(@PathParam("company_id") int company_id,@PathParam("category_id") int category_id) {
         
@@ -56,7 +56,7 @@ public class CategoryResource {
     }   
 
     @GET
-    @Path("/{company_id}/name/{category_name}")
+    @Path("/company/{company_id}/name/{category_name}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategoryByName(@PathParam("company_id") int company_id,@PathParam("category_name") String category_name) {
         
@@ -83,7 +83,7 @@ public class CategoryResource {
     }
     */
     @DELETE
-    @Path("/{company_id}/{category_id}")
+    @Path("/company/{company_id}/category/{category_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEmployee(@PathParam("company_id")int company_id,@PathParam("category_id")int category_id) {
         

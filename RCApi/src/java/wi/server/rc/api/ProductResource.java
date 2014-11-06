@@ -37,7 +37,7 @@ public class ProductResource {
     }
     */
     @GET
-    @Path("/{company_id}")
+    @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProductByCompany(@PathParam("company_id")int company_id) {
         
@@ -45,7 +45,7 @@ public class ProductResource {
     }
     
     @GET
-    @Path("/{company_id}/{product_id}")
+    @Path("/company/{company_id}/product/{product_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProduct(@PathParam("company_id")int company_id,@PathParam("product_id")int product_id) {
         
@@ -53,7 +53,7 @@ public class ProductResource {
     }
     
     @GET
-    @Path("/{company_id}/category/{category_id}")
+    @Path("/company/{company_id}/category/{category_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProductByCategory(@PathParam("company_id")int company_id,@PathParam("category_id")int category_id) {
         
@@ -61,7 +61,7 @@ public class ProductResource {
     }
     
     @GET
-    @Path("/{company_id}/name/{product_name}")
+    @Path("/company/{company_id}/name/{product_name}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProductByName(@PathParam("company_id")int company_id,@PathParam("product_name")String product_name) {
         
@@ -79,16 +79,16 @@ public class ProductResource {
     
     
     @PUT
-    @Path("/{company_id}/{product_id}")
+    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateProduct(@PathParam("company_id")int company_id,@PathParam("product_id")int product_id, String jsonProductSet) {
+    public Response updateProduct( String jsonProductSet) {
         
-        return ProductDataOpr.updateProduct(company_id, product_id,jsonProductSet);
+        return ProductDataOpr.updateProduct(jsonProductSet);
     }
     
     
     @DELETE
-    @Path("/{company_id}/{product_id}")
+    @Path("/company/{company_id}/product/{product_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteProduct(@PathParam("company_id")int company_id,@PathParam("product_id")int product_id) {
         

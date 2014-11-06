@@ -32,7 +32,7 @@ public class PosResource {
     }
     
     @GET
-    @Path("/{company_id}")
+    @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPos(@PathParam("company_id")int company_id) {
         
@@ -40,7 +40,7 @@ public class PosResource {
     }
     
     @GET
-    @Path("/{company_id}/{pos_id}")
+    @Path("/company/{company_id}/pos/{pos_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPosById(@PathParam("company_id")int company_id,@PathParam("pos_id")int pos_id) {
         
@@ -48,7 +48,7 @@ public class PosResource {
     }
     
     @GET
-    @Path("/{company_id}/store/{store_id}")
+    @Path("/company/{company_id}/store/{store_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPosByStore(@PathParam("company_id")int company_id,@PathParam("store_id")int store_id) {
         
@@ -56,7 +56,7 @@ public class PosResource {
     }
     
     @GET
-    @Path("/{company_id}/name/{store_name}")
+    @Path("/company/{company_id}/name/{store_name}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPosById(@PathParam("company_id")int company_id,@PathParam("store_name")String store_name) {
         
@@ -82,7 +82,7 @@ public class PosResource {
     }
     
     @DELETE
-    @Path("/{company_id}/{pos_id}")
+    @Path("/company/{company_id}/pos/{pos_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deletePos(@PathParam("company_id")int company_id,@PathParam("pos_id")int pos_id) {
         

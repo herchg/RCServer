@@ -40,7 +40,7 @@ public class EmployeeResource {
      * @return an instance of java.lang.String
      */
     @GET
-    @Path("/{company_id}")
+    @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEmployees(@PathParam("company_id") int company_id) {
         
@@ -48,7 +48,7 @@ public class EmployeeResource {
     }
     
     @GET
-    @Path("/{company_id}/{employee_id}")
+    @Path("/company/{company_id}/employee/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEmployeeById(@PathParam("company_id") int company_id,@PathParam("employee_id") int employee_id,@QueryParam("expand") String expand) {
         
@@ -56,7 +56,7 @@ public class EmployeeResource {
     }   
     
     @GET
-    @Path("/{company_id}/store/{store_id}")
+    @Path("/company/{company_id}/store/{store_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEmployeeByStoreId(@PathParam("company_id") int company_id,@PathParam("employee_id") int employee_id) {
         
@@ -64,7 +64,7 @@ public class EmployeeResource {
     }  
     
     @GET
-    @Path("/{company_id}/name/{employee_name}")
+    @Path("/company/{company_id}/name/{employee_name}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEmployeeByName(@PathParam("company_id") int company_id,@PathParam("employee_name") String employee_name) {
         
@@ -99,7 +99,7 @@ public class EmployeeResource {
     }
     */
     @DELETE
-    @Path("/{company_id}/{employee_id}")
+    @Path("/company/{company_id}/employee/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEmployee(@PathParam("company_id")int company_id,@PathParam("employee_id")int employee_id) {
         
