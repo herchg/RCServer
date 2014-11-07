@@ -13,7 +13,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
@@ -21,6 +21,8 @@ import wi.core.db.DSConn;
 import wi.core.util.DateTimeUtil;
 import wi.core.util.json.JsonUtil;
 import wi.core.util.sql.SQLUtil;
+import wi.rc.data.order.OrderDetail;
+import wi.rc.data.order.OrderSet;
 import wi.rc.server.Status;
 
 /**
@@ -96,8 +98,8 @@ public class OrderDataOpr {
         }
         return resp;
     }
-    
-    public static Response selectOrder(int company_id,long orderId, String expand) {
+
+    public static Response selectOrder(int company_id, long orderId, String expand) {
 
         Connection conn = null;
         Response resp;
@@ -158,7 +160,7 @@ public class OrderDataOpr {
         return resp;
     }
 
-    public static Response selectOrdersByPosId(int company_id,int posId, String expand) {
+    public static Response selectOrdersByPosId(int company_id, int posId, String expand) {
 
         Connection conn = null;
         Response resp;
@@ -226,8 +228,8 @@ public class OrderDataOpr {
         }
         return resp;
     }
-    
-    public static Response selectOrderByStatus(int company_id,long status_id, String expand) {
+
+    public static Response selectOrderByStatus(int company_id, long status_id, String expand) {
 
         Connection conn = null;
         Response resp;
@@ -295,8 +297,8 @@ public class OrderDataOpr {
         }
         return resp;
     }
-    
-    public static Response selectOrderByDate(int company_id,String begin_date , String end_date, String expand) {
+
+    public static Response selectOrderByDate(int company_id, String begin_date, String end_date, String expand) {
 
         Connection conn = null;
         Response resp;
@@ -378,16 +380,16 @@ public class OrderDataOpr {
 
         String sql = null;
         try {
-            
+
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             conn.setAutoCommit(false);
 
             Map<?, ?> map = JsonUtil.toMap(jsonString);
             Map<String, Object> mapOrder = (Map<String, Object>) map.get("order");
-            
+
             //取得ncode
-            ncode = (String)mapOrder.get("ncode");
-            
+            ncode = (String) mapOrder.get("ncode");
+
             // add server info
             mapOrder.put("status", Status.Valid.getValue());
             mapOrder.put("log_datetime", DateTimeUtil.format(new Date(System.currentTimeMillis()), DateTimeUtil.DEFAULT_DATETIME_FORMAT));
@@ -409,7 +411,7 @@ public class OrderDataOpr {
                 if (rs.next()) {
                     order_id = rs.getLong(1);
                 }
-                
+
                 PreparedStatement stmtOrderDetail = null;
                 List<Map<String, Object>> listOrderDetail = (List<Map<String, Object>>) map.get("order_detail");
                 for (Map<String, Object> mapOrderDetail : listOrderDetail) {
@@ -432,7 +434,7 @@ public class OrderDataOpr {
                         break;
                     }
                 }
-                
+
                 // gen result
                 jsonResult.addProperty("order_id", order_id);
             } else {
@@ -448,7 +450,7 @@ public class OrderDataOpr {
                 conn.rollback();
                 resp = Response.status(Response.Status.BAD_REQUEST).build();
             }
-            
+
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
@@ -467,105 +469,90 @@ public class OrderDataOpr {
         return resp;
     }
 
-    public static Response updateOrder(long orderId, String jsonOrderSet) {
+    public static Response updateOrder(long orderId, String jsonString) {
         Response resp;
-//        OrderSet orderSet;
-//
-//        Connection conn = null;
-//        boolean ret = true;
-//        String sql = "UPDATE rc.order SET";
-//        try {
-//            orderSet = OrderSet.fromJson(OrderSet._VERSION, jsonOrderSet);
-//
-//            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-//            
-//            //if dont need to update the value will be -1
-//            
-//            if (orderSet.mOrder.mCustomerId != -1)
-//                sql += " customer_id = " + orderSet.mOrder.mCustomerId;
-//            if (orderSet.mOrder.mCompanyId != -1)
-//                sql += " company_id = " + orderSet.mOrder.mCompanyId;
-//            if (orderSet.mOrder.mStoreId != -1)
-//                sql += " store_id = " + orderSet.mOrder.mStoreId;
-//            if (orderSet.mOrder.mPosId != -1)
-//                sql += " pos_id = " + orderSet.mOrder.mPosId;
-//            if (orderSet.mOrder.mEmployeeId != -1)
-//                sql += " employee_id = " + orderSet.mOrder.mEmployeeId;
-//            if (orderSet.mOrder.mNcode != null) 
-//                sql += " ncode = " + orderSet.mOrder.mNcode;
-//            if (orderSet.mOrder.mOrderDatetime != null) 
-//                sql += " order_datetime = " + orderSet.mOrder.mOrderDatetime;
-//            if (orderSet.mOrder.mStatus != null) 
-//                sql += " status = " + orderSet.mOrder.mStatus;
-//            if (orderSet.mOrder.mPosOrderId == null) 
-//                sql += " pos_order_id = " + orderSet.mOrder.mPosOrderId;
-//            if (orderSet.mOrder.mMemo == null) 
-//                sql += " memo = " + orderSet.mOrder.mMemo;
-//            
-//            PreparedStatement stmtOrder = conn.prepareStatement(sql);
-//            //
-//            // update order detail , unfinished
-//            //
-//            if (stmtOrder.executeUpdate() > 0) {
-//                // execute success
-//                ResultSet rs = stmtOrder.getGeneratedKeys();
-//                if (rs.next()) {
-//                    orderSet.mOrder.mOrderId = rs.getLong(1);
-//                }
-//
-//                PreparedStatement stmtOrderDetail = conn.prepareStatement(OrderDataOpr.DBInfo.OrderDetailInfo.SQL_ORDER_DETAIL_INSERT);
-//                for (OrderDetail orderDetail : orderSet.mOrderDetail) {
-//                    // set order_id
-//                    orderDetail.mOrderId = orderSet.mOrder.mOrderId;
-//
-//                    // execute order_detail
-//                    stmtOrderDetail.setLong(1, orderDetail.mOrderId);
-//                    stmtOrderDetail.setInt(2, orderDetail.mProductId);
-//                    stmtOrderDetail.setInt(3, orderDetail.mPrice);
-//                    stmtOrderDetail.setInt(4, orderDetail.mAmount);
-//                    stmtOrderDetail.setInt(5, orderDetail.mTotalAmount);
-//                    if (stmtOrderDetail.executeUpdate() < 0) {
-//                        ret = false;
-//                        break;
-//                    }
-//                }
-//            } else {
-//                // execute failure
-//                ret = false;
-//            }
-//
-//            // check ret and commit or rollback
-//            if (ret) {
-//                conn.commit();
-//                resp = Response.status(Response.Status.CREATED).entity(orderSet.toJson(OrderSet._VERSION)).build();
-//            } else {
-//                conn.rollback();
-//                resp = Response.status(Response.Status.BAD_REQUEST).build();
-//            }
-//        } catch (JsonSyntaxException | NullPointerException ex) {
-//            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-//        } catch (Exception ex) {
-//            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-//        } finally {
-//            if (conn != null) {
-//                try {
-//                    conn.setAutoCommit(true);
-//                    conn.close();
-//                } catch (Exception ex) {
-//
-//                }
-//            }
-//        }
-//
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
+
+        Connection conn = null;
+        boolean ret = true;
+
+        JsonObject jsonResult = new JsonObject();
+        String sql = null;
+
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+
+            Map<?, ?> map = JsonUtil.toMap(jsonString);
+            Map<String, Object> mapOrderSet = (Map<String, Object>) map.get("order");
+            Map<String, Object> mapOrderWhere = new LinkedHashMap<String, Object>();
+
+            mapOrderWhere.put("order_id", orderId);
+
+            mapOrderSet.remove("order_id");// 避免Order Set statement裡面有order_id
+
+            sql = SQLUtil.genUpdateSQLString("`order`", mapOrderSet, mapOrderWhere);
+            PreparedStatement stmtOrder = conn.prepareStatement(sql);
+
+            if (stmtOrder.executeUpdate() > 0) {
+                // execute success
+                //
+                // update order detail , unfinished
+                //
+                List<Map<String, Object>> listOrderDetail = (List<Map<String, Object>>) map.get("order_detail");
+                for (Map<String, Object> mapOrderDetailSet : listOrderDetail) {
+
+                    // add order_id
+                    Map<String, Object> mapOrderDetailWhere = new LinkedHashMap<String, Object>();
+
+                    mapOrderDetailWhere.put("order_id", orderId);
+                    mapOrderDetailWhere.put("product_id", mapOrderDetailSet.get("product_id"));
+
+                    mapOrderDetailSet.remove("order_id");// 避免Order set statement裡面有order_id
+                    mapOrderDetailSet.remove("product_id");// 避免OrderDetail set statement裡面有product_id
+
+                    // prepare sql and statement
+                    sql = SQLUtil.genUpdateSQLString("`order_detail`", mapOrderDetailSet, mapOrderDetailWhere);
+                    PreparedStatement stmtOrderDetail = conn.prepareStatement(sql);
+                    if (stmtOrderDetail.executeUpdate() < 0) {
+                        ret = false;
+                        break;
+                    }
+                }
+
+                // gen result
+                jsonResult.addProperty("order_id", orderId);
+            } else {
+                // execute failure
+                ret = false;
+            }
+
+            // check ret and commit or rollback
+            if (ret) {
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+            } else {
+                resp = Response.status(Response.Status.BAD_REQUEST).entity(sql).build();
+            }
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+
         return resp;
     }
 
-    public static Response deleteOrder(int company_id,long orderId) {
-        
+    public static Response deleteOrder(int company_id, long orderId) {
+
         Response resp;
         Connection conn = null;
-        
+
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             PreparedStatement stmtOrder = conn.prepareStatement("UPDATE `order` SET  status = ? WHERE company_id = ? AND order_id = ?");
