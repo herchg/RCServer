@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import wi.core.db.DBOperation;
 import wi.core.db.DSConn;
 import wi.core.util.json.JsonUtil;
 import wi.core.util.sql.SQLUtil;
@@ -62,19 +63,13 @@ public class EmployeeDataOpr {
                 jsonResult.add("employee", jsonEmployee);
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+            DBOperation.close(pStmt, rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -108,22 +103,17 @@ public class EmployeeDataOpr {
                     ResultSet rsEmployeeExt = stmtEmployeeExt.executeQuery();
                     JsonElement jsonEmployeeExt = JsonUtil.toJsonArray(rsEmployeeExt);
                     jsonResult.add("employee_ext", jsonEmployeeExt);
+                    DBOperation.close(stmtEmployeeExt, rsEmployeeExt);
                 }
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();  
             }
+            DBOperation.close(pStmt, rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -152,19 +142,13 @@ public class EmployeeDataOpr {
                 jsonResult.add("employee", jsonEmployee);
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+            DBOperation.close(pStmt, rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         return resp;
     }
@@ -192,19 +176,13 @@ public class EmployeeDataOpr {
                 jsonResult.add("employee", jsonEmployee);
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+            DBOperation.close(pStmt, rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         return resp;
     }
@@ -264,11 +242,13 @@ public class EmployeeDataOpr {
                 }
                 // gen result
                 jsonResult.addProperty("employee_id", employee_id);
+                DBOperation.close(rs);
+                DBOperation.close(stmtEmployeeExt);
             } else {
                 // execute failure
                 ret = false;
             }
-
+            DBOperation.close(stmtEmployee);    
             // check ret and commit or rollback
             if (ret) {
                 conn.commit();
@@ -282,14 +262,7 @@ public class EmployeeDataOpr {
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -402,13 +375,14 @@ public class EmployeeDataOpr {
                 if (stmtEmployeeExt.executeUpdate() < 0) {
                     ret = false;
                 }
+                DBOperation.close(stmtEmployeeExt);
 
             } else {
                 ret = false;
             }
 
             jsonResult.addProperty("employee_id", employeeId);
-
+            DBOperation.close(stmtEmployee);
             // check ret and commit or rollback
             if (ret) {
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
@@ -420,13 +394,7 @@ public class EmployeeDataOpr {
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -448,18 +416,13 @@ public class EmployeeDataOpr {
             } else {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             }
+            DBOperation.close(stmtEmployee);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;

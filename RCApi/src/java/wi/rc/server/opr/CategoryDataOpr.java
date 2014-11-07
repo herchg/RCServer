@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import wi.core.db.DBOperation;
 import wi.core.db.DSConn;
 import wi.core.util.json.JsonUtil;
 import wi.core.util.sql.SQLUtil;
@@ -24,18 +25,47 @@ import wi.rc.server.Status;
  * @author 10307905
  */
 public class CategoryDataOpr {
-    
-    private static String generateSqlQueryString(){
-        
+
+    private static String generateSqlQueryString() {
+
         String sql = "SELECT category_id, parent_category_id, company_id, name, name_4_short, description, description_4_short, \n"
-                    + " option0, option1, option2, option3, option4, option5, option6, option7, option8, option9, status \n"
-                    + " FROM `category` WHERE company_id = ? ";
+                + " option0, option1, option2, option3, option4, option5, option6, option7, option8, option9, status \n"
+                + " FROM `category` WHERE company_id = ? ";
         return sql;
     }
 
     public static Response selectAllCategory(int company_id) {
 
-        return null;
+        Connection conn = null;
+        Response resp;
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString());
+            
+            pStmt.setInt(1, company_id);
+            ResultSet rs = pStmt.executeQuery();
+            
+            if (!rs.next()) {
+                resp = Response.status(Response.Status.NOT_FOUND).build();
+            } else {
+                // back to first
+                rs.previous();
+     
+                JsonObject jsonResult = new JsonObject();
+                JsonElement jsonCategory = JsonUtil.toJsonArray(rs);
+                jsonResult.add("category", jsonCategory);
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+            }
+            DBOperation.close(pStmt,rs);
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            DBOperation.close(conn);
+        }
+        
+        return resp;
     }
 
     public static Response selectCategoryById(int company_id, int category_id) {
@@ -61,20 +91,14 @@ public class CategoryDataOpr {
                 jsonResult.add("category", jsonCategory);
 
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+                DBOperation.close(pStmt, rs);
             }
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -102,20 +126,14 @@ public class CategoryDataOpr {
                 JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
                 jsonResult.add("category", jsonEmployee);
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+                DBOperation.close(pStmt, rs);
             }
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         return resp;
     }
@@ -155,6 +173,7 @@ public class CategoryDataOpr {
                     category_id = rs.getLong(1);
                     // gen result
                     jsonResult.addProperty("category_id", category_id);
+                    DBOperation.close(rs);
                 } else {
                     ret = false;
                 }
@@ -170,20 +189,14 @@ public class CategoryDataOpr {
             } else {
                 conn.rollback();
                 resp = Response.status(Response.Status.BAD_REQUEST).build();
+                DBOperation.close(stmtCategory);
             }
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -211,7 +224,7 @@ public class CategoryDataOpr {
 
             mapCategorySet.remove("category_id");// 避免Category Set statement裡面有category_id
             mapCategorySet.remove("company_id");
-            
+
             sql = SQLUtil.genUpdateSQLString("`category`", mapCategorySet, mapCategoryWhere);
             PreparedStatement stmtCategory = conn.prepareStatement(sql);
 
@@ -220,7 +233,8 @@ public class CategoryDataOpr {
             }
 
             jsonResult.addProperty("category_id", categoryId);
-
+            DBOperation.close(stmtCategory);
+            
             // check ret and commit or rollback
             if (ret) {
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
@@ -232,13 +246,7 @@ public class CategoryDataOpr {
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -251,27 +259,23 @@ public class CategoryDataOpr {
 
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement stmtEmployee = conn.prepareStatement("UPDATE `category` SET  status = ? WHERE company_id = ? AND category_id = ?");
-            stmtEmployee.setLong(1, Status.Deleted.getValue());
-            stmtEmployee.setLong(2, company_id);
-            stmtEmployee.setLong(3, category_id);
-            if (stmtEmployee.executeUpdate() > 0) {
+            PreparedStatement stmtCategory = conn.prepareStatement("UPDATE `category` SET  status = ? WHERE company_id = ? AND category_id = ?");
+            stmtCategory.setLong(1, Status.Deleted.getValue());
+            stmtCategory.setLong(2, company_id);
+            stmtCategory.setLong(3, category_id);
+            if (stmtCategory.executeUpdate() > 0) {
                 resp = Response.status(Response.Status.OK).build();
             } else {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             }
+            DBOperation.close(stmtCategory);
+            
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;

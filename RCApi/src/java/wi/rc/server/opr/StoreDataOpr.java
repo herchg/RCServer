@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import wi.core.db.DBOperation;
 import wi.core.db.DSConn;
 import wi.core.util.json.JsonUtil;
 import wi.core.util.sql.SQLUtil;
@@ -60,19 +61,13 @@ public class StoreDataOpr {
                 jsonResult.add("store", jsonProduct);
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+            DBOperation.close(pStmt, rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         
         
@@ -102,19 +97,13 @@ public class StoreDataOpr {
                 jsonResult.add("store", jsonProduct);
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+            DBOperation.close(pStmt, rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         
         
@@ -144,19 +133,13 @@ public class StoreDataOpr {
                 jsonResult.add("store", jsonProduct);
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+            DBOperation.close(pStmt, rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         
         
@@ -186,19 +169,13 @@ public class StoreDataOpr {
                 jsonResult.add("store", jsonProduct);
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+            DBOperation.close(pStmt, rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         
         
@@ -242,6 +219,7 @@ public class StoreDataOpr {
       
                 // gen result
                 jsonResult.addProperty("store_id", store_id);
+                DBOperation.close(rs);
             } else {
                 // execute failure
                 ret = false;
@@ -255,19 +233,13 @@ public class StoreDataOpr {
                 conn.rollback();
                 resp = Response.status(Response.Status.BAD_REQUEST).build();
             }
+            DBOperation.close(stmtStore);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -311,18 +283,13 @@ public class StoreDataOpr {
             } else {
                 resp = Response.status(Response.Status.BAD_REQUEST).entity(sql).build();
             }
+            DBOperation.close(stmtStore);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -335,27 +302,22 @@ public class StoreDataOpr {
         
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement stmtOrder = conn.prepareStatement("UPDATE `store` SET  status = ? WHERE company_id = ? AND store_id = ?");
-            stmtOrder.setLong(1, Status.Deleted.getValue());
-            stmtOrder.setLong(2, company_id);
-            stmtOrder.setLong(3, store_id);
-            if (stmtOrder.executeUpdate() > 0) {
+            PreparedStatement stmtStore = conn.prepareStatement("UPDATE `store` SET  status = ? WHERE company_id = ? AND store_id = ?");
+            stmtStore.setLong(1, Status.Deleted.getValue());
+            stmtStore.setLong(2, company_id);
+            stmtStore.setLong(3, store_id);
+            if (stmtStore.executeUpdate() > 0) {
                 resp = Response.status(Response.Status.OK).build();
             } else {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             }
+            DBOperation.close(stmtStore);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
