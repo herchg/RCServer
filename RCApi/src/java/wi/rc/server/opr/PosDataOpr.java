@@ -12,6 +12,7 @@ import com.google.gson.JsonSyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import wi.core.db.DSConn;
@@ -24,18 +25,25 @@ import wi.rc.server.Status;
  */
 public class PosDataOpr {
     
+    private static String generateSqlQueryString() {
+
+        String sql = "SELECT p.pos_id AS pos_id, p.name AS name, p.company_id AS company_id,c.name AS company_name, "
+                    + " p.store_id AS store_id,s.name AS store_name, p.memo AS memo, p.status AS status \n" 
+                    + " FROM `pos`  AS p \n" 
+                    + " LEFT JOIN `company` AS c ON p.company_id = c.company_id \n" 
+                    + " LEFT JOIN `store` AS s ON p.store_id = s.store_id \n" 
+                    + " WHERE p.company_id = ? ";
+        
+        return sql;
+    }
+    
     public static Response selectAllPos(int company_id) {
         
         Connection conn = null;
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT p.pos_id AS pos_id, p.name AS name, p.company_id AS company_id,c.name AS company_name, "
-                    + " p.store_id AS store_id,s.name AS store_name, p.memo AS memo, p.status AS status \n" 
-                    + " FROM `pos`  AS p \n" 
-                    + " LEFT JOIN `company` AS c ON p.company_id = c.company_id \n" 
-                    + " LEFT JOIN `store` AS s ON p.store_id = s.store_id \n" 
-                    + " WHERE p.company_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString());
             
             pStmt.setInt(1, company_id);
             ResultSet rs = pStmt.executeQuery();
@@ -76,12 +84,7 @@ public class PosDataOpr {
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT p.pos_id AS pos_id, p.name AS name, p.company_id AS company_id,c.name AS company_name, "
-                    + " p.store_id AS store_id,s.name AS store_name, p.memo AS memo, p.status AS status \n" 
-                    + " FROM `pos`  AS p \n" 
-                    + " LEFT JOIN `company` AS c ON p.company_id = c.company_id \n" 
-                    + " LEFT JOIN `store` AS s ON p.store_id = s.store_id \n" 
-                    + " WHERE p.company_id = ? AND p.pos_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND p.pos_id = ?");
             
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, pos_id);
@@ -123,12 +126,7 @@ public class PosDataOpr {
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT p.pos_id AS pos_id, p.name AS name, p.company_id AS company_id,c.name AS company_name, "
-                    + " p.store_id AS store_id,s.name AS store_name, p.memo AS memo, p.status AS status \n" 
-                    + " FROM `pos`  AS p \n" 
-                    + " LEFT JOIN `company` AS c ON p.company_id = c.company_id \n" 
-                    + " LEFT JOIN `store` AS s ON p.store_id = s.store_id \n" 
-                    + " WHERE p.company_id = ? AND p.store_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND p.store_id = ?");
             
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, store_id);
@@ -170,12 +168,7 @@ public class PosDataOpr {
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT p.pos_id AS pos_id, p.name AS name, p.company_id AS company_id,c.name AS company_name, "
-                    + " p.store_id AS store_id,s.name AS store_name, p.memo AS memo, p.status AS status \n" 
-                    + " FROM `pos`  AS p \n" 
-                    + " LEFT JOIN `company` AS c ON p.company_id = c.company_id \n" 
-                    + " LEFT JOIN `store` AS s ON p.store_id = s.store_id \n" 
-                    + " WHERE p.company_id = ? AND p.name LIKE ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND p.name LIKE ?");
             
             pStmt.setInt(1, company_id);
             pStmt.setString(2, "%" + store_name + "%");
@@ -277,6 +270,61 @@ public class PosDataOpr {
         }
 
         return resp;
+    }
+    
+    public static Response updatePos(int companyId, int posId, String jsonString) {
+        
+       Response resp;
+
+        Connection conn = null;
+        boolean ret = true;
+
+        JsonObject jsonResult = new JsonObject();
+        String sql = null;
+
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+
+            Map<?, ?> map = JsonUtil.toMap(jsonString);
+            Map<String, Object> mapPosSet = (Map<String, Object>) map.get("pos");
+            Map<String, Object> mapPosWhere = new LinkedHashMap<String, Object>();
+
+            mapPosWhere.put("pos_id", posId);
+            mapPosWhere.put("company_id", companyId);
+
+            mapPosSet.remove("pos_id");
+            mapPosSet.remove("company_id");
+            
+            sql = SQLUtil.genUpdateSQLString("`pos`", mapPosSet, mapPosWhere);
+            PreparedStatement stmtPos = conn.prepareStatement(sql);
+
+            if (stmtPos.executeUpdate() < 0) {
+                ret = false;
+            }
+
+            jsonResult.addProperty("pos_id", posId);
+
+            // check ret and commit or rollback
+            if (ret) {
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+            } else {
+                resp = Response.status(Response.Status.BAD_REQUEST).entity(sql).build();
+            }
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+
+        return resp; 
     }
     
     public static Response deletePos(int company_id,int pos_id) {

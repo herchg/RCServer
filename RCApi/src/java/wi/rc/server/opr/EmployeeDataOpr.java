@@ -25,15 +25,29 @@ import wi.rc.server.Status;
  */
 public class EmployeeDataOpr {
 
+    private static String generateSqlQueryString() {
+
+        String sql = "SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
+                + " FROM `employee` \n"
+                + " WHERE company_id = ? ";
+        return sql;
+    }
+
+    private static String generateSqlQueryExtString() {
+
+        String sql = "SELECT address, contact, tel, mobile, email \n"
+                + " FROM `employee_ext` \n"
+                + " WHERE employee_id = ?";
+        return sql;
+    }
+
     public static Response selectAllEmployee(int company_id) {
 
         Response resp;
         Connection conn = null;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
-                    + " FROM `employee` \n"
-                    + " WHERE company_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString());
             pStmt.setInt(1, company_id);
             ResultSet rs = pStmt.executeQuery();
 
@@ -73,9 +87,7 @@ public class EmployeeDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
-            PreparedStatement pStmt = conn.prepareStatement("SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
-                    + " FROM `employee` \n"
-                    + " WHERE company_id = ? AND employee_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND employee_id = ?");
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, employee_id);
             ResultSet rs = pStmt.executeQuery();
@@ -91,9 +103,7 @@ public class EmployeeDataOpr {
                 jsonResult.add("employee", jsonEmployee);
 
                 if (expand != null && expand.equals("ext")) {
-                    PreparedStatement stmtEmployeeExt = conn.prepareStatement("SELECT address, contact, tel, mobile, email \n"
-                            + " FROM `employee_ext` \n"
-                            + " WHERE employee_id = ?");
+                    PreparedStatement stmtEmployeeExt = conn.prepareStatement(generateSqlQueryExtString());
                     stmtEmployeeExt.setLong(1, employee_id);
                     ResultSet rsEmployeeExt = stmtEmployeeExt.executeQuery();
                     JsonElement jsonEmployeeExt = JsonUtil.toJsonArray(rsEmployeeExt);
@@ -126,9 +136,7 @@ public class EmployeeDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
-            PreparedStatement pStmt = conn.prepareStatement("SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
-                    + " FROM `employee` \n"
-                    + " WHERE company_id = ? AND store_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND store_id = ?");
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, store_id);
             ResultSet rs = pStmt.executeQuery();
@@ -168,9 +176,7 @@ public class EmployeeDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
-            PreparedStatement pStmt = conn.prepareStatement("SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
-                    + " FROM `employee` \n"
-                    + " WHERE company_id = ? AND name LIKE ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND name LIKE ?");
             pStmt.setInt(1, company_id);
             pStmt.setString(2, "%" + employee_name + "%");
             ResultSet rs = pStmt.executeQuery();
@@ -356,7 +362,7 @@ public class EmployeeDataOpr {
         return resp;
     }
 
-    public static Response updateEmployee(int employeeId, String jsonString) {
+    public static Response updateEmployee(int companyId, int employeeId, String jsonString) {
 
         Response resp;
 
@@ -374,8 +380,10 @@ public class EmployeeDataOpr {
             Map<String, Object> mapEmployeeWhere = new LinkedHashMap<String, Object>();
 
             mapEmployeeWhere.put("employee_id", employeeId);
+            mapEmployeeWhere.put("company_id", companyId);
 
             mapEmployeeSet.remove("employee_id");
+            mapEmployeeSet.remove("company_id");
 
             sql = SQLUtil.genUpdateSQLString("`employee`", mapEmployeeSet, mapEmployeeWhere);
             PreparedStatement stmtEmployee = conn.prepareStatement(sql);
