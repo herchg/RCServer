@@ -45,8 +45,8 @@ public class OrderResource {
     @GET
     @Path("/company/{company_id}/order/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrder(@PathParam("company_id")int company_id,@PathParam("orderId")long orderId, @QueryParam("expand") String expand) {
-        return OrderDataOpr.selectOrder(company_id,orderId, expand);
+    public Response getOrderById(@PathParam("company_id")int company_id,@PathParam("orderId")long orderId, @QueryParam("expand") String expand) {
+        return OrderDataOpr.selectOrderByID(company_id,orderId, expand);
     }
 
     @GET

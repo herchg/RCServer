@@ -151,7 +151,7 @@ public class OrderDataOpr {
         return resp;
     }
 
-    public static Response selectOrder(int company_id, long orderId, String expand) {
+    public static Response selectOrderByID(int company_id, long orderId, String expand) {
 
         Connection conn = null;
         Response resp;
