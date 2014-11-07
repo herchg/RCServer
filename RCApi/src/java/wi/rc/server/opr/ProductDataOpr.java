@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import wi.core.db.DBOperation;
 import wi.core.db.DSConn;
 import wi.core.util.DateTimeUtil;
 import wi.core.util.json.JsonUtil;
@@ -82,24 +83,22 @@ public class ProductDataOpr {
                         ResultSet rsProductPrice = stmtProductPrice.executeQuery();
                         JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
                         jsonRow.add("product_price", elementProductPrice);
+                        
+                        DBOperation.close(stmtProductPrice,rsProductPrice);
                     }
                     jsonResult.add(jsonRow);
                 }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+            
+            DBOperation.close(pStmt,rs);
+            
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         
         
@@ -136,20 +135,18 @@ public class ProductDataOpr {
                 jsonResult.add("product_price", elementProductPrice);
 
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+                
+                DBOperation.close(stmtProductPrice,rsProductPrice);
             }
+            
+            DBOperation.close(pStmt,rs);
+            
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         return resp;
     }
@@ -190,24 +187,21 @@ public class ProductDataOpr {
                         ResultSet rsProductPrice = stmtProductPrice.executeQuery();
                         JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
                         jsonRow.add("product_price", elementProductPrice);
+                        
+                        DBOperation.close(stmtProductPrice,rsProductPrice);
                     }
                     jsonResult.add(jsonRow);
                 }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+            DBOperation.close(pStmt,rs);
+            
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         return resp;
     }
@@ -248,25 +242,21 @@ public class ProductDataOpr {
                         ResultSet rsProductPrice = stmtProductPrice.executeQuery();
                         JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
                         jsonRow.add("product_price", elementProductPrice);
+                        
+                        DBOperation.close(stmtProductPrice,rsProductPrice);
                     }
                     jsonResult.add(jsonRow);
                 }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
-   
+            DBOperation.close(pStmt,rs);
+            
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         return resp;
     }
@@ -307,24 +297,21 @@ public class ProductDataOpr {
                         ResultSet rsProductPrice = stmtProductPrice.executeQuery();
                         JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
                         jsonRow.add("product_price", elementProductPrice);
+                        
+                        DBOperation.close(stmtProductPrice,rsProductPrice);
                     }
                     jsonResult.add(jsonRow);
                 }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+            DBOperation.close(pStmt,rs);
+            
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         return resp;
     }
@@ -385,11 +372,14 @@ public class ProductDataOpr {
                 }
                 // gen result
                 jsonResult.addProperty("product_id", product_id);
+                
+                DBOperation.close(stmtProductPrice);
+                DBOperation.close(rs);
             } else {
                 // execute failure
                 ret = false;
             }
-
+            DBOperation.close(stmtProduct);
             // check ret and commit or rollback
             if (ret) {
                 conn.commit();
@@ -403,14 +393,7 @@ public class ProductDataOpr {
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -461,14 +444,18 @@ public class ProductDataOpr {
                 if (stmtOrderDetail.executeUpdate() < 0) {
                     ret = false;
                 }
- 
+                
                 // gen result
                 jsonResult.addProperty("product_id", product_id);
+                
+                DBOperation.close(stmtOrderDetail);
             } else {
                 // execute failure
                 ret = false;
             }
 
+            DBOperation.close(stmtOrder);
+            
             // check ret and commit or rollback
             if (ret) {
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
@@ -480,13 +467,7 @@ public class ProductDataOpr {
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -499,27 +480,24 @@ public class ProductDataOpr {
         
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement stmtOrder = conn.prepareStatement("UPDATE `product` SET  status = ? WHERE company_id = ? AND product_id = ?");
-            stmtOrder.setLong(1, Status.Deleted.getValue());
-            stmtOrder.setLong(2, company_id);
-            stmtOrder.setLong(3, product_id);
-            if (stmtOrder.executeUpdate() > 0) {
+            PreparedStatement stmtProduct = conn.prepareStatement("UPDATE `product` SET  status = ? WHERE company_id = ? AND product_id = ?");
+            stmtProduct.setLong(1, Status.Deleted.getValue());
+            stmtProduct.setLong(2, company_id);
+            stmtProduct.setLong(3, product_id);
+            if (stmtProduct.executeUpdate() > 0) {
                 resp = Response.status(Response.Status.OK).build();
             } else {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             }
+            
+            DBOperation.close(stmtProduct);
+            
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
