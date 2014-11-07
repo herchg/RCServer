@@ -77,11 +77,11 @@ public class StoreResource {
     }
     
     @PUT
-    @Path("/{store_id}")
+    @Path("/company/{company_id}/store/{store_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateStore(@PathParam("store_id")int store_id, String jsonStoreSet) {
+    public Response updateStore(@PathParam("company_id")int company_id, @PathParam("store_id")int store_id, String jsonStoreSet) {
         
-        return StoreDataOpr.updateStore(store_id, jsonStoreSet);
+        return StoreDataOpr.updateStore(company_id, store_id, jsonStoreSet);
     }
     
     @DELETE

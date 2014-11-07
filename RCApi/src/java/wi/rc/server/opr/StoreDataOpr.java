@@ -25,19 +25,26 @@ import wi.rc.server.Status;
  */
 public class StoreDataOpr {
     
+    private static String generateSqlQueryString() {
+
+        String sql = "SELECT s.store_id AS store_id, s.name AS name, s.contact AS contact, "
+                    + " s.tel AS tel, s.mobile AS mobile,  s.email AS email, s.memo AS memo, s.status AS status, s.company_id AS company_id, "
+                    + "c.name AS company_name,s.manager_employee_id AS manager_employee_id ,e.name AS manager_name\n" 
+                    + " FROM `store` AS s \n" 
+                    + " LEFT JOIN `company` AS c ON s.company_id = c.company_id \n" 
+                    + " LEFT JOIN `employee` AS e ON s.manager_employee_id = e.employee_id \n"
+                    + " WHERE s.company_id = ? ";
+        
+        return sql;
+    }
+    
     public static Response selectAllStore(int company_id) {
         
         Connection conn = null;
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT s.store_id AS store_id, s.name AS name, s.contact AS contact, "
-                    + " s.tel AS tel, s.mobile AS mobile,  s.email AS email, s.memo AS memo, s.status AS status, s.company_id AS company_id, "
-                    + "c.name AS company_name,s.manager_employee_id AS manager_employee_id ,e.name AS manager_name\n" 
-                    + " FROM `store` AS s \n" 
-                    + " LEFT JOIN `company` AS c ON s.company_id = c.company_id \n" 
-                    + " LEFT JOIN `employee` AS e ON s.manager_employee_id = e.employee_id \n"
-                    + " WHERE s.company_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString());
             
             pStmt.setInt(1, company_id);
             ResultSet rs = pStmt.executeQuery();
@@ -78,13 +85,7 @@ public class StoreDataOpr {
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT s.store_id AS store_id, s.name AS name, s.contact AS contact, "
-                    + " s.tel AS tel, s.mobile AS mobile,  s.email AS email, s.memo AS memo, s.status AS status, s.company_id AS company_id, "
-                    + "c.name AS company_name,s.manager_employee_id AS manager_employee_id ,e.name AS manager_name\n" 
-                    + " FROM `store` AS s \n" 
-                    + " LEFT JOIN `company` AS c ON s.company_id = c.company_id \n" 
-                    + " LEFT JOIN `employee` AS e ON s.manager_employee_id = e.employee_id \n"
-                    + " WHERE s.company_id = ? AND s.store_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND s.store_id = ?");
             
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, store_id);
@@ -126,13 +127,7 @@ public class StoreDataOpr {
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT s.store_id AS store_id, s.name AS name, s.contact AS contact, "
-                    + " s.tel AS tel, s.mobile AS mobile,  s.email AS email, s.memo AS memo, s.status AS status, s.company_id AS company_id, "
-                    + "c.name AS company_name,s.manager_employee_id AS manager_employee_id ,e.name AS manager_name\n" 
-                    + " FROM `store` AS s \n" 
-                    + " LEFT JOIN `company` AS c ON s.company_id = c.company_id \n" 
-                    + " LEFT JOIN `employee` AS e ON s.manager_employee_id = e.employee_id \n"
-                    + " WHERE s.company_id = ? AND s.name LIKE ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND s.name LIKE ?");
             
             pStmt.setInt(1, company_id);
             pStmt.setString(2, "%" + store_name + "%");
@@ -174,13 +169,7 @@ public class StoreDataOpr {
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT s.store_id AS store_id, s.name AS name, s.contact AS contact, "
-                    + " s.tel AS tel, s.mobile AS mobile,  s.email AS email, s.memo AS memo, s.status AS status, s.company_id AS company_id, "
-                    + "c.name AS company_name,s.manager_employee_id AS manager_employee_id ,e.name AS manager_name\n" 
-                    + " FROM `store` AS s \n" 
-                    + " LEFT JOIN `company` AS c ON s.company_id = c.company_id \n" 
-                    + " LEFT JOIN `employee` AS e ON s.manager_employee_id = e.employee_id \n"
-                    + " WHERE s.company_id = ? AND s.manager_employee_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND s.manager_employee_id = ?");
             
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, employee_id);
@@ -284,7 +273,7 @@ public class StoreDataOpr {
         return resp;
     }
     
-    public static Response updateStore(int storeId, String jsonString){
+    public static Response updateStore(int companyId, int storeId, String jsonString){
         
         Response resp;
 
@@ -302,8 +291,10 @@ public class StoreDataOpr {
             Map<String, Object> mapStoreWhere = new LinkedHashMap<String, Object>();
 
             mapStoreWhere.put("store_id", storeId);
+            mapStoreWhere.put("company_id", companyId);
             
             mapStoreSet.remove("store_id");
+            mapStoreSet.remove("company_id");
 
             sql = SQLUtil.genUpdateSQLString("`store`", mapStoreSet, mapStoreWhere);
             PreparedStatement stmtStore = conn.prepareStatement(sql);
