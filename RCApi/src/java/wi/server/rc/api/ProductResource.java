@@ -79,11 +79,11 @@ public class ProductResource {
     
     
     @PUT
-    @Path("/")
+    @Path("/company/{company_id}/product/{product_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateProduct( String jsonProductSet) {
+    public Response updateProduct(@PathParam("company_id") int company_id,@PathParam("product_id") int product_id, String jsonProductSet) {
         
-        return ProductDataOpr.updateProduct(jsonProductSet);
+        return ProductDataOpr.updateProduct(company_id,product_id,jsonProductSet);
     }
     
     

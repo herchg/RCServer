@@ -478,7 +478,7 @@ public class OrderDataOpr {
         return resp;
     }
 
-    public static Response updateOrder(long orderId, String jsonString) {
+    public static Response updateOrder(int company_id,long orderId, String jsonString) {
         Response resp;
 
         Connection conn = null;
@@ -494,9 +494,12 @@ public class OrderDataOpr {
             Map<String, Object> mapOrderSet = (Map<String, Object>) map.get("order");
             Map<String, Object> mapOrderWhere = new LinkedHashMap<String, Object>();
 
+            //where條件塞入
             mapOrderWhere.put("order_id", orderId);
-
+            mapOrderWhere.put("company_id", company_id);
+            //移除部分不可更新的input
             mapOrderSet.remove("order_id");// 避免Order Set statement裡面有order_id
+            mapOrderSet.remove("company_id");// 避免Order Set statement裡面有company_id
 
             sql = SQLUtil.genUpdateSQLString("`order`", mapOrderSet, mapOrderWhere);
             PreparedStatement stmtOrder = conn.prepareStatement(sql);
