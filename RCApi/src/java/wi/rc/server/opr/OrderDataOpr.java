@@ -30,7 +30,7 @@ import wi.rc.server.Status;
  * @author hermeschang
  */
 public class OrderDataOpr {
-
+    
     public static Response selectAllOrders(int company_id, String expand) {
 
         Connection conn = null;
@@ -416,7 +416,6 @@ public class OrderDataOpr {
                 List<Map<String, Object>> listOrderDetail = (List<Map<String, Object>>) map.get("order_detail");
                 for (Map<String, Object> mapOrderDetail : listOrderDetail) {
                     // add order_id
-                    mapOrderDetail.put("ncode", ncode);
                     mapOrderDetail.put("order_id", order_id);
                     // prepare sql and statement
                     if (stmtOrderDetail == null) {
