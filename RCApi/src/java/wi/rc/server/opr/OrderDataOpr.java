@@ -31,6 +31,32 @@ import wi.rc.server.Status;
  */
 public class OrderDataOpr {
 
+    private static String generateSqlQuerySTring() {
+
+        String sql = "SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
+                    + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
+                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount, o.order_datetime AS order_datetime, \n"
+                    + " o.log_datetime AS log_datetime, o.status AS status, o.pos_order_id AS pos_order_id, o.memo  AS memo \n"
+                    + " FROM `order` AS o \n"
+                    + " LEFT JOIN `customer` AS cu ON o.customer_id = cu.customer_id \n"
+                    + " LEFT JOIN `company` AS c ON o.company_id = c.company_id \n"
+                    + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
+                    + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
+                    + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n";
+        
+        return sql;
+    }
+    
+    private static String generateSqlQueryDetailSTring() {
+
+        String sql = "SELECT od.order_id AS order_id, od.product_id AS product_id, od.price AS price, od.amount AS amount, od.total_amount AS total_amount"
+                    + " FROM order_detail AS od"
+                    + " LEFT JOIN `product` AS pd ON od.product_id = pd.product_id \n"
+                    + " WHERE od.order_id = ?";
+        
+        return sql;
+    }
+    
     public static Response selectAllOrders(int company_id,String order_id,String store_id,String pos_id,String status,String start_date,String end_date,String expand) {
 
         Connection conn = null;
@@ -42,17 +68,7 @@ public class OrderDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             
-            sqlString = "SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
-                    + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
-                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount, o.order_datetime AS order_datetime, \n"
-                    + " o.log_datetime AS log_datetime, o.status AS status, o.pos_order_id AS pos_order_id, o.memo  AS memo \n"
-                    + " FROM `order` AS o \n"
-                    + " LEFT JOIN `customer` AS cu ON o.customer_id = cu.customer_id \n"
-                    + " LEFT JOIN `company` AS c ON o.company_id = c.company_id \n"
-                    + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
-                    + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
-                    + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
-                    + " WHERE o.company_id = ? ";
+            sqlString = generateSqlQuerySTring() + " WHERE o.company_id = ? ";
             
             //check input to add sql query string
             if(order_id != null){ sqlString += " AND o.order_id = ? ";}
@@ -119,10 +135,7 @@ public class OrderDataOpr {
                     jsonRow.add("order", jsonOrder);
 
                     if (expand != null && expand.equals("detail")) {
-                        PreparedStatement stmtOrderDetail = conn.prepareStatement("SELECT od.order_id AS order_id, od.product_id AS product_id, od.price AS price, od.amount AS amount, od.total_amount AS total_amount"
-                                + " FROM order_detail AS od"
-                                + " LEFT JOIN `product` AS pd ON od.product_id = pd.product_id \n"
-                                + " WHERE od.order_id = ?");
+                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailSTring());
                         stmtOrderDetail.setLong(1, orderId);
                         ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                         JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
@@ -158,18 +171,7 @@ public class OrderDataOpr {
 
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
-                    + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
-                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount, o.order_datetime AS order_datetime, \n"
-                    + " o.log_datetime AS log_datetime, o.status AS status, o.pos_order_id AS pos_order_id, o.memo  AS memo \n"
-                    + " FROM `order` AS o \n"
-                    + " LEFT JOIN `customer` AS cu ON o.customer_id = cu.customer_id \n"
-                    + " LEFT JOIN `company` AS c ON o.company_id = c.company_id \n"
-                    + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
-                    + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
-                    + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
-                    + " LEFT JOIN `order_detail` AS od ON o.order_id = od.order_id \n"
-                    + " WHERE o.company_id = ? AND o.order_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE o.company_id = ? AND o.order_id = ?");
             pStmt.setLong(1, company_id);
             pStmt.setLong(2, orderId);
             ResultSet rs = pStmt.executeQuery();
@@ -185,10 +187,7 @@ public class OrderDataOpr {
                 jsonResult.add("order", jsonOrder);
 
                 if (expand != null && expand.equals("detail")) {
-                    PreparedStatement stmtOrderDetail = conn.prepareStatement("SELECT od.order_id AS order_id, od.product_id AS product_id, od.price AS price, od.amount AS amount, od.total_amount AS total_amount"
-                            + " FROM order_detail AS od"
-                            + " LEFT JOIN `product` AS pd ON od.product_id = pd.product_id \n"
-                            + " WHERE od.order_id = ?");
+                    PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailSTring());
                     stmtOrderDetail.setLong(1, orderId);
                     ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                     JsonElement jsonOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
@@ -219,17 +218,7 @@ public class OrderDataOpr {
 
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
-                    + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
-                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount, o.order_datetime AS order_datetime, \n"
-                    + " o.log_datetime AS log_datetime, o.status AS status, o.pos_order_id AS pos_order_id, o.memo  AS memo \n"
-                    + " FROM `order` AS o \n"
-                    + " LEFT JOIN `customer` AS cu ON o.customer_id = cu.customer_id \n"
-                    + " LEFT JOIN `company` AS c ON o.company_id = c.company_id \n"
-                    + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
-                    + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
-                    + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
-                    + " WHERE o.company_id = ? AND o.pos_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE o.company_id = ? AND o.pos_id = ?");
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, posId);
             ResultSet rs = pStmt.executeQuery();
@@ -251,10 +240,7 @@ public class OrderDataOpr {
                     jsonRow.add("order", jsonOrder);
 
                     if (expand != null && expand.equals("detail")) {
-                        PreparedStatement stmtOrderDetail = conn.prepareStatement("SELECT od.order_id AS order_id, od.product_id AS product_id, od.price AS price, od.amount AS amount, od.total_amount AS total_amount"
-                                + " FROM order_detail AS od"
-                                + " LEFT JOIN `product` AS pd ON od.product_id = pd.product_id \n"
-                                + " WHERE od.order_id = ?");
+                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailSTring());
                         stmtOrderDetail.setLong(1, orderId);
                         ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                         JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
@@ -288,17 +274,7 @@ public class OrderDataOpr {
 
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
-                    + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
-                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount, o.order_datetime AS order_datetime, \n"
-                    + " o.log_datetime AS log_datetime, o.status AS status, o.pos_order_id AS pos_order_id, o.memo  AS memo \n"
-                    + " FROM `order` AS o \n"
-                    + " LEFT JOIN `customer` AS cu ON o.customer_id = cu.customer_id \n"
-                    + " LEFT JOIN `company` AS c ON o.company_id = c.company_id \n"
-                    + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
-                    + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
-                    + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
-                    + " WHERE o.company_id = ? AND o.status = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE o.company_id = ? AND o.status = ?");
             pStmt.setInt(1, company_id);
             pStmt.setLong(2, status_id);
             ResultSet rs = pStmt.executeQuery();
@@ -320,10 +296,7 @@ public class OrderDataOpr {
                     jsonRow.add("order", jsonOrder);
 
                     if (expand != null && expand.equals("detail")) {
-                        PreparedStatement stmtOrderDetail = conn.prepareStatement("SELECT od.order_id AS order_id, od.product_id AS product_id, od.price AS price, od.amount AS amount, od.total_amount AS total_amount"
-                                + " FROM order_detail AS od"
-                                + " LEFT JOIN `product` AS pd ON od.product_id = pd.product_id \n"
-                                + " WHERE od.order_id = ?");
+                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailSTring());
                         stmtOrderDetail.setLong(1, orderId);
                         ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                         JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
@@ -357,17 +330,7 @@ public class OrderDataOpr {
 
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
-                    + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
-                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount, o.order_datetime AS order_datetime, \n"
-                    + " o.log_datetime AS log_datetime, o.status AS status, o.pos_order_id AS pos_order_id, o.memo  AS memo \n"
-                    + " FROM `order` AS o \n"
-                    + " LEFT JOIN `customer` AS cu ON o.customer_id = cu.customer_id \n"
-                    + " LEFT JOIN `company` AS c ON o.company_id = c.company_id \n"
-                    + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
-                    + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
-                    + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
-                    + " WHERE o.company_id = ? AND o.order_datetime >= ? AND o.order_datetime <= ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE o.company_id = ? AND o.order_datetime >= ? AND o.order_datetime <= ?");
             pStmt.setInt(1, company_id);
             pStmt.setString(2, begin_date);
             pStmt.setString(3, end_date);
@@ -390,10 +353,7 @@ public class OrderDataOpr {
                     jsonRow.add("order", jsonOrder);
 
                     if (expand != null && expand.equals("detail")) {
-                        PreparedStatement stmtOrderDetail = conn.prepareStatement("SELECT od.order_id AS order_id, od.product_id AS product_id, od.price AS price, od.amount AS amount, od.total_amount AS total_amount"
-                                + " FROM order_detail AS od"
-                                + " LEFT JOIN `product` AS pd ON od.product_id = pd.product_id \n"
-                                + " WHERE od.order_id = ?");
+                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailSTring());
                         stmtOrderDetail.setLong(1, orderId);
                         ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                         JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);

@@ -25,22 +25,28 @@ import wi.rc.server.Status;
  */
 public class ProductDataOpr {
     
+    private static String generateSqlQuerySTring() {
+
+        String sql = "SELECT p.product_id AS product_id , c.company_id AS company_id, c.name AS company_name,p.name AS name, \n" 
+                    + " p.name_4_short AS name_4_short ,p.description AS description, p.description_4_short AS description_4_short, p.product_code AS product_code, \n" 
+                    + " p.barcode AS barcode, p.category_id AS category_id,ca.name AS category_name, p.option0 AS option0, p.option1 AS option1,p.option2 AS option2, \n" 
+                    + " p.option3 AS option3, p.option4 AS option4, p.option5 AS option5,p.option6 AS option6, p.option7 AS option7,p.option8 AS option8,p.option9 AS option9, \n" 
+                    + " p.status AS status, IFNULL(0,pp.price) AS price ,IFNULL('901',pp.ncode) AS ncode,IFNULL(0,pp.amount) AS amount \n" 
+                    + " FROM `product` AS p \n" 
+                    + " LEFT JOIN `category` AS ca ON p.category_id = ca.category_id \n" 
+                    + " LEFT JOIN `product_price` AS pp ON p.product_id = pp.product_id \n" 
+                    + " ,company AS c \n";
+        
+        return sql;
+    }
+    
     public static Response selectAllProduct() {
         
         Connection conn = null;
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT p.product_id AS product_id , c.company_id AS company_id, c.name AS company_name,p.name AS name, \n" 
-                    + " p.name_4_short AS name_4_short ,p.description AS description, p.description_4_short AS description_4_short, p.product_code AS product_code, \n" 
-                    + " p.barcode AS barcode, p.category_id AS category_id,ca.name AS category_name, p.option0 AS option0, p.option1 AS option1,p.option2 AS option2, \n" 
-                    + " p.option3 AS option3, p.option4 AS option4, p.option5 AS option5,p.option6 AS option6, p.option7 AS option7,p.option8 AS option8,p.option9 AS option9, \n" 
-                    + " p.status AS status,pp.price AS price ,pp.ncode AS ncode,pp.amount AS amount \n" 
-                    + " FROM `product` AS p \n" 
-                    + " LEFT JOIN `category` AS ca ON p.category_id = ca.category_id \n" 
-                    + " LEFT JOIN `product_price` AS pp ON p.product_id = pp.product_id \n" 
-                    + " ,company AS c \n" 
-                    + " WHERE p.company_id = c.company_id");
+            PreparedStatement pStmt = conn.prepareStatement( generateSqlQuerySTring() + " WHERE p.company_id = c.company_id");
             
             ResultSet rs = pStmt.executeQuery();
             
@@ -81,16 +87,7 @@ public class ProductDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
   
-            PreparedStatement pStmt = conn.prepareStatement("SELECT p.product_id AS product_id , c.company_id AS company_id, c.name AS company_name,p.name AS name, \n"
-                    + " p.name_4_short AS name_4_short , p.description AS description, p.description_4_short AS description_4_short, p.product_code AS product_code, \n"
-                    + " p.barcode AS barcode, p.category_id AS category_id, ca.name AS category_name, p.option0 AS option0, p.option1 AS option1, p.option2 AS option2, \n"
-                    + " p.option3 AS option3, p.option4 AS option4, p.option5 AS option5, p.option6 AS option6, p.option7 AS option7,p.option8 AS option8, \n"
-                    + " p.option9 AS option9, p.status AS status ,pp.price AS price ,pp.ncode AS ncode,pp.amount AS amount \n"
-                    + " FROM `product` AS p \n" 
-                    + " LEFT JOIN `category` AS ca ON p.category_id = ca.category_id \n" 
-                    + " LEFT JOIN `product_price` AS pp ON p.product_id = pp.product_id \n" 
-                    + " , company AS c \n" 
-                    + " WHERE p.company_id = c.company_id AND p.company_id = ? AND p.product_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() +" WHERE p.company_id = c.company_id AND p.company_id = ? AND p.product_id = ?");
             
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, product_id);
@@ -131,16 +128,7 @@ public class ProductDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
   
-            PreparedStatement pStmt = conn.prepareStatement("SELECT p.product_id AS product_id , c.company_id AS company_id, c.name AS company_name,p.name AS name, \n"
-                    + " p.name_4_short AS name_4_short , p.description AS description, p.description_4_short AS description_4_short, p.product_code AS product_code, \n"
-                    + " p.barcode AS barcode, p.category_id AS category_id, ca.name AS category_name, p.option0 AS option0, p.option1 AS option1, p.option2 AS option2, \n"
-                    + " p.option3 AS option3, p.option4 AS option4, p.option5 AS option5, p.option6 AS option6, p.option7 AS option7,p.option8 AS option8, \n"
-                    + " p.option9 AS option9, p.status AS status ,pp.price AS price ,pp.ncode AS ncode,pp.amount AS amount \n"
-                    + " FROM `product` AS p \n" 
-                    + " LEFT JOIN `category` AS ca ON p.category_id = ca.category_id \n" 
-                    + " LEFT JOIN `product_price` AS pp ON p.product_id = pp.product_id \n" 
-                    + " , company AS c \n" 
-                    + " WHERE p.company_id = c.company_id AND p.company_id = ? AND p.name LIKE ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE p.company_id = c.company_id AND p.company_id = ? AND p.name LIKE ?");
             
             pStmt.setInt(1, company_id);
             pStmt.setString(2, "%" + product_name + "%");
@@ -181,19 +169,10 @@ public class ProductDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
   
-            PreparedStatement pStmt = conn.prepareStatement("SELECT p.product_id AS product_id , c.company_id AS company_id, c.name AS company_name,p.name AS name, \n"
-                    + " p.name_4_short AS name_4_short , p.description AS description, p.description_4_short AS description_4_short, p.product_code AS product_code, \n"
-                    + " p.barcode AS barcode, p.category_id AS category_id, ca.name AS category_name, p.option0 AS option0, p.option1 AS option1, p.option2 AS option2, \n"
-                    + " p.option3 AS option3, p.option4 AS option4, p.option5 AS option5, p.option6 AS option6, p.option7 AS option7,p.option8 AS option8, \n"
-                    + " p.option9 AS option9, p.status AS status ,pp.price AS price ,pp.ncode AS ncode,pp.amount AS amount \n"
-                    + " FROM `product` AS p \n" 
-                    + " LEFT JOIN `category` AS ca ON p.category_id = ca.category_id \n" 
-                    + " LEFT JOIN `product_price` AS pp ON p.product_id = pp.product_id \n" 
-                    + " , company AS c \n" 
-                    + " WHERE p.company_id = c.company_id AND p.company_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE p.company_id = c.company_id AND p.company_id = ?");
             
             pStmt.setInt(1, company_id);
-            
+
             ResultSet rs = pStmt.executeQuery();
             
             if (!rs.next()) {
@@ -207,6 +186,7 @@ public class ProductDataOpr {
                 jsonResult.add("product", jsonProduct);
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+   
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
@@ -231,16 +211,7 @@ public class ProductDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
   
-            PreparedStatement pStmt = conn.prepareStatement("SELECT p.product_id AS product_id , c.company_id AS company_id, c.name AS company_name,p.name AS name, \n"
-                    + " p.name_4_short AS name_4_short , p.description AS description, p.description_4_short AS description_4_short, p.product_code AS product_code, \n"
-                    + " p.barcode AS barcode, p.category_id AS category_id, ca.name AS category_name, p.option0 AS option0, p.option1 AS option1, p.option2 AS option2, \n"
-                    + " p.option3 AS option3, p.option4 AS option4, p.option5 AS option5, p.option6 AS option6, p.option7 AS option7,p.option8 AS option8, \n"
-                    + " p.option9 AS option9, p.status AS status ,pp.price AS price ,pp.ncode AS ncode,pp.amount AS amount \n"
-                    + " FROM `product` AS p \n" 
-                    + " LEFT JOIN `category` AS ca ON p.category_id = ca.category_id \n" 
-                    + " LEFT JOIN `product_price` AS pp ON p.product_id = pp.product_id \n" 
-                    + " , company AS c \n" 
-                    + " WHERE p.company_id = c.company_id AND p.company_id = ? AND p.category_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE p.company_id = c.company_id AND p.company_id = ? AND p.category_id = ?");
             
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, category_id);
