@@ -77,13 +77,11 @@ public class CustomerResource {
     }
     
     @PUT
-    @Path("/{customer_id}")
+    @Path("/company/{company_id}/customer/{customer_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateCustomer(@PathParam("customer_id")int customer_id, String jsonCustomerSet) {
+    public Response updateCustomer(@PathParam("company_id")int company_id, @PathParam("customer_id")int customer_id, String jsonCustomerSet) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return CustomerDataOpr.updateCustomer(company_id, customer_id, jsonCustomerSet);
     }
     
     @DELETE

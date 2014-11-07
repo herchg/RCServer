@@ -12,6 +12,7 @@ import com.google.gson.JsonSyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import wi.core.db.DSConn;
@@ -24,19 +25,26 @@ import wi.rc.server.Status;
  */
 public class CustomerDataOpr {
     
+    private static String generateSqlQueryString() {
+
+        String sql = "SELECT cu.customer_id AS customer_id, cu.name AS name, cu.login_id AS login_id, cu.login_password AS login_password, "
+                    + " cu.point AS point, cu.company_id AS company_id, c.name AS company_name, cu.store_id AS store_id,s.name AS store_name,cu.active_datetime AS active_datetime, "
+                    + " cu.expiry_datetime AS expiry_datetime, cu.reg_datetime AS reg_datetime, cu.status AS status \n" 
+                    + " FROM `customer` AS cu\n" 
+                    + " LEFT JOIN `company` AS c ON cu.company_id = c.company_id \n" 
+                    + " LEFT JOIN `store` AS s ON cu.store_id = s.store_id \n" 
+                    + " WHERE cu.company_id = ? ";
+        
+        return sql;
+    }
+    
     public static Response selectAllCustomer(int company_id) {
         
         Connection conn = null;
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT cu.customer_id AS customer_id, cu.name AS name, cu.login_id AS login_id, cu.login_password AS login_password, "
-                    + " cu.point AS point, cu.company_id AS company_id, c.name AS company_name, cu.store_id AS store_id,s.name AS store_name,cu.active_datetime AS active_datetime, "
-                    + " cu.expiry_datetime AS expiry_datetime, cu.reg_datetime AS reg_datetime, cu.status AS status \n" 
-                    + " FROM `customer` AS cu\n" 
-                    + " LEFT JOIN `company` AS c ON cu.company_id = c.company_id \n" 
-                    + " LEFT JOIN `store` AS s ON cu.store_id = s.store_id \n" 
-                    + " WHERE cu.company_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString());
             
             pStmt.setInt(1, company_id);
             ResultSet rs = pStmt.executeQuery();
@@ -77,13 +85,7 @@ public class CustomerDataOpr {
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT cu.customer_id AS customer_id, cu.name AS name, cu.login_id AS login_id, cu.login_password AS login_password, "
-                    + " cu.point AS point, cu.company_id AS company_id, c.name AS company_name, cu.store_id AS store_id,s.name AS store_name,cu.active_datetime AS active_datetime, "
-                    + " cu.expiry_datetime AS expiry_datetime, cu.reg_datetime AS reg_datetime, cu.status AS status \n" 
-                    + " FROM `customer` AS cu\n" 
-                    + " LEFT JOIN `company` AS c ON cu.company_id = c.company_id \n" 
-                    + " LEFT JOIN `store` AS s ON cu.store_id = s.store_id \n" 
-                    + " WHERE cu.company_id = ? AND cu.customer_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND cu.customer_id = ?");
             
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, customer_id);
@@ -125,13 +127,7 @@ public class CustomerDataOpr {
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT cu.customer_id AS customer_id, cu.name AS name, cu.login_id AS login_id, cu.login_password AS login_password, "
-                    + " cu.point AS point, cu.company_id AS company_id, c.name AS company_name, cu.store_id AS store_id,s.name AS store_name,cu.active_datetime AS active_datetime, "
-                    + " cu.expiry_datetime AS expiry_datetime, cu.reg_datetime AS reg_datetime, cu.status AS status \n" 
-                    + " FROM `customer` AS cu\n" 
-                    + " LEFT JOIN `company` AS c ON cu.company_id = c.company_id \n" 
-                    + " LEFT JOIN `store` AS s ON cu.store_id = s.store_id \n" 
-                    + " WHERE cu.company_id = ? AND cu.store_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND cu.store_id = ?");
             
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, store_id);
@@ -173,13 +169,7 @@ public class CustomerDataOpr {
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT cu.customer_id AS customer_id, cu.name AS name, cu.login_id AS login_id, cu.login_password AS login_password, "
-                    + " cu.point AS point, cu.company_id AS company_id, c.name AS company_name, cu.store_id AS store_id,s.name AS store_name,cu.active_datetime AS active_datetime, "
-                    + " cu.expiry_datetime AS expiry_datetime, cu.reg_datetime AS reg_datetime, cu.status AS status \n" 
-                    + " FROM `customer` AS cu\n" 
-                    + " LEFT JOIN `company` AS c ON cu.company_id = c.company_id \n" 
-                    + " LEFT JOIN `store` AS s ON cu.store_id = s.store_id \n" 
-                    + " WHERE cu.company_id = ? AND cu.name LIKE ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND cu.name LIKE ?");
             
             pStmt.setInt(1, company_id);
             pStmt.setString(2, "%" + customer_name + "%");
@@ -301,7 +291,77 @@ public class CustomerDataOpr {
         return resp;
     }
     
-    public static Response deleteCustomer(int company_id,int customer_id) {
+    public static Response updateCustomer(int companyId, int customerId, String jsonString) {
+        
+        Response resp;
+
+        Connection conn = null;
+        boolean ret = true;
+
+        JsonObject jsonResult = new JsonObject();
+        String sql = null;
+
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+
+            Map<?, ?> map = JsonUtil.toMap(jsonString);
+            Map<String, Object> mapCustomerSet = (Map<String, Object>) map.get("customer");
+            Map<String, Object> mapCustomerWhere = new LinkedHashMap<String, Object>();
+
+            mapCustomerWhere.put("customer_id", customerId);
+            mapCustomerWhere.put("company_id", companyId);
+
+            mapCustomerSet.remove("customer_id");
+            mapCustomerSet.remove("company_id");
+
+            sql = SQLUtil.genUpdateSQLString("`customer`", mapCustomerSet, mapCustomerWhere);
+            PreparedStatement stmtCustomer = conn.prepareStatement(sql);
+
+            if (stmtCustomer.executeUpdate() > 0) {
+
+                Map<String, Object> mapCustomerDetailSet = (Map<String, Object>) map.get("customer_detail");
+                Map<String, Object> mapCustomerDetailWhere = new LinkedHashMap<String, Object>();
+
+                mapCustomerDetailWhere.put("customer_id", customerId);
+
+                mapCustomerDetailSet.remove("customer_id");
+
+                sql = SQLUtil.genUpdateSQLString("`customer_detail`", mapCustomerDetailSet, mapCustomerDetailWhere);
+                PreparedStatement stmtEmployeeExt = conn.prepareStatement(sql);
+                if (stmtEmployeeExt.executeUpdate() < 0) {
+                    ret = false;
+                }
+
+            } else {
+                ret = false;
+            }
+
+            jsonResult.addProperty("customer_id", customerId);
+
+            // check ret and commit or rollback
+            if (ret) {
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+            } else {
+                resp = Response.status(Response.Status.BAD_REQUEST).entity(sql).build();
+            }
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+
+        return resp;
+    }
+    
+    public static Response deleteCustomer(int company_id, int customer_id) {
         
         Response resp;
         Connection conn = null;

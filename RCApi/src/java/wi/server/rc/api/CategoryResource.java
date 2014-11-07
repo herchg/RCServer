@@ -73,11 +73,11 @@ public class CategoryResource {
 
     
     @PUT
-    @Path("/{category_id}")
+    @Path("/company/{company_id}/category/{category_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateEmployee(@PathParam("category_id")int category_id, String jsonCategorySet) {
+    public Response updateEmployee(@PathParam("company_id") int company_id, @PathParam("category_id")int category_id, String jsonCategorySet) {
         
-        return CategoryDataOpr.updateCategory(category_id, jsonCategorySet);
+        return CategoryDataOpr.updateCategory(company_id, category_id, jsonCategorySet);
     }
     
     @DELETE
