@@ -29,7 +29,7 @@ import wi.rc.server.Status;
  */
 public class OrderDataOpr {
 
-    private static String generateSqlQuerySTring() {
+    private static String generateSqlQueryString() {
 
         String sql = "SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
                     + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
@@ -45,7 +45,7 @@ public class OrderDataOpr {
         return sql;
     }
     
-    private static String generateSqlQueryDetailSTring() {
+    private static String generateSqlQueryDetailString() {
 
         String sql = "SELECT od.order_id AS order_id, od.product_id AS product_id, od.price AS price, od.amount AS amount, od.total_amount AS total_amount"
                     + " FROM order_detail AS od"
@@ -66,7 +66,7 @@ public class OrderDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             
-            sqlString = generateSqlQuerySTring() + " WHERE o.company_id = ? ";
+            sqlString = generateSqlQueryString() + " WHERE o.company_id = ? ";
             
             //check input to add sql query string
             if(order_id != null){ sqlString += " AND o.order_id = ? ";}
@@ -133,7 +133,7 @@ public class OrderDataOpr {
                     jsonRow.add("order", jsonOrder);
 
                     if (expand != null && expand.equals("detail")) {
-                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailSTring());
+                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailString());
                         stmtOrderDetail.setLong(1, orderId);
                         ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                         JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
@@ -169,7 +169,7 @@ public class OrderDataOpr {
 
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE o.company_id = ? AND o.order_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + " WHERE o.company_id = ? AND o.order_id = ?");
             pStmt.setLong(1, company_id);
             pStmt.setLong(2, orderId);
             ResultSet rs = pStmt.executeQuery();
@@ -185,7 +185,7 @@ public class OrderDataOpr {
                 jsonResult.add("order", jsonOrder);
 
                 if (expand != null && expand.equals("detail")) {
-                    PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailSTring());
+                    PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailString());
                     stmtOrderDetail.setLong(1, orderId);
                     ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                     JsonElement jsonOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
@@ -216,7 +216,7 @@ public class OrderDataOpr {
 
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE o.company_id = ? AND o.pos_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + " WHERE o.company_id = ? AND o.pos_id = ?");
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, posId);
             ResultSet rs = pStmt.executeQuery();
@@ -238,7 +238,7 @@ public class OrderDataOpr {
                     jsonRow.add("order", jsonOrder);
 
                     if (expand != null && expand.equals("detail")) {
-                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailSTring());
+                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailString());
                         stmtOrderDetail.setLong(1, orderId);
                         ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                         JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
@@ -272,7 +272,7 @@ public class OrderDataOpr {
 
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE o.company_id = ? AND o.status = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + " WHERE o.company_id = ? AND o.status = ?");
             pStmt.setInt(1, company_id);
             pStmt.setLong(2, status_id);
             ResultSet rs = pStmt.executeQuery();
@@ -294,7 +294,7 @@ public class OrderDataOpr {
                     jsonRow.add("order", jsonOrder);
 
                     if (expand != null && expand.equals("detail")) {
-                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailSTring());
+                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailString());
                         stmtOrderDetail.setLong(1, orderId);
                         ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                         JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
@@ -328,7 +328,7 @@ public class OrderDataOpr {
 
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE o.company_id = ? AND o.order_datetime >= ? AND o.order_datetime <= ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + " WHERE o.company_id = ? AND o.order_datetime >= ? AND o.order_datetime <= ?");
             pStmt.setInt(1, company_id);
             pStmt.setString(2, begin_date);
             pStmt.setString(3, end_date);
@@ -351,7 +351,7 @@ public class OrderDataOpr {
                     jsonRow.add("order", jsonOrder);
 
                     if (expand != null && expand.equals("detail")) {
-                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailSTring());
+                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailString());
                         stmtOrderDetail.setLong(1, orderId);
                         ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                         JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
