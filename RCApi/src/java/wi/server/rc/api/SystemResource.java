@@ -93,13 +93,13 @@ public class SystemResource {
     //Category Resource
     //
     
-    @GET
-    @Path("/{system_id}/category")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCategories() {
-        
-        return null;//CategoryDataOpr.selectCategory();
-    }
+//  @GET
+//  @Path("/{system_id}/category")
+//  @Produces(MediaType.APPLICATION_JSON)
+//  public Response getCategories() {
+//      
+//      return null;//CategoryDataOpr.selectCategory();
+//  }
     
 //  @GET
 //  @Path("/{system_id}/category/{category_id}")
@@ -111,29 +111,29 @@ public class SystemResource {
 //      return resp;
 //  }
     
-    @POST
-    @Path("/{system_id}/category")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createCategory(String jsonCategorySet) {
-        
-        return CategoryDataOpr.insertCategory(jsonCategorySet);
-    }
+//  @POST
+//  @Path("/{system_id}/category")
+//  @Produces(MediaType.APPLICATION_JSON)
+//  public Response createCategory(String jsonCategorySet) {
+//      
+//      return CategoryDataOpr.insertCategory(jsonCategorySet);
+//  }
     
-    @PUT
-    @Path("/{system_id}/category/{category_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateCategory(@PathParam("category_id")int category_id, String jsonCategorySet) {
-        
-        return CategoryDataOpr.updateCategory(category_id, jsonCategorySet);
-    }
+//  @PUT
+//  @Path("/{system_id}/category/{category_id}")
+//  @Produces(MediaType.APPLICATION_JSON)
+//  public Response updateCategory(@PathParam("category_id")int category_id, String jsonCategorySet) {
+//      
+//      return CategoryDataOpr.updateCategory(category_id, jsonCategorySet);
+//  }
     
-    @DELETE
-    @Path("/{system_id}/category/{category_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteCategory(@PathParam("category_id")int category_id) {
-        
-        return null;//CategoryDataOpr.deleteCategory(category_id);
-    }
+//  @DELETE
+//  @Path("/{system_id}/category/{category_id}")
+//  @Produces(MediaType.APPLICATION_JSON)
+//  public Response deleteCategory(@PathParam("category_id")int category_id) {
+//      
+//      return null;//CategoryDataOpr.deleteCategory(category_id);
+//  }
     
     //
     //Event Resource

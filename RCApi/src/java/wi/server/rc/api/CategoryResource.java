@@ -66,22 +66,20 @@ public class CategoryResource {
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createCategory(String jsonEmployeeSet) {
+    public Response createCategory(String jsonCategorySet) {
         
-        return CategoryDataOpr.insertCategory(jsonEmployeeSet);
+        return CategoryDataOpr.insertCategory(jsonCategorySet);
     }
 
-    /*
+    
     @PUT
     @Path("/{category_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateEmployee(@PathParam("employee_id")int employee_id, String jsonEmployeeSet) {
+    public Response updateEmployee(@PathParam("category_id")int category_id, String jsonCategorySet) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return CategoryDataOpr.updateCategory(category_id, jsonCategorySet);
     }
-    */
+    
     @DELETE
     @Path("/company/{company_id}/category/{category_id}")
     @Produces(MediaType.APPLICATION_JSON)
