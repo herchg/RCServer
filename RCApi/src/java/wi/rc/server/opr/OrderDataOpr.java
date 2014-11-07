@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import wi.core.db.DBOperation;
 import wi.core.db.DSConn;
 import wi.core.util.DateTimeUtil;
 import wi.core.util.json.JsonUtil;
@@ -138,27 +139,24 @@ public class OrderDataOpr {
                         ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                         JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
                         jsonRow.add("order_detail", elementOrderDetail);
+                        
+                        DBOperation.close(stmtOrderDetail,rsOrderDetail);
                     }
                     jsonResult.add(jsonRow);
                 }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+            DBOperation.close(pStmt,rs);
+            
 
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
-        
         return resp;
     }
 
@@ -190,21 +188,17 @@ public class OrderDataOpr {
                     ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                     JsonElement jsonOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
                     jsonResult.add("order_detail", jsonOrderDetail);
+                    DBOperation.close(stmtOrderDetail,rsOrderDetail);
                 }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+            DBOperation.close(pStmt,rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         return resp;
     }
@@ -243,24 +237,20 @@ public class OrderDataOpr {
                         ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                         JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
                         jsonRow.add("order_detail", elementOrderDetail);
+                        
+                        DBOperation.close(stmtOrderDetail,rsOrderDetail);
                     }
                     jsonResult.add(jsonRow);
                 }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
-
+            DBOperation.close(pStmt,rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         return resp;
     }
@@ -299,24 +289,20 @@ public class OrderDataOpr {
                         ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                         JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
                         jsonRow.add("order_detail", elementOrderDetail);
+                        
+                        DBOperation.close(stmtOrderDetail,rsOrderDetail);
                     }
                     jsonResult.add(jsonRow);
                 }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
-
+            DBOperation.close(pStmt,rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         return resp;
     }
@@ -356,24 +342,19 @@ public class OrderDataOpr {
                         ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
                         JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
                         jsonRow.add("order_detail", elementOrderDetail);
+                        DBOperation.close(stmtOrderDetail,rsOrderDetail);
                     }
                     jsonResult.add(jsonRow);
                 }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
-
+            DBOperation.close(pStmt,rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
         return resp;
     }
@@ -442,14 +423,16 @@ public class OrderDataOpr {
                         ret = false;
                         break;
                     }
+                    DBOperation.close(stmtOrderDetail);
                 }
-
                 // gen result
                 jsonResult.addProperty("order_id", order_id);
+                DBOperation.close(rs);
             } else {
                 // execute failure
                 ret = false;
             }
+            DBOperation.close(stmtOrder);
 
             // check ret and commit or rollback
             if (ret) {
@@ -459,20 +442,13 @@ public class OrderDataOpr {
                 conn.rollback();
                 resp = Response.status(Response.Status.BAD_REQUEST).build();
             }
-
+            
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -528,6 +504,8 @@ public class OrderDataOpr {
                         ret = false;
                         break;
                     }
+                    
+                    DBOperation.close(stmtOrderDetail);
                 }
 
                 // gen result
@@ -536,7 +514,7 @@ public class OrderDataOpr {
                 // execute failure
                 ret = false;
             }
-
+            DBOperation.close(stmtOrder);
             // check ret and commit or rollback
             if (ret) {
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
@@ -548,13 +526,7 @@ public class OrderDataOpr {
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;
@@ -576,18 +548,13 @@ public class OrderDataOpr {
             } else {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             }
+            DBOperation.close(stmtOrder);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
             resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            DBOperation.close(conn);
         }
 
         return resp;

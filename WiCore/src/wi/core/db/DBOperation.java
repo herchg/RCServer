@@ -19,6 +19,19 @@ public class DBOperation {
         closeConnection(conn);
     }
     
+    public final static void close(Statement stmt) {
+        closeStatement(stmt);      
+    }
+    
+    public final static void close(ResultSet rs) {
+        closeResultSet(rs);   
+    }
+    
+    public final static void close(Statement stmt, ResultSet rs) {
+        closeResultSet(rs);
+        closeStatement(stmt);      
+    }
+     
     public final static void close(Statement stmt, ResultSet rs, Connection conn) {
         closeResultSet(rs);
         closeStatement(stmt);
@@ -30,7 +43,7 @@ public class DBOperation {
         closeConnection(conn);        
     }
     
-    public final static void closeStatement(Statement stmt) {
+    private final static void closeStatement(Statement stmt) {
 
         try {
             if (stmt != null) {
@@ -40,7 +53,7 @@ public class DBOperation {
         } catch (Exception ex) { }
     }
 
-    public final static void closeResultSet(ResultSet rs) {
+    private final static void closeResultSet(ResultSet rs) {
 
         try {
             if (rs != null) {
@@ -50,7 +63,7 @@ public class DBOperation {
         } catch (Exception ex) { }
     }
 
-    public final static void closeConnection(Connection conn) {
+    private final static void closeConnection(Connection conn) {
 
         try {
             if (conn != null) {

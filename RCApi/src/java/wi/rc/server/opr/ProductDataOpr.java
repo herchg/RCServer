@@ -34,11 +34,17 @@ public class ProductDataOpr {
                     + " p.name_4_short AS name_4_short  ,p.description AS description, p.description_4_short AS description_4_short, p.product_code AS product_code, \n" 
                     + " p.barcode AS barcode, p.category_id AS category_id,ca.name AS category_name, p.option0 AS option0, p.option1 AS option1,p.option2 AS option2, \n" 
                     + " p.option3 AS option3, p.option4 AS option4, p.option5 AS option5,p.option6 AS option6, p.option7 AS option7,p.option8 AS option8,p.option9 AS option9, \n" 
-                    + " p.status AS status, IFNULL(0,pp.price) AS price ,IFNULL('901',pp.ncode) AS ncode,IFNULL(0,pp.amount) AS amount \n" 
+                    + " p.status AS status \n" 
                     + " FROM `product` AS p \n" 
-                    + " LEFT JOIN `category` AS ca ON p.category_id = ca.category_id \n" 
-                    + " LEFT JOIN `product_price` AS pp ON p.product_id = pp.product_id \n" 
+                    + " LEFT JOIN `category` AS ca ON p.category_id = ca.category_id \n"
                     + " ,company AS c \n";
+        
+        return sql;
+    }
+    
+    private static String generateSqlQueryDetailString() {
+
+        String sql = "SELECT ncode, price, amount, status FROM `product_price` WHERE product_id = ?";
         
         return sql;
     }
@@ -59,9 +65,26 @@ public class ProductDataOpr {
                 // back to first
                 rs.previous();
      
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
-                jsonResult.add("product", jsonProduct);
+                JsonArray jsonResult = new JsonArray();
+                while (rs.next()) {
+                    int product_id = rs.getInt("product_id");
+
+                    // back because next
+                    rs.previous();
+
+                    JsonObject jsonRow = new JsonObject();
+                    JsonElement jsonProduct = JsonUtil.toJsonElement(rs);
+                    jsonRow.add("product", jsonProduct);
+
+                    if (product_id > 0 ) {
+                        PreparedStatement stmtProductPrice = conn.prepareStatement(generateSqlQueryDetailString());
+                        stmtProductPrice.setLong(1, product_id);
+                        ResultSet rsProductPrice = stmtProductPrice.executeQuery();
+                        JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
+                        jsonRow.add("product_price", elementProductPrice);
+                    }
+                    jsonResult.add(jsonRow);
+                }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
         } catch (JsonSyntaxException | NullPointerException ex) {
@@ -101,10 +124,17 @@ public class ProductDataOpr {
             } else {
                 // back to first
                 rs.previous();
-                
+     
                 JsonObject jsonResult = new JsonObject();
                 JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
                 jsonResult.add("product", jsonProduct);
+
+                PreparedStatement stmtProductPrice = conn.prepareStatement(generateSqlQueryDetailString());
+                stmtProductPrice.setInt(1, product_id);
+                ResultSet rsProductPrice = stmtProductPrice.executeQuery();
+                JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
+                jsonResult.add("product_price", elementProductPrice);
+
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
         } catch (JsonSyntaxException | NullPointerException ex) {
@@ -142,10 +172,27 @@ public class ProductDataOpr {
             } else {
                 // back to first
                 rs.previous();
-                
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
-                jsonResult.add("product", jsonProduct);
+     
+                JsonArray jsonResult = new JsonArray();
+                while (rs.next()) {
+                    int product_id = rs.getInt("product_id");
+
+                    // back because next
+                    rs.previous();
+
+                    JsonObject jsonRow = new JsonObject();
+                    JsonElement jsonProduct = JsonUtil.toJsonElement(rs);
+                    jsonRow.add("product", jsonProduct);
+
+                    if (product_id > 0 ) {
+                        PreparedStatement stmtProductPrice = conn.prepareStatement(generateSqlQueryDetailString());
+                        stmtProductPrice.setLong(1, product_id);
+                        ResultSet rsProductPrice = stmtProductPrice.executeQuery();
+                        JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
+                        jsonRow.add("product_price", elementProductPrice);
+                    }
+                    jsonResult.add(jsonRow);
+                }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
         } catch (JsonSyntaxException | NullPointerException ex) {
@@ -183,10 +230,27 @@ public class ProductDataOpr {
             } else {
                 // back to first
                 rs.previous();
-                
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
-                jsonResult.add("product", jsonProduct);
+     
+                JsonArray jsonResult = new JsonArray();
+                while (rs.next()) {
+                    int product_id = rs.getInt("product_id");
+
+                    // back because next
+                    rs.previous();
+
+                    JsonObject jsonRow = new JsonObject();
+                    JsonElement jsonProduct = JsonUtil.toJsonElement(rs);
+                    jsonRow.add("product", jsonProduct);
+
+                    if (product_id > 0 ) {
+                        PreparedStatement stmtProductPrice = conn.prepareStatement(generateSqlQueryDetailString());
+                        stmtProductPrice.setLong(1, product_id);
+                        ResultSet rsProductPrice = stmtProductPrice.executeQuery();
+                        JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
+                        jsonRow.add("product_price", elementProductPrice);
+                    }
+                    jsonResult.add(jsonRow);
+                }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
    
@@ -225,10 +289,27 @@ public class ProductDataOpr {
             } else {
                 // back to first
                 rs.previous();
-                
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
-                jsonResult.add("product", jsonProduct);
+     
+                JsonArray jsonResult = new JsonArray();
+                while (rs.next()) {
+                    int product_id = rs.getInt("product_id");
+
+                    // back because next
+                    rs.previous();
+
+                    JsonObject jsonRow = new JsonObject();
+                    JsonElement jsonProduct = JsonUtil.toJsonElement(rs);
+                    jsonRow.add("product", jsonProduct);
+
+                    if (product_id > 0 ) {
+                        PreparedStatement stmtProductPrice = conn.prepareStatement(generateSqlQueryDetailString());
+                        stmtProductPrice.setLong(1, product_id);
+                        ResultSet rsProductPrice = stmtProductPrice.executeQuery();
+                        JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
+                        jsonRow.add("product_price", elementProductPrice);
+                    }
+                    jsonResult.add(jsonRow);
+                }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
         } catch (JsonSyntaxException | NullPointerException ex) {
