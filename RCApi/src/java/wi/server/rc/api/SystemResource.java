@@ -124,7 +124,7 @@ public class SystemResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCategory(@PathParam("category_id")int category_id, String jsonCategorySet) {
         
-        return null;//CategoryDataOpr.updateCategory(category_id, jsonCategorySet);
+        return CategoryDataOpr.updateCategory(category_id, jsonCategorySet);
     }
     
     @DELETE
