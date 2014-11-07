@@ -72,13 +72,11 @@ public class PosResource {
     }
     
     @PUT
-    @Path("/{pos_id}")
+    @Path("/company/{company_id}/pos/{pos_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updatePos(@PathParam("pos_id")int pos_id, String jsonPosSet) {
+    public Response updatePos(@PathParam("company_id")int company_id, @PathParam("pos_id")int pos_id, String jsonPosSet) {
         
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+        return PosDataOpr.updatePos(company_id, pos_id, jsonPosSet);
     }
     
     @DELETE

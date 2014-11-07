@@ -88,11 +88,11 @@ public class EmployeeResource {
     }
      
     @PUT
-    @Path("/{employee_id}")
+    @Path("/company/{company_id}/employee/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateEmployee(@PathParam("employee_id")int employee_id, String jsonEmployeeSet) {
+    public Response updateEmployee(@PathParam("company_id")int company_id, @PathParam("employee_id")int employee_id, String jsonEmployeeSet) {
          
-        return EmployeeDataOpr.updateEmployee(employee_id, jsonEmployeeSet);
+        return EmployeeDataOpr.updateEmployee(company_id, employee_id, jsonEmployeeSet);
     }
     
     @DELETE
