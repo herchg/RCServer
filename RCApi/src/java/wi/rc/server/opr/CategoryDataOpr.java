@@ -24,6 +24,14 @@ import wi.rc.server.Status;
  * @author 10307905
  */
 public class CategoryDataOpr {
+    
+    private static String generateSqlQueryString(){
+        
+        String sql = "SELECT category_id, parent_category_id, company_id, name, name_4_short, description, description_4_short, \n"
+                    + " option0, option1, option2, option3, option4, option5, option6, option7, option8, option9, status \n"
+                    + " FROM `category` WHERE company_id = ? ";
+        return sql;
+    }
 
     public static Response selectAllCategory(int company_id) {
 
@@ -37,9 +45,7 @@ public class CategoryDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
-            PreparedStatement pStmt = conn.prepareStatement("SELECT category_id, parent_category_id, company_id, name, name_4_short, description, description_4_short, \n"
-                    + " option0, option1, option2, option3, option4, option5, option6, option7, option8, option9, status \n"
-                    + " FROM `category` WHERE company_id = ? AND category_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND category_id = ?");
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, category_id);
             ResultSet rs = pStmt.executeQuery();
@@ -81,9 +87,7 @@ public class CategoryDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
-            PreparedStatement pStmt = conn.prepareStatement("SELECT category_id, parent_category_id, company_id, name, name_4_short, description, description_4_short, \n"
-                    + " option0, option1, option2, option3, option4, option5, option6, option7, option8, option9, status \n"
-                    + " FROM `category` WHERE company_id = ? AND name LIKE ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND name LIKE ?");
             pStmt.setInt(1, company_id);
             pStmt.setString(2, "%" + category_name + "%");
             ResultSet rs = pStmt.executeQuery();
