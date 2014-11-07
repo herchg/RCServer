@@ -31,7 +31,7 @@ public class OrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrders(@PathParam("company_id")int company_id,@QueryParam("expand") String expand) {
         
-        return OrderDataOpr.selectAllOrders(company_id, expand);
+        return OrderDataOpr.selectAllOrders(company_id,expand);
     }
     
     @GET
