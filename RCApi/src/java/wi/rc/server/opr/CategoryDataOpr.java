@@ -189,7 +189,7 @@ public class CategoryDataOpr {
         return resp;
     }
 
-    public static Response updateCategory(long categoryId, String jsonString) {
+    public static Response updateCategory(int companyId, long categoryId, String jsonString) {
 
         Response resp;
 
@@ -207,9 +207,11 @@ public class CategoryDataOpr {
             Map<String, Object> mapCategoryWhere = new LinkedHashMap<String, Object>();
 
             mapCategoryWhere.put("category_id", categoryId);
+            mapCategoryWhere.put("company_id", companyId);
 
             mapCategorySet.remove("category_id");// 避免Category Set statement裡面有category_id
-
+            mapCategorySet.remove("company_id");
+            
             sql = SQLUtil.genUpdateSQLString("`category`", mapCategorySet, mapCategoryWhere);
             PreparedStatement stmtCategory = conn.prepareStatement(sql);
 
