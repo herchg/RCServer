@@ -5,13 +5,13 @@
  */
 package wi.rc.server.opr;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import wi.core.db.DSConn;
@@ -358,9 +358,72 @@ public class EmployeeDataOpr {
     } 
     
     
-    public static Response updateEmployee(int employee_id, String jsonOrderSet) {
+    public static Response updateEmployee(int employeeId, String jsonString) {
         
-        return null;
+        Response resp;
+
+        Connection conn = null;
+        boolean ret = true;
+
+        JsonObject jsonResult = new JsonObject();
+        String sql = null;
+
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+
+            Map<?, ?> map = JsonUtil.toMap(jsonString);
+            Map<String, Object> mapEmployeeSet = (Map<String, Object>) map.get("employee");
+            Map<String, Object> mapEmployeeWhere = new LinkedHashMap<String, Object>();
+
+            mapEmployeeWhere.put("employee_id", employeeId);
+
+            mapEmployeeSet.remove("employee_id");
+
+            sql = SQLUtil.genUpdateSQLString("`employee`", mapEmployeeSet, mapEmployeeWhere);
+            PreparedStatement stmtEmployee = conn.prepareStatement(sql);
+
+            if (stmtEmployee.executeUpdate() > 0) {
+                
+                Map<String, Object> mapEmployeeExtSet = (Map<String, Object>) map.get("employee_ext");
+                Map<String, Object> mapEmployeeExtWhere = new LinkedHashMap<String, Object>();
+
+                mapEmployeeExtWhere.put("employee_id", employeeId);
+
+                mapEmployeeExtSet.remove("employee_id");
+
+                sql = SQLUtil.genUpdateSQLString("`employee_ext`", mapEmployeeExtSet, mapEmployeeExtWhere);
+                PreparedStatement stmtEmployeeExt = conn.prepareStatement(sql);
+                if (stmtEmployeeExt.executeUpdate() < 0) {
+                    ret = false;
+                }
+                
+            } else {
+                ret = false;
+            }
+            
+            jsonResult.addProperty("employee_id", employeeId);
+            
+            // check ret and commit or rollback
+            if (ret) {
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+            } else {
+                resp = Response.status(Response.Status.BAD_REQUEST).entity(sql).build();
+            }
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+
+        return resp;
     }
     
     

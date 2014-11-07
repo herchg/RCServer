@@ -87,17 +87,15 @@ public class EmployeeResource {
         return EmployeeDataOpr.loginEmployee(jsonEmployeeSet);
     }
     
-    /*
+    
     @PUT
     @Path("/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateEmployee(@PathParam("employee_id")int employee_id, String jsonEmployeeSet) {
-        
-        Response resp;
-        resp = Response.status(Response.Status.NOT_IMPLEMENTED).build();
-        return resp;
+         
+        return EmployeeDataOpr.updateEmployee(employee_id, jsonEmployeeSet);
     }
-    */
+    
     @DELETE
     @Path("/company/{company_id}/employee/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)

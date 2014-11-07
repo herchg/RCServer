@@ -5,13 +5,13 @@
  */
 package wi.rc.server.opr;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import wi.core.db.DSConn;
@@ -185,11 +185,58 @@ public class CategoryDataOpr {
         return resp;
     }
     
-    public static Response updateEmployee(String jsonOrderSet) {
+    public static Response updateCategory(long categoryId, String jsonString) {
         
-        return null;
-    }
-    
+        Response resp;
+
+        Connection conn = null;
+        boolean ret = true;
+
+        JsonObject jsonResult = new JsonObject();
+        String sql = null;
+
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+
+            Map<?, ?> map = JsonUtil.toMap(jsonString);
+            Map<String, Object> mapCategorySet = (Map<String, Object>) map.get("category");
+            Map<String, Object> mapCategoryWhere = new LinkedHashMap<String, Object>();
+
+            mapCategoryWhere.put("category_id", categoryId);
+
+            mapCategorySet.remove("category_id");// 避免Category Set statement裡面有category_id
+
+            sql = SQLUtil.genUpdateSQLString("`category`", mapCategorySet, mapCategoryWhere);
+            PreparedStatement stmtCategory = conn.prepareStatement(sql);
+
+            if (stmtCategory.executeUpdate() < 0) {
+                ret = false;
+            }
+            
+            jsonResult.addProperty("category_id", categoryId);
+            
+            // check ret and commit or rollback
+            if (ret) {
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+            } else {
+                resp = Response.status(Response.Status.BAD_REQUEST).entity(sql).build();
+            }
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+
+        return resp;
+    }  
     
     public static Response deleteCategory(int company_id,int category_id) {
         

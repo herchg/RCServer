@@ -7,6 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -29,9 +30,16 @@ public class OrderResource {
     @GET
     @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrders(@PathParam("company_id")int company_id,@QueryParam("expand") String expand) {
-        
-        return OrderDataOpr.selectAllOrders(company_id,expand);
+    public Response getOrders(@PathParam("company_id")int company_id,
+            @QueryParam("expand") String expand,
+            @HeaderParam("order_id") String order_id,
+            @HeaderParam("store_id") String store_id,
+            @HeaderParam("pos_id") String pos_id,
+            @HeaderParam("status") String status,
+            @HeaderParam("start_date") String start_date,
+            @HeaderParam("end_date") String end_date) {
+      
+        return OrderDataOpr.selectAllOrders(company_id,order_id,store_id,pos_id,status,start_date,end_date,expand);
     }
     
     @GET
