@@ -30,15 +30,19 @@ import wi.rc.server.Status;
  * @author hermeschang
  */
 public class OrderDataOpr {
-    
-    public static Response selectAllOrders(int company_id, String expand) {
+
+    public static Response selectAllOrders(int company_id,String order_id,String store_id,String pos_id,String status,String start_date,String end_date,String expand) {
 
         Connection conn = null;
         Response resp;
-
+        
+        String sqlString;
+        int sqlCount = 1;
+        
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement("SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
+            
+            sqlString = "SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
                     + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
                     + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount, o.order_datetime AS order_datetime, \n"
                     + " o.log_datetime AS log_datetime, o.status AS status, o.pos_order_id AS pos_order_id, o.memo  AS memo \n"
@@ -48,8 +52,54 @@ public class OrderDataOpr {
                     + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
                     + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
                     + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
-                    + " WHERE o.company_id = ? ");
-            pStmt.setInt(1, company_id);
+                    + " WHERE o.company_id = ? ";
+            
+            //check input to add sql query string
+            if(order_id != null){ sqlString += " AND o.order_id = ? ";}
+            if(store_id != null){ sqlString += " AND o.store_id = ? ";}
+            if(pos_id != null){ sqlString += " AND o.pos_id = ? ";}
+            if(status != null){ sqlString += " AND o.status = ? ";}
+            if(start_date != null){ sqlString += " AND o.order_datetime >= ? ";}
+            if(end_date != null){ sqlString += " AND o.order_datetime <= ? ";}
+            
+            //create statement and use 
+            PreparedStatement pStmt = conn.prepareStatement(sqlString);
+
+            //set input condition
+            pStmt.setInt(sqlCount, company_id);
+            sqlCount ++;
+            
+            if(order_id != null){ 
+                pStmt.setLong(sqlCount, Long.parseLong(order_id));
+                sqlCount ++;
+            }
+            
+            if(store_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(store_id));
+                sqlCount ++;
+            }
+            
+            if(pos_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(pos_id));
+                sqlCount ++;
+            }
+            
+            if(status != null){ 
+                pStmt.setLong(sqlCount, Long.parseLong(status));
+                sqlCount ++;
+            }
+            
+            if(start_date != null){ 
+                pStmt.setString(sqlCount, start_date);
+                sqlCount ++;
+            }
+            
+            if(end_date != null){ 
+                pStmt.setString(sqlCount, end_date);
+                sqlCount ++;
+            }
+            
+            
             ResultSet rs = pStmt.executeQuery();
 
             if (!rs.next()) {
@@ -96,6 +146,8 @@ public class OrderDataOpr {
                 }
             }
         }
+
+        
         return resp;
     }
 
