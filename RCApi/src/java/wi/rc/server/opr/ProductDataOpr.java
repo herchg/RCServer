@@ -10,14 +10,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import wi.core.db.DSConn;
+import wi.core.util.DateTimeUtil;
 import wi.core.util.json.JsonUtil;
 import wi.core.util.sql.SQLUtil;
-import wi.rc.data.product.Product;
 import wi.rc.server.Status;
 /**
  *
@@ -28,7 +31,7 @@ public class ProductDataOpr {
     private static String generateSqlQuerySTring() {
 
         String sql = "SELECT p.product_id AS product_id , c.company_id AS company_id, c.name AS company_name,p.name AS name, \n" 
-                    + " p.name_4_short AS name_4_short ,p.description AS description, p.description_4_short AS description_4_short, p.product_code AS product_code, \n" 
+                    + " p.name_4_short AS name_4_short  ,p.description AS description, p.description_4_short AS description_4_short, p.product_code AS product_code, \n" 
                     + " p.barcode AS barcode, p.category_id AS category_id,ca.name AS category_name, p.option0 AS option0, p.option1 AS option1,p.option2 AS option2, \n" 
                     + " p.option3 AS option3, p.option4 AS option4, p.option5 AS option5,p.option6 AS option6, p.option7 AS option7,p.option8 AS option8,p.option9 AS option9, \n" 
                     + " p.status AS status, IFNULL(0,pp.price) AS price ,IFNULL('901',pp.ncode) AS ncode,IFNULL(0,pp.amount) AS amount \n" 
@@ -332,9 +335,80 @@ public class ProductDataOpr {
         return resp;
     }
     
-    public static Response updateProduct(String jsonProductSet) {
-        
-        return null;
+    public static Response updateProduct(int company_id ,int product_id , String jsonString) {
+        Response resp;
+
+        Connection conn = null;
+        boolean ret = true;
+
+        JsonObject jsonResult = new JsonObject();
+        String sql = null;
+
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+
+            Map<?, ?> map = JsonUtil.toMap(jsonString);
+            Map<String, Object> mapProductSet = (Map<String, Object>) map.get("product");
+            Map<String, Object> mapOProductWhere = new LinkedHashMap<String, Object>();
+
+            mapOProductWhere.put("company_id", company_id);
+            mapOProductWhere.put("product_id", product_id);
+
+            mapProductSet.remove("company_id");// 避免Order Set statement裡面有company_id
+            mapProductSet.remove("product_id");// 避免Order Set statement裡面有product_id
+
+            sql = SQLUtil.genUpdateSQLString("`product`", mapProductSet, mapOProductWhere);
+            PreparedStatement stmtOrder = conn.prepareStatement(sql);
+
+            if (stmtOrder.executeUpdate() > 0) {
+                // execute success
+                //
+                // update product price , unfinished
+                //
+                Map<String, Object> mapProductPriceSet = (Map<String, Object>) map.get("product_price");
+
+                // add order_id
+                Map<String, Object> mapProductPriceWhere = new LinkedHashMap<String, Object>();
+
+                mapProductPriceWhere.put("product_id", product_id);
+
+                mapProductPriceSet.remove("product_id");// 避免OrderDetail set statement裡面有product_id
+
+                // prepare sql and statement
+                sql = SQLUtil.genUpdateSQLString("`product_price`", mapProductPriceSet, mapProductPriceWhere);
+                PreparedStatement stmtOrderDetail = conn.prepareStatement(sql);
+                if (stmtOrderDetail.executeUpdate() < 0) {
+                    ret = false;
+                }
+ 
+                // gen result
+                jsonResult.addProperty("product_id", product_id);
+            } else {
+                // execute failure
+                ret = false;
+            }
+
+            // check ret and commit or rollback
+            if (ret) {
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+            } else {
+                resp = Response.status(Response.Status.BAD_REQUEST).entity(sql).build();
+            }
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+
+        return resp;
     }
     
     public static Response deleteProduct(int company_id,int product_id) {

@@ -80,11 +80,11 @@ public class OrderResource {
     }
 
     @PUT
-    @Path("/{orderId}")
+    @Path("/company/{company_id}/order/{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateOrder(@PathParam("orderId") int orderId, String jsonOrderSet) {
+    public Response updateOrder(@PathParam("company_id") int company_id,@PathParam("orderId") int orderId, String jsonOrderSet) {
 
-        return OrderDataOpr.updateOrder(orderId, jsonOrderSet);
+        return OrderDataOpr.updateOrder(company_id,orderId, jsonOrderSet);
     }
     
     @DELETE
