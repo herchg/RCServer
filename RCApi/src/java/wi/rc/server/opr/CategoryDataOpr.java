@@ -24,14 +24,14 @@ import wi.rc.server.Status;
  * @author 10307905
  */
 public class CategoryDataOpr {
-    
+
     public static Response selectAllCategory(int company_id) {
-        
+
         return null;
     }
-    
-    public static Response selectCategoryById(int company_id ,int category_id) {
-        
+
+    public static Response selectCategoryById(int company_id, int category_id) {
+
         Connection conn = null;
         Response resp;
         try {
@@ -43,13 +43,13 @@ public class CategoryDataOpr {
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, category_id);
             ResultSet rs = pStmt.executeQuery();
-            
+
             if (!rs.next()) {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             } else {
                 // back to first
                 rs.previous();
-     
+
                 JsonObject jsonResult = new JsonObject();
                 JsonElement jsonCategory = JsonUtil.toJsonArray(rs);
                 jsonResult.add("category", jsonCategory);
@@ -70,12 +70,12 @@ public class CategoryDataOpr {
                 }
             }
         }
-        
+
         return resp;
     }
 
-    public static Response selectCategoryByName(int company_id,String category_name) {
-        
+    public static Response selectCategoryByName(int company_id, String category_name) {
+
         Connection conn = null;
         Response resp;
         try {
@@ -87,13 +87,13 @@ public class CategoryDataOpr {
             pStmt.setInt(1, company_id);
             pStmt.setString(2, "%" + category_name + "%");
             ResultSet rs = pStmt.executeQuery();
-            
+
             if (!rs.next()) {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             } else {
                 // back to first
                 rs.previous();
-     
+
                 JsonObject jsonResult = new JsonObject();
                 JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
                 jsonResult.add("category", jsonEmployee);
@@ -115,7 +115,7 @@ public class CategoryDataOpr {
         }
         return resp;
     }
-    
+
     public static Response insertCategory(String jsonString) {
 
         Connection conn = null;
@@ -151,7 +151,7 @@ public class CategoryDataOpr {
                     category_id = rs.getLong(1);
                     // gen result
                     jsonResult.addProperty("category_id", category_id);
-                }else{
+                } else {
                     ret = false;
                 }
             } else {
@@ -184,9 +184,9 @@ public class CategoryDataOpr {
 
         return resp;
     }
-    
+
     public static Response updateCategory(long categoryId, String jsonString) {
-        
+
         Response resp;
 
         Connection conn = null;
@@ -212,9 +212,9 @@ public class CategoryDataOpr {
             if (stmtCategory.executeUpdate() < 0) {
                 ret = false;
             }
-            
+
             jsonResult.addProperty("category_id", categoryId);
-            
+
             // check ret and commit or rollback
             if (ret) {
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
@@ -236,13 +236,13 @@ public class CategoryDataOpr {
         }
 
         return resp;
-    }  
-    
-    public static Response deleteCategory(int company_id,int category_id) {
-        
+    }
+
+    public static Response deleteCategory(int company_id, int category_id) {
+
         Response resp;
         Connection conn = null;
-        
+
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             PreparedStatement stmtEmployee = conn.prepareStatement("UPDATE `category` SET  status = ? WHERE company_id = ? AND category_id = ?");

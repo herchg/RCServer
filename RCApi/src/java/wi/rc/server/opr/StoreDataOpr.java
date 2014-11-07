@@ -12,6 +12,7 @@ import com.google.gson.JsonSyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import wi.core.db.DSConn;
@@ -283,7 +284,60 @@ public class StoreDataOpr {
         return resp;
     }
     
-    public static Response deleteStore(int company_id,int store_id) {
+    public static Response updateStore(int storeId, String jsonString){
+        
+        Response resp;
+
+        Connection conn = null;
+        boolean ret = true;
+
+        JsonObject jsonResult = new JsonObject();
+        String sql = null;
+
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+
+            Map<?, ?> map = JsonUtil.toMap(jsonString);
+            Map<String, Object> mapStoreSet = (Map<String, Object>) map.get("store");
+            Map<String, Object> mapStoreWhere = new LinkedHashMap<String, Object>();
+
+            mapStoreWhere.put("store_id", storeId);
+            
+            mapStoreSet.remove("store_id");
+
+            sql = SQLUtil.genUpdateSQLString("`store`", mapStoreSet, mapStoreWhere);
+            PreparedStatement stmtStore = conn.prepareStatement(sql);
+
+            if (stmtStore.executeUpdate() < 0) {
+                ret = false;
+            }
+
+            jsonResult.addProperty("store_id", storeId);
+
+            // check ret and commit or rollback
+            if (ret) {
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+            } else {
+                resp = Response.status(Response.Status.BAD_REQUEST).entity(sql).build();
+            }
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+
+        return resp;
+    }
+    
+    public static Response deleteStore(int company_id, int store_id) {
         
         Response resp;
         Connection conn = null;

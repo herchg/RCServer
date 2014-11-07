@@ -58,17 +58,17 @@ public class EmployeeResource {
     @GET
     @Path("/company/{company_id}/store/{store_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployeeByStoreId(@PathParam("company_id") int company_id,@PathParam("employee_id") int employee_id) {
+    public Response getEmployeeByStoreId(@PathParam("company_id") int company_id, @PathParam("store_id") int store_id) {
         
-        return EmployeeDataOpr.selectEmployeeByStoreId(company_id,employee_id);
+        return EmployeeDataOpr.selectEmployeeByStoreId(company_id, store_id);
     }  
     
     @GET
     @Path("/company/{company_id}/name/{employee_name}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployeeByName(@PathParam("company_id") int company_id,@PathParam("employee_name") String employee_name) {
+    public Response getEmployeeByName(@PathParam("company_id") int company_id, @PathParam("employee_name") String employee_name) {
         
-        return EmployeeDataOpr.selectEmployeeByName(company_id,employee_name);
+        return EmployeeDataOpr.selectEmployeeByName(company_id, employee_name);
     }  
     
     @POST
@@ -86,8 +86,7 @@ public class EmployeeResource {
         
         return EmployeeDataOpr.loginEmployee(jsonEmployeeSet);
     }
-    
-    
+     
     @PUT
     @Path("/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -99,8 +98,8 @@ public class EmployeeResource {
     @DELETE
     @Path("/company/{company_id}/employee/{employee_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteEmployee(@PathParam("company_id")int company_id,@PathParam("employee_id")int employee_id) {
+    public Response deleteEmployee(@PathParam("company_id")int company_id, @PathParam("employee_id")int employee_id) {
         
-        return EmployeeDataOpr.deleteEmployee(company_id,employee_id);
+        return EmployeeDataOpr.deleteEmployee(company_id, employee_id);
     }
 }

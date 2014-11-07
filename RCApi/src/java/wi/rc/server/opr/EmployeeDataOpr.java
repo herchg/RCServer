@@ -18,30 +18,31 @@ import wi.core.db.DSConn;
 import wi.core.util.json.JsonUtil;
 import wi.core.util.sql.SQLUtil;
 import wi.rc.server.Status;
+
 /**
  *
  * @author samuelatwistron
  */
 public class EmployeeDataOpr {
-    
+
     public static Response selectAllEmployee(int company_id) {
-        
+
         Response resp;
         Connection conn = null;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             PreparedStatement pStmt = conn.prepareStatement("SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
-                                + " FROM `employee` \n" 
-                                + " WHERE company_id = ?");
+                    + " FROM `employee` \n"
+                    + " WHERE company_id = ?");
             pStmt.setInt(1, company_id);
             ResultSet rs = pStmt.executeQuery();
-            
+
             if (!rs.next()) {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             } else {
                 // back to first
                 rs.previous();
-     
+
                 JsonObject jsonResult = new JsonObject();
                 JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
                 jsonResult.add("employee", jsonEmployee);
@@ -64,31 +65,31 @@ public class EmployeeDataOpr {
 
         return resp;
     }
-    
-    public static Response selectEmployeeById(int company_id ,int employee_id,String expand) {
-        
+
+    public static Response selectEmployeeById(int company_id, int employee_id, String expand) {
+
         Connection conn = null;
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
             PreparedStatement pStmt = conn.prepareStatement("SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
-                    + " FROM `employee` \n" 
+                    + " FROM `employee` \n"
                     + " WHERE company_id = ? AND employee_id = ?");
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, employee_id);
             ResultSet rs = pStmt.executeQuery();
-            
+
             if (!rs.next()) {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             } else {
                 // back to first
                 rs.previous();
-     
+
                 JsonObject jsonResult = new JsonObject();
                 JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
                 jsonResult.add("employee", jsonEmployee);
-                
+
                 if (expand != null && expand.equals("ext")) {
                     PreparedStatement stmtEmployeeExt = conn.prepareStatement("SELECT address, contact, tel, mobile, email \n"
                             + " FROM `employee_ext` \n"
@@ -114,31 +115,30 @@ public class EmployeeDataOpr {
                 }
             }
         }
-        
+
         return resp;
     }
-    
-    
-    public static Response selectEmployeeByStoreId(int company_id,int store_id) {
-        
+
+    public static Response selectEmployeeByStoreId(int company_id, int store_id) {
+
         Connection conn = null;
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
             PreparedStatement pStmt = conn.prepareStatement("SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
-                    + " FROM `employee` \n" 
+                    + " FROM `employee` \n"
                     + " WHERE company_id = ? AND store_id = ?");
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, store_id);
             ResultSet rs = pStmt.executeQuery();
-            
+
             if (!rs.next()) {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             } else {
                 // back to first
                 rs.previous();
-     
+
                 JsonObject jsonResult = new JsonObject();
                 JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
                 jsonResult.add("employee", jsonEmployee);
@@ -160,28 +160,27 @@ public class EmployeeDataOpr {
         }
         return resp;
     }
-    
 
-    public static Response selectEmployeeByName(int company_id,String employee_name) {
-        
+    public static Response selectEmployeeByName(int company_id, String employee_name) {
+
         Connection conn = null;
         Response resp;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
             PreparedStatement pStmt = conn.prepareStatement("SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
-                    + " FROM `employee` \n" 
+                    + " FROM `employee` \n"
                     + " WHERE company_id = ? AND name LIKE ?");
             pStmt.setInt(1, company_id);
             pStmt.setString(2, "%" + employee_name + "%");
             ResultSet rs = pStmt.executeQuery();
-            
+
             if (!rs.next()) {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             } else {
                 // back to first
                 rs.previous();
-     
+
                 JsonObject jsonResult = new JsonObject();
                 JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
                 jsonResult.add("employee", jsonEmployee);
@@ -203,7 +202,7 @@ public class EmployeeDataOpr {
         }
         return resp;
     }
-    
+
     public static Response insertEmployee(String jsonString) {
 
         Connection conn = null;
@@ -238,7 +237,7 @@ public class EmployeeDataOpr {
                 if (rs.next()) {
                     employee_id = rs.getLong(1);
                 }
-                
+
                 PreparedStatement stmtEmployeeExt = null;
                 Map<String, Object> mapEmployeeExt = (Map<String, Object>) map.get("employee_ext");
                 // add product_id
@@ -289,77 +288,76 @@ public class EmployeeDataOpr {
 
         return resp;
     }
-    
+
     public static Response loginEmployee(String jsonString) {
-        
+
         Connection conn = null;
         Response resp;
         boolean ret = false;
         /*
-        try {
-            Map<?, ?> map = JsonUtil.toMap(jsonString);
-            Map<String, Object> mapEmployee = (Map<String, Object>) map.get("employee");
+         try {
+         Map<?, ?> map = JsonUtil.toMap(jsonString);
+         Map<String, Object> mapEmployee = (Map<String, Object>) map.get("employee");
             
-            int company_id = ((Double)mapEmployee.get("company_id")).intValue();
-            int employee_id = ((Double)mapEmployee.get("employee_id")).intValue();
-            String login_account = (String)mapEmployee.get("login_account");
-            String login_password = (String)mapEmployee.get("login_password");
+         int company_id = ((Double)mapEmployee.get("company_id")).intValue();
+         int employee_id = ((Double)mapEmployee.get("employee_id")).intValue();
+         String login_account = (String)mapEmployee.get("login_account");
+         String login_password = (String)mapEmployee.get("login_password");
             
-            //check input
-            if(company_id > 0 && employee_id > 0 && login_account != null && login_password != null){
+         //check input
+         if(company_id > 0 && employee_id > 0 && login_account != null && login_password != null){
                 
-                conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-                PreparedStatement pStmt = conn.prepareStatement("SELECT login_password ,status \n"
-                        + " FROM `employee` WHERE company_id = ? AND employee_id = ? AND login_account =? ");
+         conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+         PreparedStatement pStmt = conn.prepareStatement("SELECT login_password ,status \n"
+         + " FROM `employee` WHERE company_id = ? AND employee_id = ? AND login_account =? ");
                 
-                pStmt.setInt(1, company_id);
-                pStmt.setInt(2, employee_id);
-                pStmt.setString(3, login_account);
+         pStmt.setInt(1, company_id);
+         pStmt.setInt(2, employee_id);
+         pStmt.setString(3, login_account);
         
-                ResultSet rs = pStmt.executeQuery();
+         ResultSet rs = pStmt.executeQuery();
 
-                if (rs.next()) {
-                    //check password and status
-                    String password = rs.getString("login_password");
-                    int status = rs.getInt("status");
+         if (rs.next()) {
+         //check password and status
+         String password = rs.getString("login_password");
+         int status = rs.getInt("status");
         
-                    //password ok and status = 1
-                    if(login_password.equals(password) && status == 1 ){
-                        ret = true;
-                    }
-                }
-            }
+         //password ok and status = 1
+         if(login_password.equals(password) && status == 1 ){
+         ret = true;
+         }
+         }
+         }
             
             
-            if (ret) {
-                resp = Response.status(Response.Status.OK).build();
-            } else {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            }
+         if (ret) {
+         resp = Response.status(Response.Status.OK).build();
+         } else {
+         resp = Response.status(Response.Status.NOT_FOUND).build();
+         }
             
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ex) {
+         } catch (JsonSyntaxException | NullPointerException ex) {
+         resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+         } catch (Exception ex) {
+         resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+         } finally {
+         if (conn != null) {
+         try {
+         conn.setAutoCommit(true);
+         conn.close();
+         } catch (Exception ex) {
 
-                }
-            }
-        }
-        */
+         }
+         }
+         }
+         */
         resp = Response.status(Response.Status.OK).build();
-        
+
         return resp;
-    } 
-    
-    
+    }
+
     public static Response updateEmployee(int employeeId, String jsonString) {
-        
+
         Response resp;
 
         Connection conn = null;
@@ -383,7 +381,7 @@ public class EmployeeDataOpr {
             PreparedStatement stmtEmployee = conn.prepareStatement(sql);
 
             if (stmtEmployee.executeUpdate() > 0) {
-                
+
                 Map<String, Object> mapEmployeeExtSet = (Map<String, Object>) map.get("employee_ext");
                 Map<String, Object> mapEmployeeExtWhere = new LinkedHashMap<String, Object>();
 
@@ -396,13 +394,13 @@ public class EmployeeDataOpr {
                 if (stmtEmployeeExt.executeUpdate() < 0) {
                     ret = false;
                 }
-                
+
             } else {
                 ret = false;
             }
-            
+
             jsonResult.addProperty("employee_id", employeeId);
-            
+
             // check ret and commit or rollback
             if (ret) {
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
@@ -425,13 +423,12 @@ public class EmployeeDataOpr {
 
         return resp;
     }
-    
-    
-    public static Response deleteEmployee(int company_id,int employee_id) {
-        
+
+    public static Response deleteEmployee(int company_id, int employee_id) {
+
         Response resp;
         Connection conn = null;
-        
+
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             PreparedStatement stmtEmployee = conn.prepareStatement("UPDATE `employee` SET  status = ? WHERE company_id = ? AND employee_id = ?");
