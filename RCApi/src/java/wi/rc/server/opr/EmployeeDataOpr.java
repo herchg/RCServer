@@ -32,8 +32,7 @@ public class EmployeeDataOpr {
         String sql = "SELECT e.employee_id AS employee_id, e.company_id AS company_id, e.store_id AS store_id, e.employee_code AS employee_code, e.name AS employee_name, "
                 + " e.status AS status, IFNULL('','e.photo') AS photo, e.login_account AS login_account,e.role_id AS role_id,r.name AS role_name,e.on_board_date AS on_board_date,IFNULL('','e.leave_date') AS leave_date \n"
                 + " FROM `employee` AS e \n"
-                + " LEFT JOIN `role` AS r ON e.role_id = r.role_id \n"
-                + " WHERE e.company_id = ? ";
+                + " LEFT JOIN `role` AS r ON e.role_id = r.role_id ";
 
         return sql;
     }
@@ -47,14 +46,48 @@ public class EmployeeDataOpr {
         return sql;
     }
 
-    public static Response selectAllEmployee(int company_id) {
+    public static Response selectAllEmployee(int company_id,String employee_id,String role_id,String store_id,String employee_name,String expand) {
 
         Response resp;
         Connection conn = null;
+        
+        String sqlString;
+        int sqlCount = 1;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString());
-            pStmt.setInt(1, company_id);
+            
+            sqlString = generateSqlQueryString() + " WHERE e.company_id = ? ";
+
+            if(employee_id != null){ sqlString += " AND e.employee_id = ? ";}
+            if(role_id != null){ sqlString += " AND e.role_id = ? ";}
+            if(store_id != null){ sqlString += " AND e.store_id = ? ";}
+            if(employee_name != null){ sqlString += " AND e.name LIKE ? ";}
+            
+            PreparedStatement pStmt = conn.prepareStatement(sqlString);
+            
+            pStmt.setInt(sqlCount, company_id);
+            sqlCount ++;
+            
+            if(employee_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(employee_id));
+                sqlCount ++;
+            }
+            
+            if(role_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(role_id));
+                sqlCount ++;
+            }
+            
+            if(store_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(store_id));
+                sqlCount ++;
+            }
+            
+            if(employee_name != null){ 
+                pStmt.setString(sqlCount, "%" + employee_name + "%" );
+                sqlCount ++;
+            }
+            
             ResultSet rs = pStmt.executeQuery();
 
             if (!rs.next()) {
@@ -62,12 +95,29 @@ public class EmployeeDataOpr {
             } else {
                 // back to first
                 rs.previous();
+                JsonArray jsonResult = new JsonArray();
+                while (rs.next()) {
+                    int employeeId = rs.getInt("employee_id");
 
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
-                jsonResult.add("employee", jsonEmployee);
+                    // back because next
+                    rs.previous();
+
+                    JsonObject jsonRow = new JsonObject();
+                    JsonElement jsonEmployee = JsonUtil.toJsonElement(rs);
+                    jsonRow.add("employee", jsonEmployee);
+
+                    if (expand != null && expand.equals("ext")) {
+                        PreparedStatement stmtEmployeeDetail = conn.prepareStatement(generateSqlQueryExtString());
+                        stmtEmployeeDetail.setInt(1, employeeId);
+                        ResultSet rsEmployeeDetail = stmtEmployeeDetail.executeQuery();
+                        JsonElement elementEmployeeDetail = JsonUtil.toJsonArray(rsEmployeeDetail);
+                        jsonRow.add("employee_ext", elementEmployeeDetail);
+                        
+                        DBOperation.close(stmtEmployeeDetail,rsEmployeeDetail);
+                    }
+                    jsonResult.add(jsonRow);
+                }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-                
             }
             
             DBOperation.close(pStmt, rs);
@@ -82,151 +132,6 @@ public class EmployeeDataOpr {
         return resp;
     }
 
-    public static Response selectEmployeeById(int company_id, int employee_id, String expand) {
-
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND e.employee_id = ?");
-            pStmt.setInt(1, company_id);
-            pStmt.setInt(2, employee_id);
-            ResultSet rs = pStmt.executeQuery();
-
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
-                jsonResult.add("employee", jsonEmployee);
-
-                if (expand != null && expand.equals("ext")) {
-                    PreparedStatement stmtEmployeeExt = conn.prepareStatement(generateSqlQueryExtString());
-                    stmtEmployeeExt.setLong(1, employee_id);
-                    ResultSet rsEmployeeExt = stmtEmployeeExt.executeQuery();
-                    JsonElement jsonEmployeeExt = JsonUtil.toJsonArray(rsEmployeeExt);
-                    jsonResult.add("employee_ext", jsonEmployeeExt);
-                    DBOperation.close(stmtEmployeeExt, rsEmployeeExt);
-                }
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();  
-            }
-            DBOperation.close(pStmt, rs);
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-
-        return resp;
-    }
-
-    public static Response selectEmployeeByRoleId(int company_id, int role_id) {
-
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND e.role_id = ?");
-            pStmt.setInt(1, company_id);
-            pStmt.setInt(2, role_id);
-            ResultSet rs = pStmt.executeQuery();
-
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
-                jsonResult.add("employee", jsonEmployee);
-                resp = Response.status(Response.Status.OK).entity(pStmt.toString()).build();
-            }
-            DBOperation.close(pStmt, rs);
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-        return resp;
-    }
-    
-    public static Response selectEmployeeByStoreId(int company_id, int store_id) {
-
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND e.store_id = ?");
-            pStmt.setInt(1, company_id);
-            pStmt.setInt(2, store_id);
-            ResultSet rs = pStmt.executeQuery();
-
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
-                jsonResult.add("employee", jsonEmployee);
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-            }
-            DBOperation.close(pStmt, rs);
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-        return resp;
-    }
-
-    public static Response selectEmployeeByName(int company_id, String employee_name) {
-
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND e.name LIKE ?");
-            pStmt.setInt(1, company_id);
-            pStmt.setString(2, "%" + employee_name + "%");
-            ResultSet rs = pStmt.executeQuery();
-
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
-                jsonResult.add("employee", jsonEmployee);
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-            }
-            DBOperation.close(pStmt, rs);
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-        return resp;
-    }
 
     public static Response insertEmployee(String jsonString) {
 

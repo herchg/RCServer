@@ -12,6 +12,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -39,45 +40,20 @@ public class EmployeeResource {
      * Retrieves representation of an instance of wi.server.rc.api.EmployeeResource
      * @return an instance of java.lang.String
      */
+
     @GET
     @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployees(@PathParam("company_id") int company_id) {
-        
-        return EmployeeDataOpr.selectAllEmployee(company_id);
+    public Response getEmployees(@PathParam("company_id")int company_id,
+            @QueryParam("expand") String expand,
+            @HeaderParam("employee_id") String employee_id,
+            @HeaderParam("role_id") String role_id,
+            @HeaderParam("store_id") String store_id,
+            @HeaderParam("employee_name") String employee_name
+            ) {
+      
+        return EmployeeDataOpr.selectAllEmployee(company_id,employee_id,role_id,store_id,employee_name,expand);
     }
-    
-    @GET
-    @Path("/{employee_id}/company/{company_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployeeById(@PathParam("company_id") int company_id,@PathParam("employee_id") int employee_id,@QueryParam("expand") String expand) {
-        
-        return EmployeeDataOpr.selectEmployeeById(company_id,employee_id,expand);
-    }   
-    
-    @GET
-    @Path("/company/{company_id}/role/{role_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployeeByRoleId(@PathParam("company_id") int company_id, @PathParam("role_id") int role_id) {
-        
-        return EmployeeDataOpr.selectEmployeeByRoleId(company_id, role_id);
-    }  
-    
-    @GET
-    @Path("/company/{company_id}/store/{store_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployeeByStoreId(@PathParam("company_id") int company_id, @PathParam("store_id") int store_id) {
-        
-        return EmployeeDataOpr.selectEmployeeByStoreId(company_id, store_id);
-    }  
-    
-    @GET
-    @Path("/company/{company_id}/name/{employee_name}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployeeByName(@PathParam("company_id") int company_id, @PathParam("employee_name") String employee_name) {
-        
-        return EmployeeDataOpr.selectEmployeeByName(company_id, employee_name);
-    }  
     
     @POST
     @Path("/")

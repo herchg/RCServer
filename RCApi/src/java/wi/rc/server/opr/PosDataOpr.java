@@ -32,21 +32,53 @@ public class PosDataOpr {
                     + " p.store_id AS store_id,s.name AS store_name, p.memo AS memo, p.status AS status \n" 
                     + " FROM `pos`  AS p \n" 
                     + " LEFT JOIN `company` AS c ON p.company_id = c.company_id \n" 
-                    + " LEFT JOIN `store` AS s ON p.store_id = s.store_id \n" 
-                    + " WHERE p.company_id = ? ";
+                    + " LEFT JOIN `store` AS s ON p.store_id = s.store_id ";
         
         return sql;
     }
     
-    public static Response selectAllPos(int company_id) {
+    public static Response selectAllPos(int company_id,String pos_id,String store_id,String store_name,String pos_name) {
         
         Connection conn = null;
         Response resp;
+        
+        String sqlString;
+        int sqlCount = 1;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString());
             
-            pStmt.setInt(1, company_id);
+            sqlString = generateSqlQueryString() + " WHERE p.company_id = ? ";
+
+            if(pos_id != null){ sqlString += " AND p.pos_id = ? ";}
+            if(store_id != null){ sqlString += " AND p.store_id = ? ";}
+            if(store_name != null){ sqlString += " AND s.name LIKE ? ";}
+            if(pos_name != null){ sqlString += " AND p.name LIKE ? ";}
+            
+            PreparedStatement pStmt = conn.prepareStatement(sqlString);
+            
+            pStmt.setInt(sqlCount, company_id);
+            sqlCount ++;
+            
+            if(pos_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(pos_id));
+                sqlCount ++;
+            }
+            
+            if(store_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(store_id));
+                sqlCount ++;
+            }
+            
+            if(store_name != null){ 
+                pStmt.setString(sqlCount, "%" + store_name + "%" );
+                sqlCount ++;
+            }
+            
+            if(pos_name != null){ 
+                pStmt.setString(sqlCount, "%" + pos_name + "%" );
+                sqlCount ++;
+            }
+            
             ResultSet rs = pStmt.executeQuery();
             
             if (!rs.next()) {

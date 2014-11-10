@@ -12,6 +12,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -35,39 +36,19 @@ public class StoreResource {
     public StoreResource() {
     }
 
-
     @GET
     @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getStores(@PathParam("company_id")int company_id) {
-        
-        return StoreDataOpr.selectAllStore(company_id);
+    public Response getStores(@PathParam("company_id")int company_id,
+            @HeaderParam("store_id") String store_id,
+            @HeaderParam("store_name") String store_name,
+            @HeaderParam("employee_id") String employee_id,
+            @HeaderParam("employee_name") String employee_name
+            ) {
+      
+        return StoreDataOpr.selectAllStore(company_id,store_id,store_name,employee_id,employee_name);
     }
-    
-    @GET
-    @Path("/{store_id}/company/{company_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getStoresById(@PathParam("company_id")int company_id,@PathParam("store_id")int store_id) {
-        
-        return StoreDataOpr.selectStoreById(company_id,store_id);
-    }
-    
-    @GET
-    @Path("/company/{company_id}/name/{store_name}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getStoresByName(@PathParam("company_id")int company_id,@PathParam("store_name")String store_name) {
-        
-        return StoreDataOpr.selectStoreByName(company_id,store_name);
-    }
-    
-    @GET
-    @Path("/company/{company_id}/employee/{employee_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getStoresByEmployee(@PathParam("company_id")int company_id,@PathParam("employee_id")int employee_id) {
-        
-        return StoreDataOpr.selectStoreByEmployee(company_id,employee_id);
-    }
-    
+ 
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)

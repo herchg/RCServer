@@ -12,6 +12,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -39,33 +40,14 @@ public class CustomerResource {
     @GET
     @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCustomers(@PathParam("company_id")int company_id) {
-        
-        return CustomerDataOpr.selectAllCustomer(company_id);
-    }
-    
-    @GET
-    @Path("/{customer_id}/company/{company_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCustomerById(@PathParam("company_id")int company_id,@PathParam("customer_id")int customer_id) {
-        
-        return CustomerDataOpr.selectCustomerById(company_id,customer_id);
-    }
-    
-    @GET
-    @Path("/company/{company_id}/store/{store_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCustomerByStore(@PathParam("company_id")int company_id,@PathParam("store_id")int store_id) {
-        
-        return CustomerDataOpr.selectCustomerByStore(company_id,store_id);
-    }
-        
-    @GET
-    @Path("/company/{company_id}/name/{customer_name}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCustomersByName(@PathParam("company_id")int company_id,@PathParam("customer_name")String customer_name) {
-        
-        return CustomerDataOpr.selectCustomerByName(company_id,customer_name);
+    public Response getCustomers(@PathParam("company_id")int company_id,
+            @QueryParam("expand") String expand,
+            @HeaderParam("customer_id") String customer_id,
+            @HeaderParam("store_id") String store_id,
+            @HeaderParam("customer_name") String customer_name
+            ) {
+      
+        return CustomerDataOpr.selectAllCustomer(company_id,customer_id,store_id,customer_name,expand);
     }
     
     @POST

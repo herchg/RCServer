@@ -33,21 +33,55 @@ public class CustomerDataOpr {
                     + " cu.expiry_datetime AS expiry_datetime, cu.reg_datetime AS reg_datetime, cu.status AS status \n" 
                     + " FROM `customer` AS cu\n" 
                     + " LEFT JOIN `company` AS c ON cu.company_id = c.company_id \n" 
-                    + " LEFT JOIN `store` AS s ON cu.store_id = s.store_id \n" 
-                    + " WHERE cu.company_id = ? ";
+                    + " LEFT JOIN `store` AS s ON cu.store_id = s.store_id ";
         
         return sql;
     }
     
-    public static Response selectAllCustomer(int company_id) {
+    private static String generateSqlQueryDetailString() {
+
+        String sql = "SELECT address, contact, tel, mobile, email, birthday, sex FROM `customer_detail` \n"
+                    + " WHERE customer_id = ?";
+        
+        return sql;
+    }
+    
+    public static Response selectAllCustomer(int company_id,String customer_id,String store_id,String customer_name,String expand) {
         
         Connection conn = null;
         Response resp;
+        
+        String sqlString;
+        int sqlCount = 1;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString());
             
-            pStmt.setInt(1, company_id);
+            sqlString = generateSqlQueryString() + " WHERE cu.company_id = ? ";
+
+            if(customer_id != null){ sqlString += " AND cu.customer_id = ? ";}
+            if(store_id != null){ sqlString += " AND cu.store_id = ? ";}
+            if(customer_name != null){ sqlString += " AND cu.name LIKE ? ";}
+            
+            PreparedStatement pStmt = conn.prepareStatement(sqlString);
+            
+            pStmt.setInt(sqlCount, company_id);
+            sqlCount ++;
+            
+            if(customer_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(customer_id));
+                sqlCount ++;
+            }
+            
+            if(store_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(store_id));
+                sqlCount ++;
+            }
+            
+            if(customer_name != null){ 
+                pStmt.setString(sqlCount, "%" + customer_name + "%" );
+                sqlCount ++;
+            }
+            
             ResultSet rs = pStmt.executeQuery();
             
             if (!rs.next()) {
@@ -55,10 +89,28 @@ public class CustomerDataOpr {
             } else {
                 // back to first
                 rs.previous();
-     
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
-                jsonResult.add("customer", jsonProduct);
+                JsonArray jsonResult = new JsonArray();
+                while (rs.next()) {
+                    int customerId = rs.getInt("customer_id");
+
+                    // back because next
+                    rs.previous();
+
+                    JsonObject jsonRow = new JsonObject();
+                    JsonElement jsonCustomer = JsonUtil.toJsonElement(rs);
+                    jsonRow.add("customer", jsonCustomer);
+
+                    if (expand != null && expand.equals("detail")) {
+                        PreparedStatement stmtCustomerDetail = conn.prepareStatement(generateSqlQueryDetailString());
+                        stmtCustomerDetail.setInt(1, customerId);
+                        ResultSet rsCustomerDetail = stmtCustomerDetail.executeQuery();
+                        JsonElement elementCustomerDetail = JsonUtil.toJsonArray(rsCustomerDetail);
+                        jsonRow.add("customer_detail", elementCustomerDetail);
+                        
+                        DBOperation.close(stmtCustomerDetail,rsCustomerDetail);
+                    }
+                    jsonResult.add(jsonRow);
+                }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
             DBOperation.close(pStmt,rs);
@@ -73,113 +125,6 @@ public class CustomerDataOpr {
         return resp;
     }
     
-    public static Response selectCustomerById(int company_id , int customer_id) {
-        
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND cu.customer_id = ?");
-            
-            pStmt.setInt(1, company_id);
-            pStmt.setInt(2, customer_id);
-            ResultSet rs = pStmt.executeQuery();
-            
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-     
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
-                jsonResult.add("customer", jsonProduct);
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-            }
-            DBOperation.close(pStmt,rs);
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-        
-        
-        return resp;
-    }
-    
-    public static Response selectCustomerByStore(int company_id , int store_id) {
-        
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND cu.store_id = ?");
-            
-            pStmt.setInt(1, company_id);
-            pStmt.setInt(2, store_id);
-            ResultSet rs = pStmt.executeQuery();
-            
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-     
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
-                jsonResult.add("customer", jsonProduct);
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-            }
-            DBOperation.close(pStmt,rs);
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-           DBOperation.close(conn);
-        }
-        
-        
-        return resp;
-    }
-    
-    public static Response selectCustomerByName(int company_id , String customer_name) {
-        
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND cu.name LIKE ?");
-            
-            pStmt.setInt(1, company_id);
-            pStmt.setString(2, "%" + customer_name + "%");
-            ResultSet rs = pStmt.executeQuery();
-            
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-     
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
-                jsonResult.add("customer", jsonProduct);
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-            }
-            DBOperation.close(pStmt,rs);
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-        
-        
-        return resp;
-    }
     
     public static Response insertCustomer(String jsonString) {
 
