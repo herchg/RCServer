@@ -35,11 +35,14 @@ public class OrderResource {
             @HeaderParam("order_id") String order_id,
             @HeaderParam("store_id") String store_id,
             @HeaderParam("pos_id") String pos_id,
+            @HeaderParam("employee_id") String employee_id,
             @HeaderParam("status") String status,
+            @HeaderParam("payment_id") String payment_id,
+            @HeaderParam("total_amount") String total_amount,
             @HeaderParam("start_date") String start_date,
             @HeaderParam("end_date") String end_date) {
       
-        return OrderDataOpr.selectAllOrders(company_id,order_id,store_id,pos_id,status,start_date,end_date,expand);
+        return OrderDataOpr.selectAllOrders(company_id,order_id,store_id,pos_id,employee_id,payment_id,total_amount,status,start_date,end_date,expand);
     }
     
     @GET

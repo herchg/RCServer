@@ -34,7 +34,8 @@ public class OrderDataOpr {
 
         String sql = "SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
                     + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
-                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount,o.payment_id AS payment_id, pt.name AS payment_name, o.order_datetime AS order_datetime, \n"
+                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount,o.payment_id AS payment_id, \n"
+                    + " pt.name AS payment_name, o.order_datetime AS order_datetime, \n"
                     + " o.log_datetime AS log_datetime, o.status AS status, o.pos_order_id AS pos_order_id, o.memo  AS memo \n"
                     + " FROM `order` AS o \n"
                     + " LEFT JOIN `customer` AS cu ON o.customer_id = cu.customer_id \n"
@@ -57,7 +58,7 @@ public class OrderDataOpr {
         return sql;
     }
     
-    public static Response selectAllOrders(int company_id,String order_id,String store_id,String pos_id,String status,String start_date,String end_date,String expand) {
+    public static Response selectAllOrders(int company_id,String order_id,String store_id,String pos_id,String employee_id,String payment_id,String total_amount,String status,String start_date,String end_date,String expand) {
 
         Connection conn = null;
         Response resp;
@@ -74,6 +75,9 @@ public class OrderDataOpr {
             if(order_id != null){ sqlString += " AND o.order_id = ? ";}
             if(store_id != null){ sqlString += " AND o.store_id = ? ";}
             if(pos_id != null){ sqlString += " AND o.pos_id = ? ";}
+            if(employee_id != null){ sqlString += " AND o.employee_id = ? ";}
+            if(payment_id != null){ sqlString += " AND o.payment_id = ? ";}
+            if(total_amount != null){ sqlString += " AND o.total_amount = ? ";}
             if(status != null){ sqlString += " AND o.status = ? ";}
             if(start_date != null){ sqlString += " AND o.order_datetime >= ? ";}
             if(end_date != null){ sqlString += " AND o.order_datetime <= ? ";}
@@ -97,6 +101,21 @@ public class OrderDataOpr {
             
             if(pos_id != null){ 
                 pStmt.setInt(sqlCount, Integer.parseInt(pos_id));
+                sqlCount ++;
+            }
+            
+            if(employee_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(employee_id));
+                sqlCount ++;
+            }
+            
+            if(payment_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(payment_id));
+                sqlCount ++;
+            }
+            
+            if(total_amount != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(total_amount));
                 sqlCount ++;
             }
             
