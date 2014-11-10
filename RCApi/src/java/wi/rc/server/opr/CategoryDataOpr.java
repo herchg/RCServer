@@ -30,19 +30,40 @@ public class CategoryDataOpr {
 
         String sql = "SELECT category_id, parent_category_id, company_id, name, name_4_short, description, description_4_short, \n"
                 + " option0, option1, option2, option3, option4, option5, option6, option7, option8, option9, status \n"
-                + " FROM `category` WHERE company_id = ? ";
+                + " FROM `category` ";
         return sql;
     }
 
-    public static Response selectAllCategory(int company_id) {
+    public static Response selectAllCategory(int company_id,String category_id,String category_name) {
 
         Connection conn = null;
         Response resp;
+        
+        String sqlString;
+        int sqlCount = 1;
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString());
             
-            pStmt.setInt(1, company_id);
+            sqlString = generateSqlQueryString() + " WHERE company_id = ? ";
+
+            if(category_id != null){ sqlString += " AND category_id = ? ";}
+            if(category_name != null){ sqlString += " AND category_name LIKE ? ";}
+            
+            PreparedStatement pStmt = conn.prepareStatement(sqlString);
+            
+            pStmt.setInt(sqlCount, company_id);
+            sqlCount ++;
+            
+            if(category_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(category_id));
+                sqlCount ++;
+            }
+           
+            if(category_name != null){ 
+                pStmt.setString(sqlCount, "%" + category_name + "%" );
+                sqlCount ++;
+            }
+            
             ResultSet rs = pStmt.executeQuery();
             
             if (!rs.next()) {
@@ -68,75 +89,6 @@ public class CategoryDataOpr {
         return resp;
     }
 
-    public static Response selectCategoryById(int company_id, int category_id) {
-
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND category_id = ?");
-            pStmt.setInt(1, company_id);
-            pStmt.setInt(2, category_id);
-            ResultSet rs = pStmt.executeQuery();
-
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonCategory = JsonUtil.toJsonArray(rs);
-                jsonResult.add("category", jsonCategory);
-
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-                DBOperation.close(pStmt, rs);
-            }
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-
-        return resp;
-    }
-
-    public static Response selectCategoryByName(int company_id, String category_name) {
-
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND name LIKE ?");
-            pStmt.setInt(1, company_id);
-            pStmt.setString(2, "%" + category_name + "%");
-            ResultSet rs = pStmt.executeQuery();
-
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
-                jsonResult.add("category", jsonEmployee);
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-                DBOperation.close(pStmt, rs);
-            }
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-        return resp;
-    }
 
     public static Response insertCategory(String jsonString) {
 
