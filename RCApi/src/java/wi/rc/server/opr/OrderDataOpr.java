@@ -34,14 +34,15 @@ public class OrderDataOpr {
 
         String sql = "SELECT o.order_id AS order_id , o.customer_id AS customer_id , cu.name AS customer_name, o.company_id AS company_id, \n"
                     + " c.name AS company_name, o.store_id AS store_id ,s.name AS store_name , o.pos_id AS pos_id ,p.name AS pos_name, \n"
-                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount, o.order_datetime AS order_datetime, \n"
+                    + " o.employee_id AS employee_id, e.name AS employee_name,  o.ncode AS ncode, o.total_amount AS total_amount,o.payment_id AS payment_id, pt.name AS payment_name, o.order_datetime AS order_datetime, \n"
                     + " o.log_datetime AS log_datetime, o.status AS status, o.pos_order_id AS pos_order_id, o.memo  AS memo \n"
                     + " FROM `order` AS o \n"
                     + " LEFT JOIN `customer` AS cu ON o.customer_id = cu.customer_id \n"
                     + " LEFT JOIN `company` AS c ON o.company_id = c.company_id \n"
                     + " LEFT JOIN `store` AS s ON o.store_id = s.store_id \n"
                     + " LEFT JOIN `pos` AS p ON o.pos_id = p.pos_id \n"
-                    + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n";
+                    + " LEFT JOIN `employee` AS e ON o.employee_id = e.employee_id \n"
+                    + " LEFT JOIN `payment` AS pt ON o.payment_id = pt.payment_id \n";
         
         return sql;
     }
@@ -160,6 +161,59 @@ public class OrderDataOpr {
         return resp;
     }
 
+    
+    public static Response selectOrdersByPayment(int company_id, int payment_id, String expand) {
+
+        Connection conn = null;
+        Response resp;
+
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + " WHERE o.company_id = ? AND o.payment_id = ?");
+            pStmt.setInt(1, company_id);
+            pStmt.setInt(2, payment_id);
+            ResultSet rs = pStmt.executeQuery();
+
+            if (!rs.next()) {
+                resp = Response.status(Response.Status.NOT_FOUND).build();
+            } else {
+                // back to first
+                rs.previous();
+                JsonArray jsonResult = new JsonArray();
+                while (rs.next()) {
+                    long orderId = rs.getLong("order_id");
+
+                    // back because next
+                    rs.previous();
+
+                    JsonObject jsonRow = new JsonObject();
+                    JsonElement jsonOrder = JsonUtil.toJsonElement(rs);
+                    jsonRow.add("order", jsonOrder);
+
+                    if (expand != null && expand.equals("detail")) {
+                        PreparedStatement stmtOrderDetail = conn.prepareStatement(generateSqlQueryDetailString());
+                        stmtOrderDetail.setLong(1, orderId);
+                        ResultSet rsOrderDetail = stmtOrderDetail.executeQuery();
+                        JsonElement elementOrderDetail = JsonUtil.toJsonArray(rsOrderDetail);
+                        jsonRow.add("order_detail", elementOrderDetail);
+                        
+                        DBOperation.close(stmtOrderDetail,rsOrderDetail);
+                    }
+                    jsonResult.add(jsonRow);
+                }
+                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+            }
+            DBOperation.close(pStmt,rs);
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            DBOperation.close(conn);
+        }
+        return resp;
+    }
+    
     public static Response selectOrderByID(int company_id, long orderId, String expand) {
 
         Connection conn = null;

@@ -50,6 +50,13 @@ public class OrderResource {
     }
 
     @GET
+    @Path("/company/{company_id}/payment/{payment_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOrderByPaymentId(@PathParam("company_id")int company_id,@PathParam("payment_id")int payment_id, @QueryParam("expand") String expand) {
+        return OrderDataOpr.selectOrdersByPayment(company_id,payment_id, expand);
+    }
+    
+    @GET
     @Path("/company/{company_id}/pos/{posId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrderByPosId(@PathParam("company_id")int company_id,@PathParam("posId")int posId, @QueryParam("expand") String expand) {

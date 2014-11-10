@@ -56,6 +56,14 @@ public class EmployeeResource {
     }   
     
     @GET
+    @Path("/company/{company_id}/role/{role_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getEmployeeByRoleId(@PathParam("company_id") int company_id, @PathParam("role_id") int role_id) {
+        
+        return EmployeeDataOpr.selectEmployeeByRoleId(company_id, role_id);
+    }  
+    
+    @GET
     @Path("/company/{company_id}/store/{store_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEmployeeByStoreId(@PathParam("company_id") int company_id, @PathParam("store_id") int store_id) {

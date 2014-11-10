@@ -5,6 +5,7 @@
  */
 package wi.rc.server.opr;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -28,15 +29,19 @@ public class EmployeeDataOpr {
 
     private static String generateSqlQueryString() {
 
-        String sql = "SELECT employee_id , company_id , store_id, employee_code, name, status, login_account \n"
-                + " FROM `employee` \n"
-                + " WHERE company_id = ? ";
+        String sql = "SELECT e.employee_id AS employee_id, e.company_id AS company_id, e.store_id AS store_id, e.employee_code AS employee_code, e.name AS employee_name, "
+                + " e.status AS status, IFNULL('','e.photo') AS photo, e.login_account AS login_account,e.role_id AS role_id,r.name AS role_name,e.on_board_date AS on_board_date,IFNULL('','e.leave_date') AS leave_date \n"
+                + " FROM `employee` AS e \n"
+                + " LEFT JOIN `role` AS r ON e.role_id = r.role_id \n"
+                + " WHERE e.company_id = ? ";
+
         return sql;
     }
 
     private static String generateSqlQueryExtString() {
 
-        String sql = "SELECT address, contact, tel, mobile, email \n"
+        String sql = "SELECT IFNULL('','official_id') AS official_id,IFNULL('','gender') AS gender,IFNULL('','address') AS address,IFNULL('','contact') AS contact, \n"
+                + " IFNULL('','tel') AS tel, IFNULL('','mobile') AS mobile, IFNULL('','email') AS email \n"
                 + " FROM `employee_ext` \n"
                 + " WHERE employee_id = ?";
         return sql;
@@ -62,7 +67,9 @@ public class EmployeeDataOpr {
                 JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
                 jsonResult.add("employee", jsonEmployee);
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
+                
             }
+            
             DBOperation.close(pStmt, rs);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
@@ -82,7 +89,7 @@ public class EmployeeDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND employee_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND e.employee_id = ?");
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, employee_id);
             ResultSet rs = pStmt.executeQuery();
@@ -119,6 +126,40 @@ public class EmployeeDataOpr {
         return resp;
     }
 
+    public static Response selectEmployeeByRoleId(int company_id, int role_id) {
+
+        Connection conn = null;
+        Response resp;
+        try {
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
+
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND e.role_id = ?");
+            pStmt.setInt(1, company_id);
+            pStmt.setInt(2, role_id);
+            ResultSet rs = pStmt.executeQuery();
+
+            if (!rs.next()) {
+                resp = Response.status(Response.Status.NOT_FOUND).build();
+            } else {
+                // back to first
+                rs.previous();
+
+                JsonObject jsonResult = new JsonObject();
+                JsonElement jsonEmployee = JsonUtil.toJsonArray(rs);
+                jsonResult.add("employee", jsonEmployee);
+                resp = Response.status(Response.Status.OK).entity(pStmt.toString()).build();
+            }
+            DBOperation.close(pStmt, rs);
+        } catch (JsonSyntaxException | NullPointerException ex) {
+            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        } catch (Exception ex) {
+            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
+        } finally {
+            DBOperation.close(conn);
+        }
+        return resp;
+    }
+    
     public static Response selectEmployeeByStoreId(int company_id, int store_id) {
 
         Connection conn = null;
@@ -126,7 +167,7 @@ public class EmployeeDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND store_id = ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND e.store_id = ?");
             pStmt.setInt(1, company_id);
             pStmt.setInt(2, store_id);
             ResultSet rs = pStmt.executeQuery();
@@ -160,7 +201,7 @@ public class EmployeeDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND name LIKE ?");
+            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND e.name LIKE ?");
             pStmt.setInt(1, company_id);
             pStmt.setString(2, "%" + employee_name + "%");
             ResultSet rs = pStmt.executeQuery();
