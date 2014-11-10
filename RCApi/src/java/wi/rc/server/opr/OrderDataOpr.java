@@ -540,7 +540,7 @@ public class OrderDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             PreparedStatement stmtOrder = conn.prepareStatement("UPDATE `order` SET  status = ? WHERE company_id = ? AND order_id = ?");
-            stmtOrder.setLong(1, Status.Deleted.getValue());
+            stmtOrder.setString(1, Status.Deleted.getValue().toString());
             stmtOrder.setInt(2, company_id);
             stmtOrder.setLong(3, orderId);
             if (stmtOrder.executeUpdate() > 0) {

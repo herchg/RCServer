@@ -301,7 +301,7 @@ public class PosDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             PreparedStatement stmtOrder = conn.prepareStatement("UPDATE `pos` SET  status = ? WHERE company_id = ? AND pos_id = ?");
-            stmtOrder.setLong(1, Status.Deleted.getValue());
+            stmtOrder.setString(1, Status.Deleted.getValue().toString());
             stmtOrder.setLong(2, company_id);
             stmtOrder.setLong(3, pos_id);
             if (stmtOrder.executeUpdate() > 0) {

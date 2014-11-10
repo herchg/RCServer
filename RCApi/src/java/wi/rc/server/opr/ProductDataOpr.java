@@ -481,7 +481,7 @@ public class ProductDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             PreparedStatement stmtProduct = conn.prepareStatement("UPDATE `product` SET  status = ? WHERE company_id = ? AND product_id = ?");
-            stmtProduct.setLong(1, Status.Deleted.getValue());
+            stmtProduct.setString(1, Status.Deleted.getValue().toString());
             stmtProduct.setLong(2, company_id);
             stmtProduct.setLong(3, product_id);
             if (stmtProduct.executeUpdate() > 0) {

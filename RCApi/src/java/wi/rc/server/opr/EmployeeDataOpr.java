@@ -407,8 +407,9 @@ public class EmployeeDataOpr {
 
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement stmtEmployee = conn.prepareStatement("UPDATE `employee` SET  status = ? WHERE company_id = ? AND employee_id = ?");
-            stmtEmployee.setLong(1, Status.Deleted.getValue());
+            String sql = "UPDATE `employee` SET  status = ? WHERE company_id = ? AND employee_id = ?";
+            PreparedStatement stmtEmployee = conn.prepareStatement(sql);
+            stmtEmployee.setString(1, Status.Deleted.getValue().toString());
             stmtEmployee.setLong(2, company_id);
             stmtEmployee.setLong(3, employee_id);
             if (stmtEmployee.executeUpdate() > 0) {
@@ -416,6 +417,7 @@ public class EmployeeDataOpr {
             } else {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             }
+           
             DBOperation.close(stmtEmployee);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();

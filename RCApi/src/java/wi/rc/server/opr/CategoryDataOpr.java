@@ -260,7 +260,7 @@ public class CategoryDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             PreparedStatement stmtCategory = conn.prepareStatement("UPDATE `category` SET  status = ? WHERE company_id = ? AND category_id = ?");
-            stmtCategory.setLong(1, Status.Deleted.getValue());
+            stmtCategory.setString(1, Status.Deleted.getValue().toString());
             stmtCategory.setLong(2, company_id);
             stmtCategory.setLong(3, category_id);
             if (stmtCategory.executeUpdate() > 0) {

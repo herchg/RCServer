@@ -303,7 +303,7 @@ public class StoreDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             PreparedStatement stmtStore = conn.prepareStatement("UPDATE `store` SET  status = ? WHERE company_id = ? AND store_id = ?");
-            stmtStore.setLong(1, Status.Deleted.getValue());
+            stmtStore.setString(1, Status.Deleted.getValue().toString());
             stmtStore.setLong(2, company_id);
             stmtStore.setLong(3, store_id);
             if (stmtStore.executeUpdate() > 0) {
