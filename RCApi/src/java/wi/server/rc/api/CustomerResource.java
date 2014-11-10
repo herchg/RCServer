@@ -45,7 +45,7 @@ public class CustomerResource {
     }
     
     @GET
-    @Path("/company/{company_id}/customer/{customer_id}")
+    @Path("/{customer_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCustomerById(@PathParam("company_id")int company_id,@PathParam("customer_id")int customer_id) {
         
@@ -77,7 +77,7 @@ public class CustomerResource {
     }
     
     @PUT
-    @Path("/company/{company_id}/customer/{customer_id}")
+    @Path("/{customer_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCustomer(@PathParam("company_id")int company_id, @PathParam("customer_id")int customer_id, String jsonCustomerSet) {
         
@@ -85,7 +85,7 @@ public class CustomerResource {
     }
     
     @DELETE
-    @Path("/company/{company_id}/customer/{customer_id}")
+    @Path("/{customer_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteCustomer(@PathParam("company_id")int company_id,@PathParam("customer_id")int customer_id) {
         

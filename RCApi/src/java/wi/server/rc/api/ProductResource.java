@@ -45,7 +45,7 @@ public class ProductResource {
     }
     
     @GET
-    @Path("/company/{company_id}/product/{product_id}")
+    @Path("/{product_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProduct(@PathParam("company_id")int company_id,@PathParam("product_id")int product_id) {
         
@@ -79,7 +79,7 @@ public class ProductResource {
     
     
     @PUT
-    @Path("/company/{company_id}/product/{product_id}")
+    @Path("/{product_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateProduct(@PathParam("company_id") int company_id,@PathParam("product_id") int product_id, String jsonProductSet) {
         
@@ -88,7 +88,7 @@ public class ProductResource {
     
     
     @DELETE
-    @Path("/company/{company_id}/product/{product_id}")
+    @Path("/{product_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteProduct(@PathParam("company_id")int company_id,@PathParam("product_id")int product_id) {
         

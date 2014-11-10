@@ -48,7 +48,7 @@ public class EmployeeResource {
     }
     
     @GET
-    @Path("/company/{company_id}/employee/{employee_id}")
+    @Path("/{employee_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEmployeeById(@PathParam("company_id") int company_id,@PathParam("employee_id") int employee_id,@QueryParam("expand") String expand) {
         
@@ -88,7 +88,7 @@ public class EmployeeResource {
     }
      
     @PUT
-    @Path("/company/{company_id}/employee/{employee_id}")
+    @Path("/{employee_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateEmployee(@PathParam("company_id")int company_id, @PathParam("employee_id")int employee_id, String jsonEmployeeSet) {
          
@@ -96,7 +96,7 @@ public class EmployeeResource {
     }
     
     @DELETE
-    @Path("/company/{company_id}/employee/{employee_id}")
+    @Path("/{employee_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEmployee(@PathParam("company_id")int company_id, @PathParam("employee_id")int employee_id) {
         

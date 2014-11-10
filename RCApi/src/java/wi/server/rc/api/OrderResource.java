@@ -43,7 +43,7 @@ public class OrderResource {
     }
     
     @GET
-    @Path("/company/{company_id}/order/{orderId}")
+    @Path("/{orderId}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrderById(@PathParam("company_id")int company_id,@PathParam("orderId")long orderId, @QueryParam("expand") String expand) {
         return OrderDataOpr.selectOrderByID(company_id,orderId, expand);
@@ -80,7 +80,7 @@ public class OrderResource {
     }
 
     @PUT
-    @Path("/company/{company_id}/order/{orderId}")
+    @Path("/{orderId}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateOrder(@PathParam("company_id") int company_id,@PathParam("orderId") int orderId, String jsonOrderSet) {
 
@@ -88,7 +88,7 @@ public class OrderResource {
     }
     
     @DELETE
-    @Path("/company/{company_id}/order/{orderId}")
+    @Path("/{orderId}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteOrder(@PathParam("company_id")int company_id,@PathParam("orderId") long orderId) {
         

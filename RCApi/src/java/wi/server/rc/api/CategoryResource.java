@@ -48,7 +48,7 @@ public class CategoryResource {
     }
     
     @GET
-    @Path("/company/{company_id}/category/{category_id}")
+    @Path("/{category_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategoryById(@PathParam("company_id") int company_id,@PathParam("category_id") int category_id) {
         
@@ -73,7 +73,7 @@ public class CategoryResource {
 
     
     @PUT
-    @Path("/company/{company_id}/category/{category_id}")
+    @Path("/{category_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateEmployee(@PathParam("company_id") int company_id, @PathParam("category_id")int category_id, String jsonCategorySet) {
         
@@ -81,7 +81,7 @@ public class CategoryResource {
     }
     
     @DELETE
-    @Path("/company/{company_id}/category/{category_id}")
+    @Path("/{category_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEmployee(@PathParam("company_id")int company_id,@PathParam("category_id")int category_id) {
         

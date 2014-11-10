@@ -40,7 +40,7 @@ public class PosResource {
     }
     
     @GET
-    @Path("/company/{company_id}/pos/{pos_id}")
+    @Path("/{pos_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPosById(@PathParam("company_id")int company_id,@PathParam("pos_id")int pos_id) {
         
@@ -72,7 +72,7 @@ public class PosResource {
     }
     
     @PUT
-    @Path("/company/{company_id}/pos/{pos_id}")
+    @Path("/{pos_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updatePos(@PathParam("company_id")int company_id, @PathParam("pos_id")int pos_id, String jsonPosSet) {
         
@@ -80,7 +80,7 @@ public class PosResource {
     }
     
     @DELETE
-    @Path("/company/{company_id}/pos/{pos_id}")
+    @Path("/{pos_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deletePos(@PathParam("company_id")int company_id,@PathParam("pos_id")int pos_id) {
         

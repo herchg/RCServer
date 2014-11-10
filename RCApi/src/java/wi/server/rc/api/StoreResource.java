@@ -45,7 +45,7 @@ public class StoreResource {
     }
     
     @GET
-    @Path("/company/{company_id}/store/{store_id}")
+    @Path("/{store_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStoresById(@PathParam("company_id")int company_id,@PathParam("store_id")int store_id) {
         
@@ -77,7 +77,7 @@ public class StoreResource {
     }
     
     @PUT
-    @Path("/company/{company_id}/store/{store_id}")
+    @Path("{store_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateStore(@PathParam("company_id")int company_id, @PathParam("store_id")int store_id, String jsonStoreSet) {
         
@@ -85,7 +85,7 @@ public class StoreResource {
     }
     
     @DELETE
-    @Path("/company/{company_id}/store/{store_id}")
+    @Path("{store_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteStore(@PathParam("company_id")int company_id,@PathParam("store_id")int store_id) {
         
