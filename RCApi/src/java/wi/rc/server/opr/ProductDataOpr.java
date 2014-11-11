@@ -146,6 +146,7 @@ public class ProductDataOpr {
         JsonObject jsonResult = new JsonObject();
 
         String sql = null;
+
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             conn.setAutoCommit(false);
@@ -170,7 +171,7 @@ public class ProductDataOpr {
                 if (rs.next()) {
                     product_id = rs.getLong(1);
                 }
-                
+
                 PreparedStatement stmtProductPrice = null;
                 Map<String, Object> mapProductPrice = (Map<String, Object>) map.get("product_price");
                 // add product_id
@@ -191,14 +192,15 @@ public class ProductDataOpr {
                 }
                 // gen result
                 jsonResult.addProperty("product_id", product_id);
-                
+
                 DBOperation.close(stmtProductPrice);
                 DBOperation.close(rs);
             } else {
                 // execute failure
                 ret = false;
             }
-            DBOperation.close(stmtProduct);
+            DBOperation.close(stmtProduct);  
+
             // check ret and commit or rollback
             if (ret) {
                 conn.commit();
@@ -206,6 +208,7 @@ public class ProductDataOpr {
             } else {
                 conn.rollback();
                 resp = Response.status(Response.Status.BAD_REQUEST).build();
+                
             }
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();

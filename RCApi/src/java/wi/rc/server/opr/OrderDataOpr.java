@@ -120,7 +120,7 @@ public class OrderDataOpr {
             }
             
             if(status != null){ 
-                pStmt.setLong(sqlCount, Long.parseLong(status));
+                pStmt.setString(sqlCount, status);
                 sqlCount ++;
             }
             
@@ -166,9 +166,9 @@ public class OrderDataOpr {
                 }
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
+           
             DBOperation.close(pStmt,rs);
-            
-
+           
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
@@ -204,7 +204,7 @@ public class OrderDataOpr {
             ncode = (String) mapOrder.get("ncode");
 
             // add server info
-            mapOrder.put("status", Status.Valid.getValue());
+            //mapOrder.put("status", Status.Valid.getValue());
             mapOrder.put("log_datetime", DateTimeUtil.format(new Date(System.currentTimeMillis()), DateTimeUtil.DEFAULT_DATETIME_FORMAT));
 
             sql = SQLUtil.genInsertSQLString("`order`", mapOrder.keySet());
@@ -245,6 +245,8 @@ public class OrderDataOpr {
                         ret = false;
                         break;
                     }
+                }
+                if(stmtOrderDetail != null){
                     DBOperation.close(stmtOrderDetail);
                 }
                 // gen result

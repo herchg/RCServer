@@ -86,5 +86,15 @@ public class JsonUtil {
         }
         return null;
     }
+    
+    public static List<?> toArray(String jsonString) {
+        
+        Gson gson = GsonUtil.getGson();
+        try {
+            return gson.fromJson(jsonString, ArrayList.class);
+        } catch (Exception ex) {
+        }
+        return null;
+    }
 
 }
