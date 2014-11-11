@@ -43,12 +43,19 @@ public class CustomerResource {
     public Response getCustomers(@PathParam("company_id")int company_id,
             @QueryParam("expand") String expand,
             @HeaderParam("customer_id") String customer_id,
-            @HeaderParam("store_id") String store_id,
-            @HeaderParam("customer_name") String customer_name
+            @HeaderParam("store_id") String store_id
             ) {
       
-        return CustomerDataOpr.selectAllCustomer(company_id,customer_id,store_id,customer_name,expand);
+        return CustomerDataOpr.selectAllCustomer(company_id,customer_id,store_id,null,expand);
     }
+    
+    @GET
+    @Path("/company/{company_id}/name/{customer_name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCustomersByName(@PathParam("company_id")int company_id,@PathParam("customer_name") String customer_name,@QueryParam("expand") String expand) {
+      
+        return CustomerDataOpr.selectAllCustomer(company_id,null,null,customer_name,expand);
+    }    
     
     @POST
     @Path("/")

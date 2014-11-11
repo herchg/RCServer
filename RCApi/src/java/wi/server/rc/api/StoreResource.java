@@ -41,14 +41,20 @@ public class StoreResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStores(@PathParam("company_id")int company_id,
             @HeaderParam("store_id") String store_id,
-            @HeaderParam("store_name") String store_name,
-            @HeaderParam("employee_id") String employee_id,
-            @HeaderParam("employee_name") String employee_name
+            @HeaderParam("employee_id") String employee_id
             ) {
       
-        return StoreDataOpr.selectAllStore(company_id,store_id,store_name,employee_id,employee_name);
+        return StoreDataOpr.selectAllStore(company_id,store_id,null,employee_id,null);
     }
  
+    @GET
+    @Path("/company/{company_id}/name/{store_name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getStoresByName(@PathParam("company_id")int company_id,@PathParam("store_name") String store_name) {
+      
+        return StoreDataOpr.selectAllStore(company_id,null,store_name,null,null);
+    }
+    
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)

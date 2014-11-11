@@ -45,13 +45,19 @@ public class CategoryResource {
     @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllCategorys(@PathParam("company_id")int company_id,
-            @HeaderParam("category_id") String category_id,
-            @HeaderParam("category_name") String category_name
+            @HeaderParam("category_id") String category_id
             ) {
       
-        return CategoryDataOpr.selectAllCategory(company_id,category_id,category_name);
+        return CategoryDataOpr.selectAllCategory(company_id,category_id,null);
     }
- 
+    
+    @GET
+    @Path("/company/{company_id}/name/{category_name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllCategorysByName(@PathParam("company_id")int company_id,@PathParam("category_name") String category_name) {
+      
+        return CategoryDataOpr.selectAllCategory(company_id,null,category_name);
+    } 
     
     @POST
     @Path("/")

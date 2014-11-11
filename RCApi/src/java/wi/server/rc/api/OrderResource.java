@@ -45,42 +45,6 @@ public class OrderResource {
         return OrderDataOpr.selectAllOrders(company_id,order_id,store_id,pos_id,employee_id,payment_id,total_amount,status,start_date,end_date,expand);
     }
     
-    @GET
-    @Path("/{orderId}/company/{company_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrderById(@PathParam("company_id")int company_id,@PathParam("orderId")long orderId, @QueryParam("expand") String expand) {
-        return OrderDataOpr.selectOrderByID(company_id,orderId, expand);
-    }
-
-    @GET
-    @Path("/company/{company_id}/payment/{payment_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrderByPaymentId(@PathParam("company_id")int company_id,@PathParam("payment_id")int payment_id, @QueryParam("expand") String expand) {
-        return OrderDataOpr.selectOrdersByPayment(company_id,payment_id, expand);
-    }
-    
-    @GET
-    @Path("/company/{company_id}/pos/{posId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrderByPosId(@PathParam("company_id")int company_id,@PathParam("posId")int posId, @QueryParam("expand") String expand) {
-        return OrderDataOpr.selectOrdersByPosId(company_id,posId, expand);
-    }
-    
-    @GET
-    @Path("/company/{company_id}/status/{status_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrderByStatus(@PathParam("company_id")int company_id,@PathParam("status_id")long status_id, @QueryParam("expand") String expand) {
-        return OrderDataOpr.selectOrderByStatus(company_id,status_id, expand);
-    }
-    
-    @GET
-    @Path("/company/{company_id}/start_date/{start_date}/end_date/{end_date}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrderByOrderDate(@PathParam("company_id")int company_id,@PathParam("start_date")String start_date,@PathParam("end_date")String end_date, @QueryParam("expand") String expand) {
-        return OrderDataOpr.selectOrderByDate(company_id,start_date,end_date, expand);
-    }
-    
-    
 
     @POST
     @Path("/")

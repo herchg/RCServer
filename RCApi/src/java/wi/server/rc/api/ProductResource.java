@@ -5,6 +5,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
@@ -39,36 +40,23 @@ public class ProductResource {
     @GET
     @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProductByCompany(@PathParam("company_id")int company_id) {
+    public Response getProducts(@PathParam("company_id")int company_id,
+            @HeaderParam("product_id") String product_id,
+            @HeaderParam("category_id") String category_id
+            ) {
         
-        return ProductDataOpr.selectProductByCompany(company_id);
-    }
-    
-    @GET
-    @Path("/{product_id}/company/{company_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProduct(@PathParam("company_id")int company_id,@PathParam("product_id")int product_id) {
         
-        return ProductDataOpr.selectProductById(company_id,product_id);
-    }
-    
-    @GET
-    @Path("/company/{company_id}/category/{category_id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProductByCategory(@PathParam("company_id")int company_id,@PathParam("category_id")int category_id) {
-        
-        return ProductDataOpr.selectProductByCategory(company_id,category_id);
+        return ProductDataOpr.selectAllProduct(company_id,product_id,category_id,null);
     }
     
     @GET
     @Path("/company/{company_id}/name/{product_name}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProductByName(@PathParam("company_id")int company_id,@PathParam("product_name")String product_name) {
-        
-        return ProductDataOpr.selectProductByName(company_id,product_name);
+    public Response getProductsByName(@PathParam("company_id")int company_id,@PathParam("product_name")String product_name) {
+      
+        return ProductDataOpr.selectAllProduct(company_id,null,null,product_name);
     }
-    
-    
+
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)

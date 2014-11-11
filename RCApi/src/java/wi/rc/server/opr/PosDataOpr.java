@@ -37,7 +37,7 @@ public class PosDataOpr {
         return sql;
     }
     
-    public static Response selectAllPos(int company_id,String pos_id,String store_id,String store_name,String pos_name) {
+    public static Response selectAllPos(int company_id,String pos_id,String store_id,String pos_name) {
         
         Connection conn = null;
         Response resp;
@@ -51,7 +51,6 @@ public class PosDataOpr {
 
             if(pos_id != null){ sqlString += " AND p.pos_id = ? ";}
             if(store_id != null){ sqlString += " AND p.store_id = ? ";}
-            if(store_name != null){ sqlString += " AND s.name LIKE ? ";}
             if(pos_name != null){ sqlString += " AND p.name LIKE ? ";}
             
             PreparedStatement pStmt = conn.prepareStatement(sqlString);
@@ -68,12 +67,7 @@ public class PosDataOpr {
                 pStmt.setInt(sqlCount, Integer.parseInt(store_id));
                 sqlCount ++;
             }
-            
-            if(store_name != null){ 
-                pStmt.setString(sqlCount, "%" + store_name + "%" );
-                sqlCount ++;
-            }
-            
+
             if(pos_name != null){ 
                 pStmt.setString(sqlCount, "%" + pos_name + "%" );
                 sqlCount ++;

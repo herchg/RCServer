@@ -47,7 +47,7 @@ public class CategoryDataOpr {
             sqlString = generateSqlQueryString() + " WHERE company_id = ? ";
 
             if(category_id != null){ sqlString += " AND category_id = ? ";}
-            if(category_name != null){ sqlString += " AND category_name LIKE ? ";}
+            if(category_name != null){ sqlString += " AND name LIKE ? ";}
             
             PreparedStatement pStmt = conn.prepareStatement(sqlString);
             

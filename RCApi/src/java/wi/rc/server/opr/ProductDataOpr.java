@@ -38,7 +38,8 @@ public class ProductDataOpr {
                     + " p.status AS status \n" 
                     + " FROM `product` AS p \n" 
                     + " LEFT JOIN `category` AS ca ON p.category_id = ca.category_id \n"
-                    + " ,company AS c \n";
+                    + " ,company AS c \n"
+                    + " WHERE p.company_id = c.company_id \n";
         
         return sql;
     }
@@ -50,14 +51,43 @@ public class ProductDataOpr {
         return sql;
     }
     
-    public static Response selectAllProduct() {
+    public static Response selectAllProduct(int company_id,String product_id,String category_id,String product_name) {
         
         Connection conn = null;
         Response resp;
+        
+        String sqlString;
+        int sqlCount = 1;
+        
         try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement( generateSqlQuerySTring() + " WHERE p.company_id = c.company_id");
+            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);           
+            sqlString = generateSqlQuerySTring() + " AND p.company_id = ? ";
             
+            //check input to add sql query string
+            if(product_id != null){ sqlString += " AND p.product_id = ? ";}
+            if(product_name != null){ sqlString += " AND p.name LIKE ? ";}
+            if(category_id != null){ sqlString += " AND p.category_id = ? ";}
+            
+            PreparedStatement pStmt = conn.prepareStatement(sqlString);
+            
+            pStmt.setInt(sqlCount, company_id);
+            sqlCount ++;
+            
+            if(product_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(product_id));
+                sqlCount ++;
+            }
+            
+            if(product_name != null){ 
+                pStmt.setString(sqlCount, "%" + product_name + "%");
+                sqlCount ++;
+            }
+            
+            if(category_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(category_id));
+                sqlCount ++;
+            }
+
             ResultSet rs = pStmt.executeQuery();
             
             if (!rs.next()) {
@@ -68,7 +98,7 @@ public class ProductDataOpr {
      
                 JsonArray jsonResult = new JsonArray();
                 while (rs.next()) {
-                    int product_id = rs.getInt("product_id");
+                    int productId = rs.getInt("product_id");
 
                     // back because next
                     rs.previous();
@@ -77,9 +107,9 @@ public class ProductDataOpr {
                     JsonElement jsonProduct = JsonUtil.toJsonElement(rs);
                     jsonRow.add("product", jsonProduct);
 
-                    if (product_id > 0 ) {
+                    if (productId > 0 ) {
                         PreparedStatement stmtProductPrice = conn.prepareStatement(generateSqlQueryDetailString());
-                        stmtProductPrice.setLong(1, product_id);
+                        stmtProductPrice.setLong(1, productId);
                         ResultSet rsProductPrice = stmtProductPrice.executeQuery();
                         JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
                         jsonRow.add("product_price", elementProductPrice);
@@ -102,217 +132,6 @@ public class ProductDataOpr {
         }
         
         
-        return resp;
-    }
-    
-    public static Response selectProductById(int company_id,int product_id) {
-        
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-  
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() +" WHERE p.company_id = c.company_id AND p.company_id = ? AND p.product_id = ?");
-            
-            pStmt.setInt(1, company_id);
-            pStmt.setInt(2, product_id);
-            ResultSet rs = pStmt.executeQuery();
-            
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-     
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
-                jsonResult.add("product", jsonProduct);
-
-                PreparedStatement stmtProductPrice = conn.prepareStatement(generateSqlQueryDetailString());
-                stmtProductPrice.setInt(1, product_id);
-                ResultSet rsProductPrice = stmtProductPrice.executeQuery();
-                JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
-                jsonResult.add("product_price", elementProductPrice);
-
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-                
-                DBOperation.close(stmtProductPrice,rsProductPrice);
-            }
-            
-            DBOperation.close(pStmt,rs);
-            
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-        return resp;
-    }
-    
-    public static Response selectProductByName(int company_id,String product_name) {
-        
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-  
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE p.company_id = c.company_id AND p.company_id = ? AND p.name LIKE ?");
-            
-            pStmt.setInt(1, company_id);
-            pStmt.setString(2, "%" + product_name + "%");
-            ResultSet rs = pStmt.executeQuery();
-            
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-     
-                JsonArray jsonResult = new JsonArray();
-                while (rs.next()) {
-                    int product_id = rs.getInt("product_id");
-
-                    // back because next
-                    rs.previous();
-
-                    JsonObject jsonRow = new JsonObject();
-                    JsonElement jsonProduct = JsonUtil.toJsonElement(rs);
-                    jsonRow.add("product", jsonProduct);
-
-                    if (product_id > 0 ) {
-                        PreparedStatement stmtProductPrice = conn.prepareStatement(generateSqlQueryDetailString());
-                        stmtProductPrice.setLong(1, product_id);
-                        ResultSet rsProductPrice = stmtProductPrice.executeQuery();
-                        JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
-                        jsonRow.add("product_price", elementProductPrice);
-                        
-                        DBOperation.close(stmtProductPrice,rsProductPrice);
-                    }
-                    jsonResult.add(jsonRow);
-                }
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-            }
-            DBOperation.close(pStmt,rs);
-            
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-        return resp;
-    }
-    
-    public static Response selectProductByCompany(int company_id) {
-        
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-  
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE p.company_id = c.company_id AND p.company_id = ?");
-            
-            pStmt.setInt(1, company_id);
-
-            ResultSet rs = pStmt.executeQuery();
-            
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-     
-                JsonArray jsonResult = new JsonArray();
-                while (rs.next()) {
-                    int product_id = rs.getInt("product_id");
-
-                    // back because next
-                    rs.previous();
-
-                    JsonObject jsonRow = new JsonObject();
-                    JsonElement jsonProduct = JsonUtil.toJsonElement(rs);
-                    jsonRow.add("product", jsonProduct);
-
-                    if (product_id > 0 ) {
-                        PreparedStatement stmtProductPrice = conn.prepareStatement(generateSqlQueryDetailString());
-                        stmtProductPrice.setLong(1, product_id);
-                        ResultSet rsProductPrice = stmtProductPrice.executeQuery();
-                        JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
-                        jsonRow.add("product_price", elementProductPrice);
-                        
-                        DBOperation.close(stmtProductPrice,rsProductPrice);
-                    }
-                    jsonResult.add(jsonRow);
-                }
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-            }
-            DBOperation.close(pStmt,rs);
-            
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-        return resp;
-    }
-
-    public static Response selectProductByCategory(int company_id,int category_id) {
-        
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-  
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQuerySTring() + " WHERE p.company_id = c.company_id AND p.company_id = ? AND p.category_id = ?");
-            
-            pStmt.setInt(1, company_id);
-            pStmt.setInt(2, category_id);
-            ResultSet rs = pStmt.executeQuery();
-            
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-     
-                JsonArray jsonResult = new JsonArray();
-                while (rs.next()) {
-                    int product_id = rs.getInt("product_id");
-
-                    // back because next
-                    rs.previous();
-
-                    JsonObject jsonRow = new JsonObject();
-                    JsonElement jsonProduct = JsonUtil.toJsonElement(rs);
-                    jsonRow.add("product", jsonProduct);
-
-                    if (product_id > 0 ) {
-                        PreparedStatement stmtProductPrice = conn.prepareStatement(generateSqlQueryDetailString());
-                        stmtProductPrice.setLong(1, product_id);
-                        ResultSet rsProductPrice = stmtProductPrice.executeQuery();
-                        JsonElement elementProductPrice = JsonUtil.toJsonArray(rsProductPrice);
-                        jsonRow.add("product_price", elementProductPrice);
-                        
-                        DBOperation.close(stmtProductPrice,rsProductPrice);
-                    }
-                    jsonResult.add(jsonRow);
-                }
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-            }
-            DBOperation.close(pStmt,rs);
-            
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
         return resp;
     }
     
