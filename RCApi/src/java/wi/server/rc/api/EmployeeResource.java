@@ -50,19 +50,13 @@ public class EmployeeResource {
             @QueryParam("expand") String expand,
             @HeaderParam("employee_id") String employee_id,
             @HeaderParam("role_id") String role_id,
-            @HeaderParam("store_id") String store_id
+            @HeaderParam("store_id") String store_id,
+            @HeaderParam("employee_name") String employee_name
             ) {
       
-        return EmployeeDataOpr.selectAllEmployee(company_id,employee_id,role_id,store_id,null,expand);
+        return EmployeeDataOpr.selectAllEmployee(company_id,employee_id,role_id,store_id,employee_name,expand);
     }
-    
-    @GET
-    @Path("/company/{company_id}/name/{employee_name}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployeesByName(@PathParam("company_id")int company_id,@PathParam("employee_name") String employee_name,@QueryParam("expand") String expand) {
-      
-        return EmployeeDataOpr.selectAllEmployee(company_id,null,null,null,employee_name,expand);
-    }    
+ 
     
     @POST
     @Path("/")

@@ -5,67 +5,71 @@
  */
 package wi.rc.server.opr;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import java.net.URLDecoder;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.net.URLDecoder;
 import javax.ws.rs.core.Response;
 import wi.core.db.DBOperation;
 import wi.core.db.DSConn;
+import wi.core.util.DateTimeUtil;
 import wi.core.util.json.JsonUtil;
 import wi.core.util.sql.SQLUtil;
 import wi.rc.server.Status;
-
 /**
  *
- * @author 10307905
+ * @author samuelatwistron
  */
-public class CategoryDataOpr {
-
+public class RoleDataOpr {
+    
     private static String generateSqlQueryString() {
 
-        String sql = "SELECT category_id, parent_category_id, company_id, name, name_4_short, description, description_4_short, \n"
-                + " option0, option1, option2, option3, option4, option5, option6, option7, option8, option9, status \n"
-                + " FROM `category` ";
+        String sql = "SELECT r.role_id AS role_id, r.company_id AS company_id, c.name AS company_name, r.name AS role_name, r.description AS description, r.status AS status \n"
+                + " FROM `role` AS r \n"
+                + " LEFT JOIN `company` AS c ON r.company_id = c.company_id ";
+        
         return sql;
     }
-
-    public static Response selectAllCategory(int company_id,String category_id,String category_name,String status) {
-
+    
+    public static Response selectAllRole(int company_id,String role_id,String role_name, String status) {
+        
         Connection conn = null;
         Response resp;
         
         String sqlString;
         int sqlCount = 1;
+        
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             
-            sqlString = generateSqlQueryString() + " WHERE company_id = ? ";
-
-            if(category_id != null){ sqlString += " AND category_id = ? ";}
-            if(category_name != null){ sqlString += " AND name LIKE ? ";}
-            if(status != null){ sqlString += " AND status = ? ";}
+            sqlString = generateSqlQueryString() + " AND r.company_id = ? ";
             
-            //DESC
-            sqlString += " ORDER BY category_id DESC";
+            //check input to add sql query string
+            if(role_id != null){ sqlString += " AND r.role_id = ? ";}
+            if(role_name != null){ sqlString += " AND r.name LIKE ? ";}
+            if(status != null){ sqlString += " AND r.status = ? ";}
             
+            //create statement and use 
             PreparedStatement pStmt = conn.prepareStatement(sqlString);
             
             pStmt.setInt(sqlCount, company_id);
             sqlCount ++;
             
-            if(category_id != null){ 
-                pStmt.setInt(sqlCount, Integer.parseInt(category_id));
+            if(role_id != null){ 
+                pStmt.setInt(sqlCount, Integer.parseInt(role_id));
                 sqlCount ++;
             }
-           
-            if(category_name != null){ 
-                pStmt.setString(sqlCount, "%" + URLDecoder.decode(category_name, "UTF-8") + "%" );
+            
+            if(role_name != null){ 
+                pStmt.setString(sqlCount, "%" + URLDecoder.decode(role_name, "UTF-8") + "%");
                 sqlCount ++;
             }
             
@@ -75,19 +79,21 @@ public class CategoryDataOpr {
             }
             
             ResultSet rs = pStmt.executeQuery();
-            
+
             if (!rs.next()) {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             } else {
                 // back to first
                 rs.previous();
-     
+                
                 JsonObject jsonResult = new JsonObject();
-                JsonElement jsonCategory = JsonUtil.toJsonArray(rs);
-                jsonResult.add("category", jsonCategory);
+                JsonElement jsonRole = JsonUtil.toJsonArray(rs);
+                jsonResult.add("role", jsonRole);
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             }
             DBOperation.close(pStmt,rs);
+            
+
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
@@ -95,18 +101,16 @@ public class CategoryDataOpr {
         } finally {
             DBOperation.close(conn);
         }
-        
+
         return resp;
     }
-
-
-    public static Response insertCategory(String jsonString) {
-
+    
+    public static Response insertRole(String jsonString) {
         Connection conn = null;
         Response resp;
         boolean ret = true;
 
-        long category_id = -1;
+        long role_id = -1;
         JsonObject jsonResult = new JsonObject();
 
         String sql = null;
@@ -115,30 +119,29 @@ public class CategoryDataOpr {
             conn.setAutoCommit(false);
 
             Map<?, ?> map = JsonUtil.toMap(jsonString);
-            Map<String, Object> mapCategory = (Map<String, Object>) map.get("category");
+            Map<String, Object> mapPos = (Map<String, Object>) map.get("role");
 
-            sql = SQLUtil.genInsertSQLString("`category`", mapCategory.keySet());
-            PreparedStatement stmtCategory = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            sql = SQLUtil.genInsertSQLString("`role`", mapPos.keySet());
+            PreparedStatement stmtPos = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 
             int count = 1;
-            for (String key : mapCategory.keySet()) {
-                Object value = mapCategory.get(key);
-                stmtCategory.setObject(count, value);
+            for (String key : mapPos.keySet()) {
+                Object value = mapPos.get(key);
+                stmtPos.setObject(count, value);
                 count++;
             }
 
-            if (stmtCategory.executeUpdate() > 0) {
+            if (stmtPos.executeUpdate() > 0) {
                 // execute success
                 // get product_id
-                ResultSet rs = stmtCategory.getGeneratedKeys();
+                ResultSet rs = stmtPos.getGeneratedKeys();
                 if (rs.next()) {
-                    category_id = rs.getLong(1);
-                    // gen result
-                    jsonResult.addProperty("category_id", category_id);
-                    DBOperation.close(rs);
-                } else {
-                    ret = false;
+                    role_id = rs.getLong(1);
                 }
+      
+                // gen result
+                jsonResult.addProperty("role_id", role_id);
+                DBOperation.close(rs);
             } else {
                 // execute failure
                 ret = false;
@@ -151,8 +154,9 @@ public class CategoryDataOpr {
             } else {
                 conn.rollback();
                 resp = Response.status(Response.Status.BAD_REQUEST).build();
-                DBOperation.close(stmtCategory);
             }
+            DBOperation.close(stmtPos);
+            
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
@@ -163,9 +167,8 @@ public class CategoryDataOpr {
 
         return resp;
     }
-
-    public static Response updateCategory(int companyId, long categoryId, String jsonString) {
-
+    
+    public static Response updateRole(int company_id,int role_id,String jsonString) {
         Response resp;
 
         Connection conn = null;
@@ -178,31 +181,29 @@ public class CategoryDataOpr {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
 
             Map<?, ?> map = JsonUtil.toMap(jsonString);
-            Map<String, Object> mapCategorySet = (Map<String, Object>) map.get("category");
-            Map<String, Object> mapCategoryWhere = new LinkedHashMap<String, Object>();
+            Map<String, Object> mapRoleSet = (Map<String, Object>) map.get("role");
+            Map<String, Object> mapRoleWhere = new LinkedHashMap<String, Object>();
 
-            mapCategoryWhere.put("category_id", categoryId);
-            mapCategoryWhere.put("company_id", companyId);
+            mapRoleWhere.put("role_id", role_id);
+            mapRoleWhere.put("company_id", company_id);
 
-            mapCategorySet.remove("category_id");// 避免Category Set statement裡面有category_id
-            mapCategorySet.remove("company_id");
+            mapRoleSet.remove("role_id");
+            mapRoleSet.remove("company_id");
+            
+            sql = SQLUtil.genUpdateSQLString("`role`", mapRoleSet, mapRoleWhere);
+            PreparedStatement stmtPos = conn.prepareStatement(sql);
 
-            sql = SQLUtil.genUpdateSQLString("`category`", mapCategorySet, mapCategoryWhere);
-            PreparedStatement stmtCategory = conn.prepareStatement(sql);
-
-            if (stmtCategory.executeUpdate() < 0) {
+            if (stmtPos.executeUpdate() < 0) {
                 ret = false;
             }
-
-            jsonResult.addProperty("category_id", categoryId);
-            DBOperation.close(stmtCategory);
-            
+            jsonResult.addProperty("role_id", role_id);
             // check ret and commit or rollback
             if (ret) {
                 resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
             } else {
                 resp = Response.status(Response.Status.BAD_REQUEST).entity(sql).build();
             }
+            DBOperation.close(stmtPos);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {
@@ -211,27 +212,25 @@ public class CategoryDataOpr {
             DBOperation.close(conn);
         }
 
-        return resp;
+        return resp; 
     }
-
-    public static Response deleteCategory(int company_id, int category_id) {
-
+    
+    public static Response deleteRole(int company_id,int role_id) {
         Response resp;
         Connection conn = null;
-
+        
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement stmtCategory = conn.prepareStatement("UPDATE `category` SET  status = ? WHERE company_id = ? AND category_id = ?");
-            stmtCategory.setString(1, Status.Deleted.getValue().toString());
-            stmtCategory.setLong(2, company_id);
-            stmtCategory.setLong(3, category_id);
-            if (stmtCategory.executeUpdate() > 0) {
+            PreparedStatement stmtRole = conn.prepareStatement("UPDATE `role` SET  status = ? WHERE company_id = ? AND role_id = ?");
+            stmtRole.setString(1, Status.Deleted.getValue().toString());
+            stmtRole.setLong(2, company_id);
+            stmtRole.setLong(3, role_id);
+            if (stmtRole.executeUpdate() > 0) {
                 resp = Response.status(Response.Status.OK).build();
             } else {
                 resp = Response.status(Response.Status.NOT_FOUND).build();
             }
-            DBOperation.close(stmtCategory);
-            
+            DBOperation.close(stmtRole);
         } catch (JsonSyntaxException | NullPointerException ex) {
             resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         } catch (Exception ex) {

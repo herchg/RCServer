@@ -37,18 +37,11 @@ public class PosResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPos(@PathParam("company_id")int company_id,
             @HeaderParam("pos_id") String pos_id,
-            @HeaderParam("store_id") String store_id
+            @HeaderParam("store_id") String store_id,
+            @HeaderParam("pos_name") String pos_name
             ) {
       
-        return PosDataOpr.selectAllPos(company_id,pos_id,store_id,null);
-    }
-    
-    @GET
-    @Path("/company/{company_id}/name/{pos_name}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getPosByName(@PathParam("company_id")int company_id,@PathParam("pos_name")String pos_name) {
-      
-        return PosDataOpr.selectAllPos(company_id,null,null,pos_name);
+        return PosDataOpr.selectAllPos(company_id,pos_id,store_id,pos_name);
     }
 
     

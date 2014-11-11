@@ -38,6 +38,7 @@ public class ApplicationConfig extends Application {
         resources.add(wi.server.rc.api.PaymentResource.class);
         resources.add(wi.server.rc.api.PosResource.class);
         resources.add(wi.server.rc.api.ProductResource.class);
+        resources.add(wi.server.rc.api.RoleResource.class);
         resources.add(wi.server.rc.api.StoreResource.class);
         resources.add(wi.server.rc.api.SystemResource.class);
     }

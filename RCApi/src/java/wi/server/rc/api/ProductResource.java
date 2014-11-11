@@ -1,5 +1,6 @@
 package wi.server.rc.api;
 
+import java.net.URLDecoder;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -13,6 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.URLEncoder;
 import wi.rc.server.opr.ProductDataOpr;
 /**
  * REST Web Service
@@ -41,22 +43,15 @@ public class ProductResource {
     @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProducts(@PathParam("company_id")int company_id,
+            @HeaderParam("product_name") String product_name,
             @HeaderParam("product_id") String product_id,
-            @HeaderParam("category_id") String category_id
+            @HeaderParam("category_id") String category_id,
+            @HeaderParam("status") String status
             ) {
-        
-        
-        return ProductDataOpr.selectAllProduct(company_id,product_id,category_id,null);
+
+        return ProductDataOpr.selectAllProduct(company_id,product_id,category_id,product_name,status);
     }
     
-    @GET
-    @Path("/company/{company_id}/name/{product_name}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProductsByName(@PathParam("company_id")int company_id,@PathParam("product_name")String product_name) {
-      
-        return ProductDataOpr.selectAllProduct(company_id,null,null,product_name);
-    }
-
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)

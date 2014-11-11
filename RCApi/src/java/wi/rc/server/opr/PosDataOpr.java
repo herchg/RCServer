@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,7 +29,7 @@ public class PosDataOpr {
     
     private static String generateSqlQueryString() {
 
-        String sql = "SELECT p.pos_id AS pos_id, p.name AS name, p.company_id AS company_id,c.name AS company_name, "
+        String sql = "SELECT p.pos_id AS pos_id, p.model AS model,p.name AS name, p.company_id AS company_id,c.name AS company_name, "
                     + " p.store_id AS store_id,s.name AS store_name, p.memo AS memo, p.status AS status \n" 
                     + " FROM `pos`  AS p \n" 
                     + " LEFT JOIN `company` AS c ON p.company_id = c.company_id \n" 
@@ -69,118 +70,10 @@ public class PosDataOpr {
             }
 
             if(pos_name != null){ 
-                pStmt.setString(sqlCount, "%" + pos_name + "%" );
+                pStmt.setString(sqlCount, "%" + URLDecoder.decode(pos_name, "UTF-8") + "%" );
                 sqlCount ++;
             }
             
-            ResultSet rs = pStmt.executeQuery();
-            
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-     
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
-                jsonResult.add("pos", jsonProduct);
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-            }
-            DBOperation.close(pStmt, rs);
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-        
-        
-        return resp;
-    } 
-    
-    public static Response selectPosById(int company_id , int pos_id) {
-        
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND p.pos_id = ?");
-            
-            pStmt.setInt(1, company_id);
-            pStmt.setInt(2, pos_id);
-            ResultSet rs = pStmt.executeQuery();
-            
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-     
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
-                jsonResult.add("pos", jsonProduct);
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-            }
-            DBOperation.close(pStmt, rs);
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-        
-        
-        return resp;
-    } 
-    
-    public static Response selectPosByStore(int company_id , int store_id) {
-        
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND p.store_id = ?");
-            
-            pStmt.setInt(1, company_id);
-            pStmt.setInt(2, store_id);
-            ResultSet rs = pStmt.executeQuery();
-            
-            if (!rs.next()) {
-                resp = Response.status(Response.Status.NOT_FOUND).build();
-            } else {
-                // back to first
-                rs.previous();
-     
-                JsonObject jsonResult = new JsonObject();
-                JsonElement jsonProduct = JsonUtil.toJsonArray(rs);
-                jsonResult.add("pos", jsonProduct);
-                resp = Response.status(Response.Status.OK).entity(jsonResult.toString()).build();
-            }
-            DBOperation.close(pStmt, rs);
-        } catch (JsonSyntaxException | NullPointerException ex) {
-            resp = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
-        } catch (Exception ex) {
-            resp = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).build();
-        } finally {
-            DBOperation.close(conn);
-        }
-        
-        
-        return resp;
-    } 
-    
-    public static Response selectPosByName(int company_id , String store_name) {
-        
-        Connection conn = null;
-        Response resp;
-        try {
-            conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
-            PreparedStatement pStmt = conn.prepareStatement(generateSqlQueryString() + "AND p.name LIKE ?");
-            
-            pStmt.setInt(1, company_id);
-            pStmt.setString(2, "%" + store_name + "%");
             ResultSet rs = pStmt.executeQuery();
             
             if (!rs.next()) {
@@ -273,7 +166,7 @@ public class PosDataOpr {
     
     public static Response updatePos(int companyId, int posId, String jsonString) {
         
-       Response resp;
+        Response resp;
 
         Connection conn = null;
         boolean ret = true;

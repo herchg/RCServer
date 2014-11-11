@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.net.URLDecoder;
 import javax.ws.rs.core.Response;
 import wi.core.db.DBOperation;
 import wi.core.db.DSConn;
@@ -29,7 +30,7 @@ import wi.rc.server.Status;
  */
 public class ProductDataOpr {
     
-    private static String generateSqlQuerySTring() {
+    private static String generateSqlQueryString() {
 
         String sql = "SELECT p.product_id AS product_id , c.company_id AS company_id, c.name AS company_name,p.name AS name, \n" 
                     + " p.name_4_short AS name_4_short  ,p.description AS description, p.description_4_short AS description_4_short, p.product_code AS product_code, \n" 
@@ -51,7 +52,7 @@ public class ProductDataOpr {
         return sql;
     }
     
-    public static Response selectAllProduct(int company_id,String product_id,String category_id,String product_name) {
+    public static Response selectAllProduct(int company_id,String product_id,String category_id,String product_name , String status) {
         
         Connection conn = null;
         Response resp;
@@ -61,12 +62,16 @@ public class ProductDataOpr {
         
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);           
-            sqlString = generateSqlQuerySTring() + " AND p.company_id = ? ";
+            sqlString = generateSqlQueryString() + " AND p.company_id = ? ";
             
             //check input to add sql query string
             if(product_id != null){ sqlString += " AND p.product_id = ? ";}
             if(product_name != null){ sqlString += " AND p.name LIKE ? ";}
             if(category_id != null){ sqlString += " AND p.category_id = ? ";}
+            if(status != null){ sqlString += " AND p.status = ? ";}
+            
+            //DESC
+            sqlString += " ORDER BY p.product_id DESC";
             
             PreparedStatement pStmt = conn.prepareStatement(sqlString);
             
@@ -79,12 +84,17 @@ public class ProductDataOpr {
             }
             
             if(product_name != null){ 
-                pStmt.setString(sqlCount, "%" + product_name + "%");
+                pStmt.setString(sqlCount, "%" + URLDecoder.decode(product_name, "UTF-8") + "%");
                 sqlCount ++;
             }
             
             if(category_id != null){ 
                 pStmt.setInt(sqlCount, Integer.parseInt(category_id));
+                sqlCount ++;
+            }
+            
+            if(status != null){ 
+                pStmt.setString(sqlCount, status);
                 sqlCount ++;
             }
 
