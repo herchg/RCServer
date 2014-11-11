@@ -5,9 +5,11 @@
  */
 package wi.server.rc.api;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -77,14 +79,24 @@ public class EmployeeResource {
         
         return EmployeeDataOpr.loginEmployee(jsonEmployeeSet);
     }
-     
+    /*
+    @POST
+    @Path("/upload")
+    @Consumes(MediaType.TEXT_HTML)
+    public Response test(@FormParam("image")String image) {
+        
+        String res = image;
+        
+        return Response.ok(res).build();
+    }
+    */
     @PUT
     @Path("/{employee_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateEmployee(@PathParam("company_id")int company_id, @PathParam("employee_id")int employee_id, String jsonEmployeeSet) {
          
         return EmployeeDataOpr.updateEmployee(company_id, employee_id, jsonEmployeeSet);
-    }
+    } 
     
     @DELETE
     @Path("/{employee_id}/company/{company_id}")
