@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -84,7 +85,7 @@ public class EmployeeDataOpr {
             }
             
             if(employee_name != null){ 
-                pStmt.setString(sqlCount, "%" + employee_name + "%" );
+                pStmt.setString(sqlCount, "%" + URLDecoder.decode(employee_name, "UTF-8") + "%" );
                 sqlCount ++;
             }
             

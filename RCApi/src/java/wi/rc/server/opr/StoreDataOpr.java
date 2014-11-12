@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,8 +29,8 @@ public class StoreDataOpr {
     
     private static String generateSqlQueryString() {
 
-        String sql = "SELECT s.store_id AS store_id, s.name AS name, s.contact AS contact, "
-                    + " s.tel AS tel, s.mobile AS mobile,  s.email AS email, s.memo AS memo, s.status AS status, s.company_id AS company_id, "
+        String sql = "SELECT s.store_id AS store_id, s.name AS name, s.contact AS contact, s.tel AS tel, s.mobile AS mobile,  s.email AS email,"
+                    + " s.address AS address, s.business_id AS business_id,s.memo AS memo, s.status AS status, s.company_id AS company_id, "
                     + "c.name AS company_name,s.manager_employee_id AS manager_employee_id ,e.name AS manager_name\n" 
                     + " FROM `store` AS s \n" 
                     + " LEFT JOIN `company` AS c ON s.company_id = c.company_id \n" 
@@ -66,7 +67,7 @@ public class StoreDataOpr {
             }
             
             if(store_name != null){ 
-                pStmt.setString(sqlCount, "%" + store_name + "%" );
+                pStmt.setString(sqlCount, "%" + URLDecoder.decode(store_name, "UTF-8") + "%" );
                 sqlCount ++;
             }
             
@@ -76,7 +77,7 @@ public class StoreDataOpr {
             }
             
             if(employee_name != null){ 
-                pStmt.setString(sqlCount, "%" + employee_name + "%" );
+                pStmt.setString(sqlCount, "%" + URLDecoder.decode(employee_name, "UTF-8") + "%" );
                 sqlCount ++;
             }
 
