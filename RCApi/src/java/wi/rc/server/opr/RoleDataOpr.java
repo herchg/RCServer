@@ -50,7 +50,7 @@ public class RoleDataOpr {
         try {
             conn = DSConn.getConnection(wi.rc.server.Properties.DS_RC);
             
-            sqlString = generateSqlQueryString() + " AND r.company_id = ? ";
+            sqlString = generateSqlQueryString() + " WHERE r.company_id = ? ";
             
             //check input to add sql query string
             if(role_id != null){ sqlString += " AND r.role_id = ? ";}
