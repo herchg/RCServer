@@ -5,6 +5,10 @@
  */
 package wi.server.rc.api;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -21,6 +25,7 @@ import javax.ws.rs.core.Response;
 import wi.rc.server.opr.PaymentDataOpr;
 
 @Path("payment")
+@Api(value = "payment", description = "Operations about payment")
 public class PaymentResource {
 
     @Context
@@ -35,6 +40,17 @@ public class PaymentResource {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Get payment",
+            notes = "Payment",
+            response = Response.class
+    )
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Got results"),
+        @ApiResponse(code = 404, message = "Not found"),
+        @ApiResponse(code = 500, message = "Internal server error"),
+        @ApiResponse(code = 400, message = "Bad request")
+    })
     public Response getPayments() {
       
         return PaymentDataOpr.selectAllPayments();

@@ -5,6 +5,11 @@
  */
 package wi.server.rc.api;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.PathParam;
@@ -25,6 +30,7 @@ import wi.rc.server.opr.StoreDataOpr;
  * @author 10307905
  */
 @Path("store")
+@Api(value = "store", description = "Operations about store")
 public class StoreResource {
 
     @Context
@@ -39,10 +45,22 @@ public class StoreResource {
     @GET
     @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getStores(@PathParam("company_id")int company_id,
-            @HeaderParam("store_id") String store_id,
-            @HeaderParam("employee_id") String employee_id,
-            @HeaderParam("store_name") String store_name
+    @ApiOperation(
+            value = "Get store",
+            notes = "Store",
+            response = Response.class
+    )
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Got results"),
+        @ApiResponse(code = 404, message = "Not found"),
+        @ApiResponse(code = 500, message = "Internal server error"),
+        @ApiResponse(code = 400, message = "Bad request")
+    })
+    public Response getStores(
+            @ApiParam(value = "company id", required = true) @PathParam("company_id")int company_id,
+            @ApiParam(value = "store id", required = false) @HeaderParam("store_id") String store_id,
+            @ApiParam(value = "employee id", required = false) @HeaderParam("employee_id") String employee_id,
+            @ApiParam(value = "store name", required = false) @HeaderParam("store_name") String store_name
             ) {
       
         return StoreDataOpr.selectAllStore(company_id,store_id,store_name,employee_id,null);
@@ -51,6 +69,16 @@ public class StoreResource {
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Create a store",
+            notes = "Create a store",
+            response = Response.class
+    )
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "Created"),
+        @ApiResponse(code = 500, message = "Internal server error"),
+        @ApiResponse(code = 400, message = "Bad request")
+    })
     public Response createStore(String jsonStoreSet) {
         
         return StoreDataOpr.insertStore(jsonStoreSet);
@@ -59,7 +87,21 @@ public class StoreResource {
     @PUT
     @Path("{store_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateStore(@PathParam("company_id")int company_id, @PathParam("store_id")int store_id, String jsonStoreSet) {
+    @ApiOperation(
+            value = "Update a store",
+            notes = "Update a store",
+            response = Response.class
+    )
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found"),
+        @ApiResponse(code = 500, message = "Internal server error"),
+        @ApiResponse(code = 400, message = "Bad request")
+    })
+    public Response updateStore(
+            @ApiParam(value = "company id", required = true) @PathParam("company_id")int company_id,
+            @ApiParam(value = "store id", required = true) @HeaderParam("store_id") int store_id,
+            String jsonStoreSet) {
         
         return StoreDataOpr.updateStore(company_id, store_id, jsonStoreSet);
     }
@@ -67,8 +109,21 @@ public class StoreResource {
     @DELETE
     @Path("{store_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteStore(@PathParam("company_id")int company_id,@PathParam("store_id")int store_id) {
+    @ApiOperation(
+            value = "delete a store",
+            notes = "delete a store",
+            response = Response.class
+    )
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found"),
+        @ApiResponse(code = 500, message = "Internal server error"),
+        @ApiResponse(code = 400, message = "Bad request")
+    })
+    public Response deleteStore(
+            @ApiParam(value = "company id", required = true) @PathParam("company_id")int company_id,
+            @ApiParam(value = "store id", required = true) @HeaderParam("store_id") int store_id) {
         
-        return StoreDataOpr.deleteStore(company_id,store_id);
+        return StoreDataOpr.deleteStore(company_id, store_id);
     }
 }

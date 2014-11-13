@@ -31,9 +31,6 @@ public class OrderResource {
     public OrderResource() {
     }
 
-    /**
-     * Get all orders 
-     */
     @GET
     @Path("/company/{company_id}")
     @Produces("application/json")

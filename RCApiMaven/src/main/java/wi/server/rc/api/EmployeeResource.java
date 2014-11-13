@@ -5,6 +5,11 @@
  */
 package wi.server.rc.api;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -27,6 +32,7 @@ import wi.rc.server.opr.EmployeeDataOpr;
  * @author 10307905
  */
 @Path("employee")
+@Api(value = "employee", description = "Operations about employee")
 public class EmployeeResource {
 
     @Context
@@ -38,23 +44,31 @@ public class EmployeeResource {
     public EmployeeResource() {
     }
 
-    /**
-     * Retrieves representation of an instance of wi.server.rc.api.EmployeeResource
-     * @return an instance of java.lang.String
-     */
-
     @GET
     @Path("/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEmployees(@PathParam("company_id")int company_id,
-            @QueryParam("expand") String expand,
-            @HeaderParam("employee_id") String employee_id,
-            @HeaderParam("role_id") String role_id,
-            @HeaderParam("store_id") String store_id,
-            @HeaderParam("employee_name") String employee_name
+    @ApiOperation(
+            value = "Get employee",
+            notes = "Employee",
+            response = Response.class
+    )
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Got results"),
+        @ApiResponse(code = 404, message = "Not found"),
+        @ApiResponse(code = 500, message = "Internal server error"),
+        @ApiResponse(code = 400, message = "Bad request")
+    })
+    public Response getEmployees(
+            @ApiParam(value = "company id", required = true) @PathParam("company_id")int company_id,
+            @ApiParam(value = "expand", required = false) @QueryParam("expand") String expand,
+            @ApiParam(value = "employee id", required = false) @HeaderParam("employee_id") String employee_id,
+            @ApiParam(value = "role id", required = false) @HeaderParam("role_id") String role_id,
+            @ApiParam(value = "store id", required = false) @HeaderParam("store_id") String store_id,
+            @ApiParam(value = "employee name", required = false) @HeaderParam("employee_name") String employee_name,
+            @ApiParam(value = "status", required = false) @HeaderParam("status") String status
             ) {
       
-        return EmployeeDataOpr.selectAllEmployee(company_id,employee_id,role_id,store_id,employee_name,expand);
+        return EmployeeDataOpr.selectAllEmployee(company_id,employee_id,role_id,store_id,employee_name,status,expand);
     }
  
     
@@ -69,6 +83,16 @@ public class EmployeeResource {
     @POST
     @Path("/login")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(
+            value = "Create a employee",
+            notes = "Create a employee",
+            response = Response.class
+    )
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "Created"),
+        @ApiResponse(code = 500, message = "Internal server error"),
+        @ApiResponse(code = 400, message = "Bad request")
+    })
     public Response loginEmployee(String jsonEmployeeSet) {
         
         return EmployeeDataOpr.loginEmployee(jsonEmployeeSet);
@@ -87,7 +111,21 @@ public class EmployeeResource {
     @PUT
     @Path("/{employee_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateEmployee(@PathParam("company_id")int company_id, @PathParam("employee_id")int employee_id, String jsonEmployeeSet) {
+    @ApiOperation(
+            value = "Update a employee",
+            notes = "Update a employee",
+            response = Response.class
+    )
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found"),
+        @ApiResponse(code = 500, message = "Internal server error"),
+        @ApiResponse(code = 400, message = "Bad request")
+    })
+    public Response updateEmployee(
+            @ApiParam(value = "company id", required = true) @PathParam("company_id")int company_id, 
+            @ApiParam(value = "employee id", required = true) @PathParam("employee_id")int employee_id, 
+            String jsonEmployeeSet) {
          
         return EmployeeDataOpr.updateEmployee(company_id, employee_id, jsonEmployeeSet);
     } 
@@ -95,7 +133,20 @@ public class EmployeeResource {
     @DELETE
     @Path("/{employee_id}/company/{company_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteEmployee(@PathParam("company_id")int company_id, @PathParam("employee_id")int employee_id) {
+    @ApiOperation(
+            value = "delete a employee",
+            notes = "delete a employee",
+            response = Response.class
+    )
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found"),
+        @ApiResponse(code = 500, message = "Internal server error"),
+        @ApiResponse(code = 400, message = "Bad request")
+    })
+    public Response deleteEmployee(
+            @ApiParam(value = "company id", required = true) @PathParam("company_id")int company_id, 
+            @ApiParam(value = "employee id", required = true) @PathParam("employee_id")int employee_id) {
         
         return EmployeeDataOpr.deleteEmployee(company_id, employee_id);
     }

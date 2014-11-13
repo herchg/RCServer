@@ -55,7 +55,7 @@ public class CategoryResource {
         @ApiResponse(code = 500, message = "Internal server error"),
         @ApiResponse(code = 400, message = "Bad request")
     })
-    public Response getAllCategorys(
+    public Response getAllCategories(
             @ApiParam(value = "company id", required = true) @PathParam("company_id") int company_id,
             @ApiParam(value = "category id", required = false) @HeaderParam("category_id") String category_id,
             @ApiParam(value = "category name", required = false) @HeaderParam("category_name") String category_name,
