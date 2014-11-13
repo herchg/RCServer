@@ -51,10 +51,11 @@ public class EmployeeResource {
             @HeaderParam("employee_id") String employee_id,
             @HeaderParam("role_id") String role_id,
             @HeaderParam("store_id") String store_id,
-            @HeaderParam("employee_name") String employee_name
+            @HeaderParam("employee_name") String employee_name,
+            @HeaderParam("status") String status
             ) {
       
-        return EmployeeDataOpr.selectAllEmployee(company_id,employee_id,role_id,store_id,employee_name,expand);
+        return EmployeeDataOpr.selectAllEmployee(company_id,employee_id,role_id,store_id,employee_name,status,expand);
     }
  
     

@@ -47,7 +47,7 @@ public class EmployeeDataOpr {
         return sql;
     }
 
-    public static Response selectAllEmployee(int company_id,String employee_id,String role_id,String store_id,String employee_name,String expand) {
+    public static Response selectAllEmployee(int company_id,String employee_id,String role_id,String store_id,String employee_name,String status,String expand) {
 
         Response resp;
         Connection conn = null;
@@ -63,6 +63,7 @@ public class EmployeeDataOpr {
             if(role_id != null){ sqlString += " AND e.role_id = ? ";}
             if(store_id != null){ sqlString += " AND e.store_id = ? ";}
             if(employee_name != null){ sqlString += " AND e.name LIKE ? ";}
+            if(status != null){ sqlString += " AND e.status = ? ";}
             
             PreparedStatement pStmt = conn.prepareStatement(sqlString);
             
@@ -86,6 +87,11 @@ public class EmployeeDataOpr {
             
             if(employee_name != null){ 
                 pStmt.setString(sqlCount, "%" + URLDecoder.decode(employee_name, "UTF-8") + "%" );
+                sqlCount ++;
+            }
+            
+            if(status != null){ 
+                pStmt.setString(sqlCount, status);
                 sqlCount ++;
             }
             
